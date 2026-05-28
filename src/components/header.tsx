@@ -91,7 +91,13 @@ function TransactionsButton({
       </svg>
       <span className="hidden sm:inline text-xs">Transactions</span>
       {transactions.length > 0 && (
-        <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-semibold text-black sm:static sm:ml-1.5 sm:size-auto sm:rounded-full sm:px-1.5 sm:py-0.5">
+        <span
+          className={`absolute -right-1 -top-1 inline-flex shrink-0 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-semibold tabular-nums leading-none text-black sm:static sm:ml-1.5 ${
+            transactions.length > 9
+              ? "h-4 min-w-[1.125rem] px-1 sm:h-5 sm:min-w-[1.375rem]"
+              : "size-4 sm:size-5"
+          }`}
+        >
           {transactions.length > 9 ? "9+" : transactions.length}
         </span>
       )}
