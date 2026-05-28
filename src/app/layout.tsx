@@ -17,8 +17,12 @@ export const metadata: Metadata = {
   title: "Celina Agent",
   description: "Chat with Celina — your Celo wallet assistant",
   icons: {
-    icon: CELINA_LOGO_PATH,
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: CELINA_LOGO_PATH, type: "image/png" },
+    ],
     apple: CELINA_LOGO_PATH,
+    shortcut: "/favicon.ico",
   },
 };
 
