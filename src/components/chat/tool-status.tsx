@@ -3,6 +3,10 @@
 import { getToolName, isToolUIPart, type UIMessage } from "ai";
 import { BalanceCard } from "@/components/balance-card";
 import { getToolLabels } from "@/components/chat/tool-labels";
+import {
+  getToolErrorTone,
+  TOOL_ERROR_TONE_CLASS,
+} from "@/components/chat/tool-error-tone";
 import { parseToolBalanceRows } from "@/lib/balances";
 import { formatHumanFlowText } from "@/lib/format-human-flow-text";
 
@@ -87,10 +91,11 @@ export function ToolStatus({
   }
 
   if (part.state === "output-error") {
+    const errorText = part.errorText ?? `${labels.done} failed`;
+    const tone = getToolErrorTone(errorText);
+
     return (
-      <p className="rounded-xl border border-red-500/25 bg-red-500/10 px-3 py-2 text-xs text-red-300">
-        {part.errorText ?? `${labels.done} failed`}
-      </p>
+      <p className={TOOL_ERROR_TONE_CLASS[tone]}>{errorText}</p>
     );
   }
 

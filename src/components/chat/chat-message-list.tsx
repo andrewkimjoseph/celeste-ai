@@ -3,9 +3,10 @@
 import type { ChatStatus, UIMessage } from "ai";
 import { useEffect, useRef } from "react";
 import { AssistantLoading } from "@/components/chat/assistant-loading";
-import { ChatMessage } from "@/components/chat/chat-message";
+import { ChatTurnRow } from "@/components/chat/chat-turn-row";
 import {
   extractRecipientLabel,
+  groupMessagesIntoTurns,
   shouldShowAssistantLoading,
 } from "@/components/chat/chat-utils";
 import type { SerializedPreparedFlow } from "@/lib/prepared-flow";
@@ -78,6 +79,11 @@ export function ChatMessageList({
   const isLandingView =
     (showEmptyState || showConnectPrompt) && !showLoading && !showTxCard;
   const recipientLabel = extractRecipientLabel(messages);
+  const turns = groupMessagesIntoTurns(messages);
+  const pendingTurnIndex =
+    showLoading && turns.at(-1)?.user && !turns.at(-1)?.assistant
+      ? turns.length - 1
+      : -1;
 
   return (
     <div
@@ -86,8 +92,10 @@ export function ChatMessageList({
       }`}
     >
       <div
-        className={`px-3 py-4 sm:px-6 sm:py-5 ${
-          isLandingView ? "mx-auto w-full max-w-2xl" : "space-y-5 sm:space-y-6"
+        className={`w-full py-4 sm:py-5 ${
+          isLandingView
+            ? "mx-auto max-w-2xl px-3 sm:px-6"
+            : "space-y-6 px-4 sm:space-y-8 sm:px-5"
         }`}
       >
       {showConnectPrompt && (
@@ -152,15 +160,20 @@ export function ChatMessageList({
         </div>
       )}
 
-      {messages.map((message) => (
-        <ChatMessage
-          key={message.id}
-          message={message}
+      {turns.map((turn, index) => (
+        <ChatTurnRow
+          key={turn.id}
+          turn={turn}
           hidePrepareToolDone={showTxCard}
+          showLoading={index === pendingTurnIndex}
         />
       ))}
 
-      {showLoading && <AssistantLoading />}
+      {showLoading && pendingTurnIndex === -1 && (
+        <div className="md:w-1/2 md:pr-4 lg:pr-6">
+          <AssistantLoading />
+        </div>
+      )}
 
       {showTxCard && latestFlow && (
         <TxConfirmCard

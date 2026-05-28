@@ -1,5 +1,41 @@
 import { isTextUIPart, isToolUIPart, type ChatStatus, type UIMessage } from "ai";
 
+export type ChatTurn = {
+  id: string;
+  user?: UIMessage;
+  assistant?: UIMessage;
+};
+
+export function groupMessagesIntoTurns(messages: UIMessage[]): ChatTurn[] {
+  const turns: ChatTurn[] = [];
+  let pendingUser: UIMessage | undefined;
+
+  for (const message of messages) {
+    if (message.role === "user") {
+      if (pendingUser) {
+        turns.push({ id: pendingUser.id, user: pendingUser });
+      }
+      pendingUser = message;
+      continue;
+    }
+
+    if (message.role === "assistant") {
+      turns.push({
+        id: `${pendingUser?.id ?? message.id}-turn`,
+        user: pendingUser,
+        assistant: message,
+      });
+      pendingUser = undefined;
+    }
+  }
+
+  if (pendingUser) {
+    turns.push({ id: pendingUser.id, user: pendingUser });
+  }
+
+  return turns;
+}
+
 export function formatChatError(message: string): string {
   try {
     const parsed = JSON.parse(message) as { error?: string };

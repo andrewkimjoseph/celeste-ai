@@ -1,6 +1,7 @@
 "use client";
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { CelinaLogoAvatar } from "@/components/celina-logo";
 import { CELINA_SDK_DOCS_URL } from "@/lib/links";
 import { useMounted } from "@/hooks/use-mounted";
 import { useTransactions } from "@/hooks/use-transactions";
@@ -109,12 +110,11 @@ export function Header({
     <header className="border-b border-[var(--surface-2)] bg-[var(--surface-0)]/80 px-3 py-2.5 backdrop-blur-md sm:px-4 sm:py-3">
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
-          <div
-            className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--accent)]/20 to-emerald-900/20 text-sm font-bold text-[var(--accent-hover)] ring-1 ring-emerald-500/20 sm:size-9 sm:rounded-lg"
-            aria-hidden
-          >
-            C
-          </div>
+          <CelinaLogoAvatar
+            size="md"
+            shape="squircle"
+            className="shadow-sm ring-1 ring-emerald-500/20"
+          />
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 sm:gap-2">
               <h1 className="truncate text-base font-semibold text-white sm:text-lg">

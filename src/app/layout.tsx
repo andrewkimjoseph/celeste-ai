@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { CELINA_LOGO_PATH } from "@/components/celina-logo";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -15,6 +16,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Celina Agent",
   description: "Chat with Celina — your Celo wallet assistant",
+  icons: {
+    icon: CELINA_LOGO_PATH,
+    apple: CELINA_LOGO_PATH,
+  },
 };
 
 export const viewport: Viewport = {

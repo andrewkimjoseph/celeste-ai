@@ -1,11 +1,13 @@
 "use client";
 
 import type { UIMessage } from "ai";
+import { CelinaLogoAvatar } from "@/components/celina-logo";
 import { MessagePart } from "@/components/chat/message-part";
 
 interface ChatMessageProps {
   message: UIMessage;
   hidePrepareToolDone?: boolean;
+  align?: "start" | "end";
 }
 
 function UserAvatar() {
@@ -30,24 +32,37 @@ function UserAvatar() {
 export function ChatMessage({
   message,
   hidePrepareToolDone = false,
+  align,
 }: ChatMessageProps) {
   const isUser = message.role === "user";
+  const messageAlign = align ?? (isUser ? "end" : "start");
 
   return (
     <div
-      className={`group flex gap-2.5 sm:gap-3 ${isUser ? "flex-row-reverse" : "flex-row"}`}
+      className={`group flex gap-2.5 sm:gap-3 ${
+        messageAlign === "end"
+          ? "ml-auto w-fit max-w-full flex-row-reverse"
+          : "w-full flex-row"
+      }`}
     >
+      {isUser ? (
+        <div
+          className="mt-1 flex size-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 shadow-sm ring-2 ring-emerald-400/20 sm:size-8"
+          aria-label="You"
+        >
+          <UserAvatar />
+        </div>
+      ) : (
+        <CelinaLogoAvatar
+          size="sm"
+          className="mt-1 shadow-sm ring-2 ring-emerald-500/15"
+        />
+      )}
       <div
-        className={`mt-1 flex size-7 shrink-0 items-center justify-center rounded-full shadow-sm sm:size-8 ${
-          isUser
-            ? "bg-gradient-to-br from-emerald-500 to-emerald-700 ring-2 ring-emerald-400/20"
-            : "bg-gradient-to-br from-zinc-800 to-zinc-900 text-[11px] font-semibold text-emerald-300 ring-2 ring-emerald-500/15"
+        className={`min-w-0 ${
+          messageAlign === "end" ? "w-fit max-w-full" : "min-w-0 flex-1"
         }`}
-        aria-label={isUser ? "You" : "Celina"}
       >
-        {isUser ? <UserAvatar /> : "C"}
-      </div>
-      <div className={`min-w-0 flex-1 ${isUser ? "max-w-[88%] sm:max-w-[82%]" : "max-w-[94%]"}`}>
         <p
           className={`mb-1.5 text-[11px] font-medium tracking-wide ${
             isUser ? "sr-only" : "text-zinc-500"

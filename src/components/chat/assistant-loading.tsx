@@ -1,15 +1,15 @@
 "use client";
 
+import { CelinaLogoAvatar } from "@/components/celina-logo";
+
 export function AssistantLoading() {
   return (
-    <div className="flex gap-3">
-      <div
-        className="mt-1 flex size-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-zinc-800 to-zinc-900 text-[11px] font-semibold text-emerald-300 ring-2 ring-emerald-500/15"
-        aria-hidden
-      >
-        C
-      </div>
-      <div className="min-w-0 max-w-[94%]">
+    <div className="flex w-full gap-3">
+      <CelinaLogoAvatar
+        size="sm"
+        className="mt-1 shadow-sm ring-2 ring-emerald-500/15"
+      />
+      <div className="min-w-0 flex-1">
         <p className="mb-1.5 text-[11px] font-medium tracking-wide text-zinc-500">
           Celina
         </p>
