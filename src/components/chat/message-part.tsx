@@ -5,6 +5,7 @@ import {
   type MessageTextVariant,
 } from "@/components/chat/format-message-text";
 import { isTextUIPart, isToolUIPart, type UIMessage } from "ai";
+import { StreamingCursor } from "@/components/chat/streaming-cursor";
 import { ToolStatus } from "@/components/chat/tool-status";
 import { useTransactions } from "@/hooks/use-transactions";
 
@@ -28,20 +29,26 @@ export function MessagePart({
       return null;
     }
 
+    const isStreaming = part.state === "streaming";
+
     return (
       <div
         className={`space-y-3 text-[0.9375rem] leading-[1.65] ${
           variant === "user" ? "text-white" : "text-zinc-100"
         }`}
       >
-        {formatMessageText(part.text, {
-          variant,
-          onHashClick: (hash) => {
-            void openTransactionByHash(hash);
-          },
-        })}
-        {part.state === "streaming" && (
-          <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse rounded-full bg-[var(--accent-hover)] align-middle" />
+        {isStreaming ? (
+          <p className="streaming-text whitespace-pre-wrap leading-[1.65]">
+            {part.text}
+            <StreamingCursor />
+          </p>
+        ) : (
+          formatMessageText(part.text, {
+            variant,
+            onHashClick: (hash) => {
+              void openTransactionByHash(hash);
+            },
+          })
         )}
       </div>
     );

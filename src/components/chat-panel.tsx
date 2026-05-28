@@ -31,7 +31,7 @@ export function ChatPanel({
   const mounted = mountedProp ?? mountedInternal;
   const isConnected = isConnectedProp ?? false;
   const canChat = mounted && isConnected && Boolean(address);
-  const { addTransaction, openDrawer } = useTransactions();
+  const { addTransaction } = useTransactions();
   const [input, setInput] = useState("");
   const [dismissedFlowKey, setDismissedFlowKey] = useState<string | null>(null);
 
@@ -101,8 +101,6 @@ export function ChatPanel({
                 summary: flowMeta.flow.summary,
                 steps: flowMeta.flow.steps.map((step) => step.description),
                 status: "confirmed",
-              }).then(() => {
-                openDrawer();
               });
             }
 

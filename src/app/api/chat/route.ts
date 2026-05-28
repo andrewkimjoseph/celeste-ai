@@ -2,7 +2,7 @@
  * Streaming chat API — requires a connected wallet address in the request body.
  * Tools call celina-sdk for reads and prepare* flows; signing happens client-side.
  */
-import { convertToModelMessages, stepCountIs, streamText, UIMessage } from "ai";
+import { convertToModelMessages, smoothStream, stepCountIs, streamText, UIMessage } from "ai";
 import { isAddress } from "viem";
 import { assertChatApiKeyConfigured, getChatModel } from "@/lib/chat-model";
 import { createChatTools, SYSTEM_PROMPT } from "@/lib/chat-tools";
@@ -42,6 +42,10 @@ export async function POST(req: Request) {
     messages: await convertToModelMessages(messages),
     tools: createChatTools(celina, walletAddress),
     stopWhen: stepCountIs(3),
+    experimental_transform: smoothStream({
+      delayInMs: 52,
+      chunking: "word",
+    }),
   });
 
   return result.toUIMessageStreamResponse({ originalMessages: messages });

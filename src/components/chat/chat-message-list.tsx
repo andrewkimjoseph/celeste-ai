@@ -3,6 +3,7 @@
 import type { ChatStatus, UIMessage } from "ai";
 import { useEffect, useRef } from "react";
 import { AssistantLoading } from "@/components/chat/assistant-loading";
+import { AssistantColumn, AssistantMessageSlot } from "@/components/chat/assistant-message-slot";
 import { ChatTurnRow } from "@/components/chat/chat-turn-row";
 import {
   extractRecipientLabel,
@@ -68,11 +69,30 @@ export function ChatMessageList({
   onTxReject,
 }: ChatMessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const showLoading = shouldShowAssistantLoading(status, messages);
+  const isStreaming = status === "streaming";
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, status, showTxCard, showLoading]);
+    const container = scrollContainerRef.current;
+    const bottom = bottomRef.current;
+    if (!container || !bottom) {
+      return;
+    }
+
+    const distanceFromBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight;
+    const shouldStickToBottom = distanceFromBottom < 120;
+
+    if (!shouldStickToBottom && !showLoading && !isStreaming) {
+      return;
+    }
+
+    bottom.scrollIntoView({
+      behavior: isStreaming ? "auto" : "smooth",
+      block: "end",
+    });
+  }, [messages, status, showTxCard, showLoading, isStreaming]);
 
   const showEmptyState = mounted && isConnected && messages.length === 0;
   const showConnectPrompt = mounted && !isConnected && messages.length === 0;
@@ -87,6 +107,7 @@ export function ChatMessageList({
 
   return (
     <div
+      ref={scrollContainerRef}
       className={`flex-1 overflow-y-auto overscroll-contain ${
         isLandingView ? "flex min-h-0 flex-col justify-center" : ""
       }`}
@@ -176,13 +197,17 @@ export function ChatMessageList({
       )}
 
       {showTxCard && latestFlow && (
-        <TxConfirmCard
-          summary={latestFlow.summary}
-          steps={latestFlow.steps}
-          recipientLabel={recipientLabel}
-          onComplete={onTxComplete}
-          onDismiss={onTxReject}
-        />
+        <AssistantColumn>
+          <AssistantMessageSlot showAvatar={false} showLabel={false}>
+            <TxConfirmCard
+              summary={latestFlow.summary}
+              steps={latestFlow.steps}
+              recipientLabel={recipientLabel}
+              onComplete={onTxComplete}
+              onDismiss={onTxReject}
+            />
+          </AssistantMessageSlot>
+        </AssistantColumn>
       )}
 
       {errorMessage && (
