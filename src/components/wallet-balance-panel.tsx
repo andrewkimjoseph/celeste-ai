@@ -240,7 +240,7 @@ export function WalletBalancePanel({
 
   if (!isConnected || !address) {
     return (
-      <aside className="hidden w-72 shrink-0 border-r border-[var(--surface-2)] bg-[var(--surface-1)]/50 p-4 lg:flex lg:flex-col">
+      <aside className="hidden h-full min-h-0 w-72 shrink-0 flex-col overflow-y-auto border-r border-[var(--surface-2)] bg-[var(--surface-1)]/50 p-4 lg:flex">
         <p className="text-xs text-zinc-500">
           Connect your wallet to view balances.
         </p>
@@ -249,7 +249,7 @@ export function WalletBalancePanel({
   }
 
   return (
-    <aside className="hidden w-72 shrink-0 flex-col overflow-y-auto border-r border-[var(--surface-2)] bg-[var(--surface-1)]/50 p-4 lg:flex">
+    <aside className="hidden h-full min-h-0 w-72 shrink-0 flex-col overflow-y-auto border-r border-[var(--surface-2)] bg-[var(--surface-1)]/50 p-4 lg:flex">
       <PanelBody
         address={address}
         includeZero={includeZero}

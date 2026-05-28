@@ -7,7 +7,13 @@ import {
   addressSchema,
   resolveTargetAddress,
 } from "@/lib/chat-tools/schemas";
+import {
+  AAVE_TOKEN_SYMBOLS,
+  normalizeAaveTokenInput,
+} from "@/lib/aave-token";
 import { checkSendPreflight } from "@/lib/send-preflight";
+
+const aaveTokenDescription = `Aave asset symbol on Celo (${AAVE_TOKEN_SYMBOLS.join(", ")}). Pass the symbol only — never a contract address from balance results.`;
 
 type CelinaClient = ReturnType<typeof createCelinaClient>;
 
@@ -79,30 +85,32 @@ export function createWriteTools(
 
     prepare_aave_supply: tool({
       description:
-        "Prepare unsigned Aave V3 supply steps on Celo. User must sign in wallet.",
+        "Prepare unsigned Aave V3 supply steps on Celo. User must sign in wallet. Pass token symbol only.",
       inputSchema: z.object({
-        token: z.string(),
+        token: z.string().describe(aaveTokenDescription),
         amount: z.string(),
         from: addressSchema.optional(),
       }),
       execute: async ({ token, amount, from }) => {
         const sender = resolveTargetAddress(connectedAddress, from);
-        return celina.aave.prepareSupply(sender, token, amount);
+        const symbol = normalizeAaveTokenInput(celina, token);
+        return celina.aave.prepareSupply(sender, symbol, amount);
       },
     }),
 
     prepare_aave_withdraw: tool({
       description:
-        "Prepare unsigned Aave V3 withdraw on Celo. User must sign in wallet.",
+        "Prepare unsigned Aave V3 withdraw on Celo. User must sign in wallet. Pass token symbol only.",
       inputSchema: z.object({
-        token: z.string(),
+        token: z.string().describe(aaveTokenDescription),
         amount: z.string().optional(),
         withdraw_max: z.boolean().optional(),
         from: addressSchema.optional(),
       }),
       execute: async ({ token, amount, withdraw_max, from }) => {
         const sender = resolveTargetAddress(connectedAddress, from);
-        return celina.aave.prepareWithdraw(sender, token, amount, withdraw_max);
+        const symbol = normalizeAaveTokenInput(celina, token);
+        return celina.aave.prepareWithdraw(sender, symbol, amount, withdraw_max);
       },
     }),
   };

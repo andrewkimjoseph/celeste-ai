@@ -74,11 +74,23 @@ export function ChatMessageList({
   }, [messages, status, showTxCard, showLoading]);
 
   const showEmptyState = mounted && isConnected && messages.length === 0;
+  const showConnectPrompt = mounted && !isConnected && messages.length === 0;
+  const isLandingView =
+    (showEmptyState || showConnectPrompt) && !showLoading && !showTxCard;
   const recipientLabel = extractRecipientLabel(messages);
 
   return (
-    <div className="flex-1 space-y-5 overflow-y-auto overscroll-contain px-3 py-4 sm:space-y-6 sm:px-6 sm:py-5">
-      {mounted && !isConnected && (
+    <div
+      className={`flex-1 overflow-y-auto overscroll-contain ${
+        isLandingView ? "flex min-h-0 flex-col justify-center" : ""
+      }`}
+    >
+      <div
+        className={`px-3 py-4 sm:px-6 sm:py-5 ${
+          isLandingView ? "mx-auto w-full max-w-2xl" : "space-y-5 sm:space-y-6"
+        }`}
+      >
+      {showConnectPrompt && (
         <div className="rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)]/60 px-4 py-6 text-center">
           <p className="text-sm text-zinc-300">Connect your wallet to start chatting with Celina.</p>
           <p className="mt-1 text-xs text-zinc-500">
@@ -167,6 +179,7 @@ export function ChatMessageList({
       )}
 
       <div ref={bottomRef} aria-hidden className="h-px shrink-0" />
+      </div>
     </div>
   );
 }

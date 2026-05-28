@@ -97,7 +97,8 @@ export function createReadTools(
     }),
 
     get_token_info: tool({
-      description: "Returns metadata for a known or custom ERC-20 token on mainnet.",
+      description:
+        "Returns metadata for a Celo mainnet registry token (symbol or registry address).",
       inputSchema: z.object({
         token: z.string(),
       }),
@@ -105,14 +106,15 @@ export function createReadTools(
     }),
 
     get_token_balance: tool({
-      description: "Returns ERC-20 balance for a specific token contract address.",
+      description:
+        "Returns balance for a Celo mainnet registry token. Pass a symbol (USDC, USDT, USDm, …).",
       inputSchema: z.object({
-        token_address: addressSchema,
+        token: z.string(),
         address: addressSchema.optional(),
       }),
-      execute: async ({ token_address, address }) =>
+      execute: async ({ token, address }) =>
         celina.token.getTokenBalance(
-          token_address as `0x${string}`,
+          token,
           resolveTargetAddress(connectedAddress, address),
         ),
     }),

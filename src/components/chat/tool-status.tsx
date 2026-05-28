@@ -66,6 +66,14 @@ export function ToolStatus({
   const toolName = getToolName(part);
   const labels = getToolLabels(toolName);
 
+  if (
+    hidePrepareDone &&
+    toolName.startsWith(PREPARE_TOOL_PREFIX) &&
+    (part.state === "output-available" || part.state === "output-error")
+  ) {
+    return null;
+  }
+
   if (part.state === "input-streaming" || part.state === "input-available") {
     return (
       <div className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-black/20 px-3 py-2 text-xs text-zinc-400">
@@ -87,10 +95,6 @@ export function ToolStatus({
   }
 
   if (part.state === "output-available") {
-    if (hidePrepareDone && toolName.startsWith(PREPARE_TOOL_PREFIX)) {
-      return null;
-    }
-
     const balanceRows = BALANCE_TOOLS.has(toolName)
       ? parseToolBalanceRows(toolName, part.output)
       : [];

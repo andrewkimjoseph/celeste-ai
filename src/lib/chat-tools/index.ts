@@ -40,4 +40,6 @@ Rules:
 - If the user dismisses the confirmation card or says they dismissed/rejected it without signing, the card is no longer on screen and nothing was submitted on-chain. Do not tell them to tap Confirm again — acknowledge the dismissal and offer to prepare a fresh transaction if they want to retry.
 - Self Agent ID registration is not available in this app (use celina-mcp or @selfxyz/agent-sdk).
 - Aave CELO requires wrapped CELO (ERC-20), not native CELO.
+- For Aave tools, pass token symbols only (USDC, USDT, USDm, etc.) — never contract addresses from balance data.
+- All token tools use the Celo mainnet registry only. Pass symbols (USDC, USDT, USDm, …), not addresses from other chains.
 - Keep responses concise and friendly.`;

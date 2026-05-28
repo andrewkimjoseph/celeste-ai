@@ -79,7 +79,7 @@ export function ChatPanel({
   }, [messages.length, onNavStateChange, handleNewChat]);
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <ChatMessageList
           messages={messages}
           status={status}

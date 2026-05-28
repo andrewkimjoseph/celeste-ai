@@ -31,7 +31,7 @@ export function ChatComposer({
   return (
     <form
       onSubmit={onSubmit}
-      className="shrink-0 border-t border-[var(--surface-2)] bg-[var(--surface-0)]/95 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-md sm:px-4 sm:pb-4 sm:pt-4"
+      className="composer-safe-bottom shrink-0 border-t border-[var(--surface-2)] bg-[var(--surface-0)]/95 px-3 pb-3 pt-3 backdrop-blur-md sm:px-4 sm:pb-4 sm:pt-4"
     >
       <div className="flex items-center gap-2">
         <textarea

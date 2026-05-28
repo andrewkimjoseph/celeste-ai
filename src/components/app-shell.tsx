@@ -25,14 +25,14 @@ export function AppShell() {
 
   return (
     <TransactionProvider address={address}>
-      <div className="flex h-dvh w-full">
+      <div className="flex min-h-0 flex-1 overflow-hidden">
         <WalletBalancePanel
           address={address}
           isConnected={isConnected}
           mounted={mounted}
           variant="sidebar"
         />
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <div className="sticky top-0 z-30 shrink-0 border-b border-[var(--surface-2)] bg-[var(--surface-0)]/90 backdrop-blur-md lg:border-b-0">
             <Header
               showNewChat={navShowNewChat}
