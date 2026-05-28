@@ -1,3 +1,5 @@
+import { formatHumanFlowText } from "@/lib/format-human-flow-text";
+
 export type WalletErrorDisplay = {
   title: string;
   message: string;
@@ -77,7 +79,9 @@ export function formatFlowSummary(
       .replace(TRUNCATED_HEX, recipientLabel);
   }
 
-  return formatted.replace(HEX_ADDRESS, (address) => {
-    return `${address.slice(0, 6)}…${address.slice(-4)}`;
-  });
+  return formatHumanFlowText(
+    formatted.replace(HEX_ADDRESS, (address) => {
+      return `${address.slice(0, 6)}…${address.slice(-4)}`;
+    }),
+  );
 }

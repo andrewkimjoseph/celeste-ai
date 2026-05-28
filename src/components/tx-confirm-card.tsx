@@ -1,9 +1,12 @@
 "use client";
 
 import { useTxPreflight } from "@/hooks/use-tx-preflight";
+import { useWalletBalances } from "@/hooks/use-wallet-balances";
 import type { PreparedTx } from "@/lib/prepared-flow";
 import { parseSendSummary } from "@/lib/send-preflight";
 import { formatFlowSummary, formatWalletError } from "@/lib/wallet-error";
+import { formatBalanceShort } from "@/lib/format-balance";
+import { formatHumanFlowText } from "@/lib/format-human-flow-text";
 import { useState } from "react";
 import { useAccount, usePublicClient, useSendTransaction } from "wagmi";
 
@@ -22,7 +25,7 @@ const CARD_COPY: Record<
   { title: string; hint: string; icon: "ready" | "wallet" | "cancelled" }
 > = {
   idle: {
-    title: "Ready to send",
+    title: "Ready to confirm",
     hint: "Tap Confirm below — your wallet will open to approve.",
     icon: "ready",
   },
@@ -113,6 +116,7 @@ export function TxConfirmCard({
   const { sendTransactionAsync } = useSendTransaction();
   const publicClient = usePublicClient();
   const preflight = useTxPreflight(address, summary);
+  const { data: walletBalances } = useWalletBalances(address);
   const isSendFlow = parseSendSummary(summary) !== null;
   const preflightBlocked =
     isSendFlow &&
@@ -180,7 +184,7 @@ export function TxConfirmCard({
 
   return (
     <div
-      className={`rounded-xl border bg-gradient-to-b from-amber-500/10 to-zinc-900/80 p-4 shadow-sm ${borderStyles}`}
+      className={`rounded-xl border bg-gradient-to-b from-[var(--warn)]/10 to-[var(--surface-1)] p-4 shadow-sm ${borderStyles}`}
     >
       <div className="flex items-start gap-3">
         <div
@@ -199,11 +203,11 @@ export function TxConfirmCard({
       </div>
 
       {isSendFlow && (
-        <div className="mt-3 border-t border-amber-500/15 pt-3">
+        <div className="mt-3 border-t border-[var(--warn)]/15 pt-3">
           {preflight.status === "loading" && (
             <p className="flex items-center gap-2 text-xs text-zinc-400">
               <span
-                className="inline-block size-3 shrink-0 animate-spin rounded-full border-2 border-zinc-500 border-t-emerald-400"
+                className="inline-block size-3 shrink-0 animate-spin rounded-full border-2 border-zinc-500 border-t-[var(--accent-hover)]"
                 aria-hidden
               />
               Checking your balance…
@@ -213,11 +217,11 @@ export function TxConfirmCard({
             <p className="text-xs text-zinc-400">
               Your balance:{" "}
               <span className="text-zinc-200">
-                {preflight.data.tokenBalance} {preflight.data.token}
+                {formatBalanceShort(preflight.data.tokenBalance)} {preflight.data.token}
               </span>
               {" · "}
               <span className="text-zinc-200">
-                {preflight.data.celoBalance} CELO
+                {formatBalanceShort(preflight.data.celoBalance)} CELO
               </span>{" "}
               for gas
             </p>
@@ -230,14 +234,25 @@ export function TxConfirmCard({
         </div>
       )}
 
-      <ol className="mt-3 space-y-1.5 border-t border-amber-500/15 pt-3">
+      {!isSendFlow && walletBalances && (
+        <div className="mt-3 border-t border-[var(--warn)]/15 pt-3">
+          <p className="text-xs text-zinc-400">
+            Gas balance:{" "}
+            <span className="text-zinc-200">
+              {formatBalanceShort(walletBalances.celo.formatted)} CELO
+            </span>
+          </p>
+        </div>
+      )}
+
+      <ol className="mt-3 space-y-1.5 border-t border-[var(--warn)]/15 pt-3">
         {steps.map((step, index) => (
           <li
             key={`${step.description}-${index}`}
             className="flex gap-2 text-sm text-zinc-400"
           >
             <span className="font-medium text-zinc-500">{index + 1}.</span>
-            <span>{step.description}</span>
+            <span>{formatHumanFlowText(step.description)}</span>
           </li>
         ))}
       </ol>

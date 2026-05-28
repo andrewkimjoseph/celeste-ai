@@ -11,6 +11,35 @@ import {
 import type { SerializedPreparedFlow } from "@/lib/prepared-flow";
 import { TxConfirmCard } from "@/components/tx-confirm-card";
 
+const SUGGESTED_PROMPT_GROUPS = [
+  {
+    label: "Swaps & sends",
+    prompts: [
+      "Swap 10 USDm to CELO",
+      "Get a quote to swap CELO to USDC",
+      "Send 1 USDC to ",
+      "Send 0.1 CELO to ",
+    ],
+  },
+  {
+    label: "DeFi",
+    prompts: [
+      "Supply 0.05 USDT to Aave",
+      "Withdraw my USDC from Aave",
+      "What's the gas price?",
+    ],
+  },
+  {
+    label: "Explore",
+    prompts: [
+      "Check my GoodDollar status",
+      "Show my staking balances",
+      "Show recent governance proposals",
+      "Resolve vitalik.eth on Celo",
+    ],
+  },
+] as const;
+
 interface ChatMessageListProps {
   messages: UIMessage[];
   status: ChatStatus;
@@ -19,6 +48,7 @@ interface ChatMessageListProps {
   errorMessage: string | null;
   showTxCard: boolean;
   latestFlow: SerializedPreparedFlow | undefined;
+  onPromptSelect: (prompt: string) => void;
   onTxComplete: (hashes: string[]) => void;
   onTxReject: () => void;
 }
@@ -31,6 +61,7 @@ export function ChatMessageList({
   errorMessage,
   showTxCard,
   latestFlow,
+  onPromptSelect,
   onTxComplete,
   onTxReject,
 }: ChatMessageListProps) {
@@ -45,17 +76,46 @@ export function ChatMessageList({
   const recipientLabel = extractRecipientLabel(messages);
 
   return (
-    <div className="flex-1 space-y-4 overflow-y-auto px-4 py-4">
+    <div className="flex-1 space-y-6 overflow-y-auto px-4 py-5 sm:px-6">
       {mounted && !isConnected && (
-        <p className="text-sm text-zinc-400">
-          Connect your wallet to start chatting with Celina.
-        </p>
+        <div className="rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)]/60 px-4 py-6 text-center">
+          <p className="text-sm text-zinc-300">Connect your wallet to start chatting with Celina.</p>
+          <p className="mt-1 text-xs text-zinc-500">
+            Your balances will appear in the panel once connected.
+          </p>
+        </div>
       )}
 
       {showEmptyState && (
-        <p className="text-sm text-zinc-500">
-          Ask about balances, swaps, or sends on Celo mainnet.
-        </p>
+        <div className="rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)]/60 px-4 py-6">
+          <h2 className="text-base font-semibold text-white">What can Celina do?</h2>
+          <p className="mt-1 text-sm text-zinc-400">
+            Swaps, sends, Aave, balances, and more on Celo mainnet. Tap{" "}
+            <span className="text-zinc-300">Balances</span> in the nav to see
+            your wallet.
+          </p>
+          <div className="mt-4 space-y-3">
+            {SUGGESTED_PROMPT_GROUPS.map((group) => (
+              <div key={group.label}>
+                <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wide text-zinc-500">
+                  {group.label}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {group.prompts.map((prompt) => (
+                    <button
+                      key={prompt}
+                      type="button"
+                      onClick={() => onPromptSelect(prompt)}
+                      className="rounded-full border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-1.5 text-xs text-zinc-300 transition-colors hover:border-[var(--accent)]/40 hover:text-white"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       {messages.map((message) => (
@@ -79,7 +139,9 @@ export function ChatMessageList({
       )}
 
       {errorMessage && (
-        <p className="text-sm text-red-400">{errorMessage}</p>
+        <p className="rounded-lg border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+          {errorMessage}
+        </p>
       )}
 
       <div ref={bottomRef} aria-hidden className="h-px shrink-0" />

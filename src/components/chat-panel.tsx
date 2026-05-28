@@ -5,19 +5,30 @@
  */
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { useAccount } from "wagmi";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { ChatComposer } from "@/components/chat/chat-composer";
 import { ChatMessageList } from "@/components/chat/chat-message-list";
 import { formatChatError } from "@/components/chat/chat-utils";
-import { Header } from "@/components/header";
 import { getLatestPreparedFlowWithMeta } from "@/lib/prepared-flow";
 import { useMounted } from "@/hooks/use-mounted";
 
-export function ChatPanel() {
-  const mounted = useMounted();
-  const { address, isConnected } = useAccount();
-  const canChat = mounted && isConnected;
+interface ChatPanelProps {
+  address?: `0x${string}`;
+  isConnected?: boolean;
+  mounted?: boolean;
+  onNavStateChange?: (showNewChat: boolean, onNewChat: () => void) => void;
+}
+
+export function ChatPanel({
+  address,
+  isConnected: isConnectedProp,
+  mounted: mountedProp,
+  onNavStateChange,
+}: ChatPanelProps = {}) {
+  const mountedInternal = useMounted();
+  const mounted = mountedProp ?? mountedInternal;
+  const isConnected = isConnectedProp ?? false;
+  const canChat = mounted && isConnected && Boolean(address);
   const [input, setInput] = useState("");
   const [dismissedFlowKey, setDismissedFlowKey] = useState<string | null>(null);
 
@@ -45,19 +56,27 @@ export function ChatPanel() {
     await sendMessage({ text }, { body: { address } });
   }
 
-  function handleNewChat() {
+  async function handlePromptSelect(prompt: string) {
+    if (!canChat || !address) {
+      setInput(prompt);
+      return;
+    }
+
+    await sendMessage({ text: prompt }, { body: { address } });
+  }
+
+  const handleNewChat = useCallback(() => {
     setMessages([]);
     setDismissedFlowKey(null);
     setInput("");
-  }
+  }, [setMessages]);
+
+  useEffect(() => {
+    onNavStateChange?.(messages.length > 0, handleNewChat);
+  }, [messages.length, onNavStateChange, handleNewChat]);
 
   return (
-    <>
-      <Header
-        showNewChat={messages.length > 0}
-        onNewChat={handleNewChat}
-      />
-      <div className="flex min-h-0 flex-1 flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
         <ChatMessageList
           messages={messages}
           status={status}
@@ -66,6 +85,7 @@ export function ChatPanel() {
           errorMessage={error ? formatChatError(error.message) : null}
           showTxCard={showTxCard}
           latestFlow={flowMeta?.flow}
+          onPromptSelect={(prompt) => void handlePromptSelect(prompt)}
           onTxComplete={(hashes) => {
             if (flowKey) {
               setDismissedFlowKey(flowKey);
@@ -81,6 +101,15 @@ export function ChatPanel() {
             if (flowKey) {
               setDismissedFlowKey(flowKey);
             }
+            const summary = flowMeta?.flow.summary;
+            void sendMessage(
+              {
+                text: summary
+                  ? `I dismissed the transaction confirmation card without signing. Prepared action: ${summary}`
+                  : "I dismissed the transaction confirmation card without signing.",
+              },
+              { body: { address } },
+            );
           }}
         />
         <ChatComposer
@@ -90,7 +119,6 @@ export function ChatPanel() {
           onInputChange={setInput}
           onSubmit={handleSubmit}
         />
-      </div>
-    </>
+    </div>
   );
 }
