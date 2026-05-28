@@ -1,0 +1,36 @@
+{
+  "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+  "name": "Celina",
+  "description": "Celina is a Celo mainnet assistant that helps you check balances, read on-chain data, and prepare transactions — token sends, Mento FX swaps, and Aave supply/withdraw — for confirmation in your wallet. Powered by Celina MCP and the Celina SDK, with 40+ tools for network status, governance, staking, ENS, and more.",
+  "image": "https://raw.githubusercontent.com/andrewkimjoseph/celina-mcp/main/assets/logo-yellow.png",
+  "active": true,
+  "x402Support": false,
+  "services": [
+    {
+      "name": "MCP",
+      "endpoint": "https://mcp.usecelina.xyz/api/mcp",
+      "version": "0.7.5"
+    },
+    {
+      "name": "Self Agent ID",
+      "endpoint": "https://app.ai.self.xyz",
+      "version": "1.0.0"
+    },
+    {
+      "name": "wallet",
+      "endpoint": "0x7C6c7C0DE51f5F2ed56936b568A44c266A255f81",
+      "chainId": 42220
+    }
+  ],
+  "registrations": [
+    {
+      "agentId": 9186,
+      "agentRegistry": "eip155:42220:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"
+    },
+    {
+      "agentId": 139,
+      "agentRegistry": "eip155:42220:0xaC3DF9ABf80d0F5c020C06B04Cced27763355944"
+    }
+  ],
+  "supportedTrust": ["reputation"]
+}

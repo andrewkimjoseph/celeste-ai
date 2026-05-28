@@ -6,6 +6,7 @@ import {
 } from "@/components/chat/format-message-text";
 import { isTextUIPart, isToolUIPart, type UIMessage } from "ai";
 import { ToolStatus } from "@/components/chat/tool-status";
+import { useTransactions } from "@/hooks/use-transactions";
 
 type MessagePart = UIMessage["parts"][number];
 
@@ -20,6 +21,8 @@ export function MessagePart({
   hidePrepareToolDone = false,
   variant = "assistant",
 }: MessagePartProps) {
+  const { openTransactionByHash } = useTransactions();
+
   if (isTextUIPart(part)) {
     if (!part.text) {
       return null;
@@ -31,7 +34,12 @@ export function MessagePart({
           variant === "user" ? "text-white" : "text-zinc-100"
         }`}
       >
-        {formatMessageText(part.text, { variant })}
+        {formatMessageText(part.text, {
+          variant,
+          onHashClick: (hash) => {
+            void openTransactionByHash(hash);
+          },
+        })}
         {part.state === "streaming" && (
           <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse rounded-full bg-[var(--accent-hover)] align-middle" />
         )}

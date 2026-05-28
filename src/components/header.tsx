@@ -3,6 +3,7 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { CELINA_SDK_DOCS_URL } from "@/lib/links";
 import { useMounted } from "@/hooks/use-mounted";
+import { useTransactions } from "@/hooks/use-transactions";
 
 interface HeaderProps {
   showNewChat?: boolean;
@@ -52,6 +53,48 @@ function NewChatButton({
         New chat
       </button>
     </>
+  );
+}
+
+function TransactionsButton({
+  isConnected,
+}: {
+  isConnected: boolean;
+}) {
+  const { transactions, openDrawer } = useTransactions();
+
+  if (!isConnected) {
+    return null;
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={openDrawer}
+      aria-label="View transactions"
+      className="relative flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-zinc-400 transition-colors hover:border-zinc-600 hover:text-white sm:h-auto sm:w-auto sm:rounded-lg sm:px-3 sm:py-1.5"
+    >
+      <svg
+        className="size-4 sm:mr-1.5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={1.75}
+        aria-hidden
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+        />
+      </svg>
+      <span className="hidden sm:inline text-xs">Transactions</span>
+      {transactions.length > 0 && (
+        <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-semibold text-black sm:static sm:ml-1.5 sm:size-auto sm:rounded-full sm:px-1.5 sm:py-0.5">
+          {transactions.length > 9 ? "9+" : transactions.length}
+        </span>
+      )}
+    </button>
   );
 }
 
@@ -113,6 +156,7 @@ export function Header({
             </svg>
             <span className="hidden sm:inline">SDK docs</span>
           </a>
+          <TransactionsButton isConnected={isConnected} />
           <NewChatButton showNewChat={showNewChat} onNewChat={onNewChat} />
           {mounted ? (
             <>

@@ -12,6 +12,7 @@ import { formatChatError } from "@/components/chat/chat-utils";
 import { getLatestPreparedFlowWithMeta } from "@/lib/prepared-flow";
 import { formatTxHashes } from "@/lib/format-balance";
 import { useMounted } from "@/hooks/use-mounted";
+import { useTransactions } from "@/hooks/use-transactions";
 
 interface ChatPanelProps {
   address?: `0x${string}`;
@@ -30,6 +31,7 @@ export function ChatPanel({
   const mounted = mountedProp ?? mountedInternal;
   const isConnected = isConnectedProp ?? false;
   const canChat = mounted && isConnected && Boolean(address);
+  const { addTransaction, openDrawer } = useTransactions();
   const [input, setInput] = useState("");
   const [dismissedFlowKey, setDismissedFlowKey] = useState<string | null>(null);
 
@@ -91,6 +93,19 @@ export function ChatPanel({
             if (flowKey) {
               setDismissedFlowKey(flowKey);
             }
+
+            if (address && flowMeta?.flow) {
+              void addTransaction({
+                address,
+                hashes,
+                summary: flowMeta.flow.summary,
+                steps: flowMeta.flow.steps.map((step) => step.description),
+                status: "confirmed",
+              }).then(() => {
+                openDrawer();
+              });
+            }
+
             void sendMessage(
               {
                 text: `Transaction confirmed. Hash${hashes.length > 1 ? "es" : ""}: ${formatTxHashes(hashes)}`,

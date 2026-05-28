@@ -3,15 +3,20 @@ import type { ReactNode } from "react";
 export type MessageTextVariant = "assistant" | "user";
 
 const INLINE_PATTERN =
-  /(\*\*[^*\n]+\*\*|\*[^*\n]+\*|`[^`\n]+`|0x[a-fA-F0-9]{40,}|https?:\/\/[^\s]+)/g;
+  /(\*\*[^*\n]+\*\*|\*[^*\n]+\*|`[^`\n]+`|0x[a-fA-F0-9]{40,}|0x[a-fA-F0-9]{4,}…[a-fA-F0-9]{4,}|https?:\/\/[^\s]+)/g;
 
 interface FormatOptions {
   variant?: MessageTextVariant;
   keyPrefix?: string;
+  onHashClick?: (hash: string) => void;
 }
 
 function parseInline(text: string, options: FormatOptions = {}): ReactNode[] {
-  const { variant = "assistant", keyPrefix = "inline" } = options;
+  const {
+    variant = "assistant",
+    keyPrefix = "inline",
+    onHashClick,
+  } = options;
   const nodes: ReactNode[] = [];
   let lastIndex = 0;
   let match: RegExpExecArray | null;
@@ -63,11 +68,25 @@ function parseInline(text: string, options: FormatOptions = {}): ReactNode[] {
         </code>,
       );
     } else if (token.startsWith("0x")) {
-      nodes.push(
-        <span key={`${keyPrefix}-${key++}`} className={hashClass}>
-          {token}
-        </span>,
-      );
+      if (onHashClick) {
+        nodes.push(
+          <button
+            key={`${keyPrefix}-${key++}`}
+            type="button"
+            onClick={() => onHashClick(token)}
+            className={`${hashClass} cursor-pointer transition-colors hover:text-emerald-200`}
+            title="View in transactions"
+          >
+            {token}
+          </button>,
+        );
+      } else {
+        nodes.push(
+          <span key={`${keyPrefix}-${key++}`} className={hashClass}>
+            {token}
+          </span>,
+        );
+      }
     } else {
       nodes.push(
         <a
