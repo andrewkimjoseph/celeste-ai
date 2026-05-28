@@ -87,6 +87,8 @@ export function ChatMessage({
               <MessagePart
                 key={partKey}
                 part={part}
+                messageParts={message.parts}
+                partIndex={index}
                 hidePrepareToolDone={hidePrepareToolDone}
                 variant={isUser ? "user" : "assistant"}
               />

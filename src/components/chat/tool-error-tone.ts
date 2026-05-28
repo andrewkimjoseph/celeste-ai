@@ -12,6 +12,8 @@ const NOTICE_PATTERNS: RegExp[] = [
   /not found on celo/i,
   /is not supported on aave/i,
   /token .+ is not supported/i,
+  /unknown token/i,
+  /did you mean/i,
 ];
 
 /** Expected or informational tool outcomes — not system failures. */

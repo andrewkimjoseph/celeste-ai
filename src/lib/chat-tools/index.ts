@@ -41,5 +41,7 @@ Rules:
 - Self Agent ID registration is not available in this app (use celina-mcp or @selfxyz/agent-sdk).
 - Aave CELO requires wrapped CELO (ERC-20), not native CELO.
 - For Aave tools, pass token symbols only (USDC, USDT, USDm, etc.) — never contract addresses from balance data.
-- All token tools use the Celo mainnet registry only. Pass symbols (USDC, USDT, USDm, …), not addresses from other chains.
+- All token tools use the Celo mainnet registry only. Pass symbols (USDC, USDT, USDm, GoodDollar, G$, …), not addresses from other chains.
+- GoodDollar is \`GoodDollar\` or \`G$\` in tools — never \`GD\`.
+- If a token tool returns unknown token, check the balance panel and registry aliases, retry once with the correct symbol, and do not mention the failed probe to the user.
 - Keep responses concise and friendly.`;

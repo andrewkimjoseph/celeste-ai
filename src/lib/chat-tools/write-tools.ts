@@ -12,6 +12,7 @@ import {
   normalizeAaveTokenInput,
 } from "@/lib/aave-token";
 import { checkSendPreflight } from "@/lib/send-preflight";
+import { normalizeRegistryTokenInput } from "@/lib/registry-token";
 
 const aaveTokenDescription = `Aave asset symbol on Celo (${AAVE_TOKEN_SYMBOLS.join(", ")}). Pass the symbol only — never a contract address from balance results.`;
 
@@ -36,7 +37,7 @@ export function createWriteTools(
         const preflight = await checkSendPreflight(
           celina,
           sender,
-          token,
+          normalizeRegistryTokenInput(token),
           amount,
         );
         if (!preflight.ok) {
@@ -49,7 +50,12 @@ export function createWriteTools(
         const recipient = isAddress(to)
           ? (to as `0x${string}`)
           : (await celina.ens.resolveAddressOrEns(to)).address;
-        return celina.transaction.prepareSend(sender, recipient, token, amount);
+        return celina.transaction.prepareSend(
+          sender,
+          recipient,
+          normalizeRegistryTokenInput(token),
+          amount,
+        );
       },
     }),
 
@@ -75,11 +81,17 @@ export function createWriteTools(
         deadline_minutes,
       }) => {
         const sender = resolveTargetAddress(connectedAddress, from);
-        return celina.mentoFx.prepareFx(sender, token_in, token_out, amount, {
-          recipient: recipient as `0x${string}` | undefined,
-          slippageTolerance: slippage_tolerance,
-          deadlineMinutes: deadline_minutes,
-        });
+        return celina.mentoFx.prepareFx(
+          sender,
+          normalizeRegistryTokenInput(token_in),
+          normalizeRegistryTokenInput(token_out),
+          amount,
+          {
+            recipient: recipient as `0x${string}` | undefined,
+            slippageTolerance: slippage_tolerance,
+            deadlineMinutes: deadline_minutes,
+          },
+        );
       },
     }),
 

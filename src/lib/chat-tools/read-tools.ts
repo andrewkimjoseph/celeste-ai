@@ -10,6 +10,7 @@ import {
   blockIdSchema,
   resolveTargetAddress,
 } from "@/lib/chat-tools/schemas";
+import { normalizeRegistryTokenInput } from "@/lib/registry-token";
 
 type CelinaClient = ReturnType<typeof createCelinaClient>;
 
@@ -102,7 +103,8 @@ export function createReadTools(
       inputSchema: z.object({
         token: z.string(),
       }),
-      execute: async ({ token }) => celina.token.getTokenInfo(token),
+      execute: async ({ token }) =>
+        celina.token.getTokenInfo(normalizeRegistryTokenInput(token)),
     }),
 
     get_token_balance: tool({
@@ -114,20 +116,25 @@ export function createReadTools(
       }),
       execute: async ({ token, address }) =>
         celina.token.getTokenBalance(
-          token,
+          normalizeRegistryTokenInput(token),
           resolveTargetAddress(connectedAddress, address),
         ),
     }),
 
     get_mento_fx_quote: tool({
-      description: "Get a Mento FX quote (no wallet required).",
+      description:
+        "Get a Mento FX quote (no wallet required). Use registry symbols (GoodDollar or G$ for GoodDollar).",
       inputSchema: z.object({
-        token_in: z.string(),
-        token_out: z.string(),
+        token_in: z.string().describe("Registry symbol, e.g. GoodDollar, G$, USDC"),
+        token_out: z.string().describe("Registry symbol, e.g. USDT, USDm"),
         amount: z.string(),
       }),
       execute: async ({ token_in, token_out, amount }) =>
-        celina.mentoFx.getFxQuote(token_in, token_out, amount),
+        celina.mentoFx.getFxQuote(
+          normalizeRegistryTokenInput(token_in),
+          normalizeRegistryTokenInput(token_out),
+          amount,
+        ),
     }),
 
     estimate_send: tool({
@@ -147,7 +154,7 @@ export function createReadTools(
         return celina.transaction.estimateSend(
           sender,
           recipient,
-          token ?? "CELO",
+          normalizeRegistryTokenInput(token ?? "CELO"),
           amount,
         );
       },
@@ -175,11 +182,17 @@ export function createReadTools(
         deadline_minutes,
       }) => {
         const sender = resolveTargetAddress(connectedAddress, from);
-        return celina.mentoFx.estimateFx(sender, token_in, token_out, amount, {
-          recipient: recipient as `0x${string}` | undefined,
-          slippageTolerance: slippage_tolerance,
-          deadlineMinutes: deadline_minutes,
-        });
+        return celina.mentoFx.estimateFx(
+          sender,
+          normalizeRegistryTokenInput(token_in),
+          normalizeRegistryTokenInput(token_out),
+          amount,
+          {
+            recipient: recipient as `0x${string}` | undefined,
+            slippageTolerance: slippage_tolerance,
+            deadlineMinutes: deadline_minutes,
+          },
+        );
       },
     }),
 

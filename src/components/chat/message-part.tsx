@@ -7,22 +7,41 @@ import {
 import { isTextUIPart, isToolUIPart, type UIMessage } from "ai";
 import { StreamingCursor } from "@/components/chat/streaming-cursor";
 import { ToolStatus } from "@/components/chat/tool-status";
+import { shouldHideSupersededToolError } from "@/components/chat/tool-utils";
 import { useTransactions } from "@/hooks/use-transactions";
 
-type MessagePart = UIMessage["parts"][number];
+type MessagePartType = UIMessage["parts"][number];
 
 interface MessagePartProps {
-  part: MessagePart;
+  part: MessagePartType;
+  messageParts?: UIMessage["parts"];
+  partIndex?: number;
   hidePrepareToolDone?: boolean;
   variant?: MessageTextVariant;
 }
 
 export function MessagePart({
   part,
+  messageParts,
+  partIndex,
   hidePrepareToolDone = false,
   variant = "assistant",
 }: MessagePartProps) {
   const { openTransactionByHash } = useTransactions();
+
+  if (isToolUIPart(part)) {
+    if (
+      messageParts &&
+      partIndex !== undefined &&
+      shouldHideSupersededToolError(messageParts, partIndex)
+    ) {
+      return null;
+    }
+
+    return (
+      <ToolStatus part={part} hidePrepareDone={hidePrepareToolDone} />
+    );
+  }
 
   if (isTextUIPart(part)) {
     if (!part.text) {
@@ -51,12 +70,6 @@ export function MessagePart({
           })
         )}
       </div>
-    );
-  }
-
-  if (isToolUIPart(part)) {
-    return (
-      <ToolStatus part={part} hidePrepareDone={hidePrepareToolDone} />
     );
   }
 

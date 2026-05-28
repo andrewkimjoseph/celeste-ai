@@ -1,5 +1,6 @@
 import type { createCelinaClient } from "@andrewkimjoseph/celina-sdk";
 import { parseUnits } from "viem";
+import { normalizeRegistryTokenInput } from "@/lib/registry-token";
 
 type CelinaClient = ReturnType<typeof createCelinaClient>;
 
@@ -34,7 +35,7 @@ export async function checkSendPreflight(
   token: string,
   amount: string,
 ): Promise<SendPreflightResult> {
-  const resolved = celina.token.resolveToken(token);
+  const resolved = celina.token.resolveToken(normalizeRegistryTokenInput(token));
   const { balances } = await celina.token.getBalances(address, [
     resolved.symbol,
     "CELO",

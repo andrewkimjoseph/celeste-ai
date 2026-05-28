@@ -1,4 +1,5 @@
 import type { createCelinaClient } from "@andrewkimjoseph/celina-sdk";
+import { normalizeRegistryTokenInput } from "@/lib/registry-token";
 
 type CelinaClient = ReturnType<typeof createCelinaClient>;
 
@@ -16,7 +17,7 @@ export function normalizeAaveTokenInput(
   celina: CelinaClient,
   token: string,
 ): (typeof AAVE_TOKEN_SYMBOLS)[number] {
-  const resolved = celina.token.resolveToken(token.trim());
+  const resolved = celina.token.resolveToken(normalizeRegistryTokenInput(token));
   const match = AAVE_TOKEN_SYMBOLS.find(
     (entry) => entry.toLowerCase() === resolved.symbol.toLowerCase(),
   );
