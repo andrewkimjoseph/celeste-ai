@@ -9,6 +9,7 @@ import {
   shouldShowAssistantLoading,
 } from "@/components/chat/chat-utils";
 import type { SerializedPreparedFlow } from "@/lib/prepared-flow";
+import { CELINA_SDK_DOCS_URL } from "@/lib/links";
 import { TxConfirmCard } from "@/components/tx-confirm-card";
 
 const SUGGESTED_PROMPT_GROUPS = [
@@ -81,7 +82,15 @@ export function ChatMessageList({
         <div className="rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)]/60 px-4 py-6 text-center">
           <p className="text-sm text-zinc-300">Connect your wallet to start chatting with Celina.</p>
           <p className="mt-1 text-xs text-zinc-500">
-            Your balances will appear in the panel once connected.
+            Your balances will appear in the panel once connected.{" "}
+            <a
+              href={CELINA_SDK_DOCS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--accent-hover)] underline-offset-2 hover:underline"
+            >
+              Celina SDK docs
+            </a>
           </p>
         </div>
       )}
@@ -115,6 +124,19 @@ export function ChatMessageList({
               </div>
             ))}
           </div>
+          <p className="mt-4 border-t border-[var(--surface-2)] pt-3 text-xs text-zinc-500">
+            Built on{" "}
+            <a
+              href={CELINA_SDK_DOCS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--accent-hover)] underline-offset-2 hover:underline"
+            >
+              Celina SDK
+            </a>
+            {" — "}
+            guides, wagmi integration, and API reference on GitBook.
+          </p>
         </div>
       )}
 

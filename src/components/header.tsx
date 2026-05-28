@@ -1,6 +1,7 @@
 "use client";
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { CELINA_SDK_DOCS_URL } from "@/lib/links";
 import { useMounted } from "@/hooks/use-mounted";
 
 interface HeaderProps {
@@ -89,6 +90,29 @@ export function Header({
         </div>
 
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <a
+            href={CELINA_SDK_DOCS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-zinc-400 transition-colors hover:border-zinc-600 hover:text-white sm:h-auto sm:w-auto sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs"
+            aria-label="Celina SDK documentation"
+          >
+            <svg
+              className="size-4 sm:hidden"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.75}
+              aria-hidden
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
+              />
+            </svg>
+            <span className="hidden sm:inline">SDK docs</span>
+          </a>
           <NewChatButton showNewChat={showNewChat} onNewChat={onNewChat} />
           {mounted ? (
             <>
