@@ -10,6 +10,7 @@ import { ChatComposer } from "@/components/chat/chat-composer";
 import { ChatMessageList } from "@/components/chat/chat-message-list";
 import { formatChatError } from "@/components/chat/chat-utils";
 import { getLatestPreparedFlowWithMeta } from "@/lib/prepared-flow";
+import { formatTxHashes } from "@/lib/format-balance";
 import { useMounted } from "@/hooks/use-mounted";
 
 interface ChatPanelProps {
@@ -92,7 +93,7 @@ export function ChatPanel({
             }
             void sendMessage(
               {
-                text: `Transaction confirmed. Hashes: ${hashes.join(", ")}`,
+                text: `Transaction confirmed. Hash${hashes.length > 1 ? "es" : ""}: ${formatTxHashes(hashes)}`,
               },
               { body: { address } },
             );

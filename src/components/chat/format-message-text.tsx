@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 export type MessageTextVariant = "assistant" | "user";
 
 const INLINE_PATTERN =
-  /(\*\*[^*\n]+\*\*|\*[^*\n]+\*|`[^`\n]+`|https?:\/\/[^\s]+)/g;
+  /(\*\*[^*\n]+\*\*|\*[^*\n]+\*|`[^`\n]+`|0x[a-fA-F0-9]{40,}|https?:\/\/[^\s]+)/g;
 
 interface FormatOptions {
   variant?: MessageTextVariant;
@@ -32,6 +32,11 @@ function parseInline(text: string, options: FormatOptions = {}): ReactNode[] {
       ? "rounded bg-black/20 px-1.5 py-0.5 font-mono text-[0.85em] text-emerald-50"
       : "rounded bg-black/30 px-1.5 py-0.5 font-mono text-[0.85em] text-emerald-100/90";
 
+  const hashClass =
+    variant === "user"
+      ? "break-all rounded bg-black/15 px-1 py-0.5 font-mono text-[0.8em] text-emerald-50"
+      : "break-all rounded bg-black/25 px-1 py-0.5 font-mono text-[0.8em] text-zinc-200";
+
   while ((match = INLINE_PATTERN.exec(text)) !== null) {
     if (match.index > lastIndex) {
       nodes.push(text.slice(lastIndex, match.index));
@@ -56,6 +61,12 @@ function parseInline(text: string, options: FormatOptions = {}): ReactNode[] {
         <code key={`${keyPrefix}-${key++}`} className={codeClass}>
           {token.slice(1, -1)}
         </code>,
+      );
+    } else if (token.startsWith("0x")) {
+      nodes.push(
+        <span key={`${keyPrefix}-${key++}`} className={hashClass}>
+          {token}
+        </span>,
       );
     } else {
       nodes.push(

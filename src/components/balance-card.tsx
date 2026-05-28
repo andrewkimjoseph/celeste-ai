@@ -1,6 +1,7 @@
 "use client";
 
 import type { TokenBalanceRow } from "@/lib/balances";
+import { formatBalanceShort } from "@/lib/format-balance";
 
 interface BalanceRowProps {
   row: TokenBalanceRow;
@@ -24,11 +25,11 @@ export function BalanceRow({
 
   return (
     <div
-      className={`flex items-center justify-between gap-3 ${
-        compact ? "py-1.5" : "py-2"
+      className={`flex gap-2 sm:items-center sm:justify-between ${
+        compact ? "flex-col py-1.5 sm:flex-row" : "flex-col py-2 sm:flex-row"
       } ${isZero(row.raw) ? "opacity-50" : ""}`}
     >
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <p className={`truncate font-medium text-zinc-100 ${compact ? "text-xs" : "text-sm"}`}>
           {row.symbol}
           {row.readError && (
@@ -42,11 +43,11 @@ export function BalanceRow({
         )}
       </div>
       <p
-        className={`shrink-0 font-mono tabular-nums text-zinc-200 ${
+        className={`max-w-full font-mono tabular-nums text-zinc-200 sm:shrink-0 sm:text-right ${
           compact ? "text-xs" : "text-sm"
         }`}
       >
-        {row.formatted}
+        {formatBalanceShort(row.formatted)}
       </p>
     </div>
   );
@@ -78,14 +79,14 @@ export function BalanceCard({
 
   if (!hasCelo && !hasTokens) {
     return (
-      <div className="mt-2 rounded-lg border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-2">
+      <div className="mt-2 rounded-lg border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-2 sm:px-3.5">
         <p className="text-xs text-zinc-500">{emptyMessage}</p>
       </div>
     );
   }
 
   return (
-    <div className="mt-2 rounded-lg border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-2">
+    <div className="mt-2 rounded-lg border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-2 sm:px-3.5">
       {title && (
         <p className="mb-1 text-[10px] font-medium uppercase tracking-wide text-zinc-500">
           {title}

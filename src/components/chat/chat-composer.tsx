@@ -29,8 +29,11 @@ export function ChatComposer({
   }
 
   return (
-    <form onSubmit={onSubmit} className="border-t border-[var(--surface-2)] p-4">
-      <div className="flex gap-2">
+    <form
+      onSubmit={onSubmit}
+      className="shrink-0 border-t border-[var(--surface-2)] bg-[var(--surface-0)]/95 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-md sm:px-4 sm:pb-4 sm:pt-4"
+    >
+      <div className="flex items-center gap-2">
         <textarea
           value={input}
           onChange={(event) => onInputChange(event.target.value)}
@@ -43,17 +46,17 @@ export function ChatComposer({
           disabled={!canChat || isBusy}
           rows={1}
           suppressHydrationWarning
-          className="max-h-32 min-h-[42px] flex-1 resize-y rounded-lg border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/30 disabled:opacity-50"
+          className="max-h-28 min-h-[44px] flex-1 resize-none rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/30 disabled:opacity-50"
         />
         <button
           type="submit"
           disabled={!canChat || !input.trim() || isBusy}
-          className="self-end rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-hover)] disabled:opacity-50"
+          className="h-[44px] shrink-0 rounded-xl bg-[var(--accent)] px-4 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-hover)] disabled:opacity-50"
         >
           Send
         </button>
       </div>
-      <p className="mt-1.5 text-[10px] text-zinc-600">
+      <p className="mt-1.5 hidden text-[10px] text-zinc-600 sm:block">
         Enter to send · Shift+Enter for new line
       </p>
     </form>
