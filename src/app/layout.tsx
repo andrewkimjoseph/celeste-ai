@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { CELINA_LOGO_PATH } from "@/components/celina-logo";
+import { CELESTE_LOGO_PATH } from "@/components/celeste-logo";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,14 +14,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Celina Agent",
-  description: "Chat with Celina — your Celo wallet assistant",
+  title: "Celeste",
+  description: "DeFAI chat for Celo — powered by Celina",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
-      { url: CELINA_LOGO_PATH, type: "image/png" },
+      { url: CELESTE_LOGO_PATH, type: "image/png" },
     ],
-    apple: CELINA_LOGO_PATH,
+    apple: CELESTE_LOGO_PATH,
     shortcut: "/favicon.ico",
   },
 };

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { CelinaLogoAvatar } from "@/components/celina-logo";
+import { CelesteLogoAvatar } from "@/components/celeste-logo";
 
 interface AssistantMessageSlotProps {
   children: ReactNode;
@@ -15,7 +15,7 @@ export function AssistantMessageSlot({
   return (
     <div className="flex w-full gap-2.5 sm:gap-3">
       {showAvatar ? (
-        <CelinaLogoAvatar
+        <CelesteLogoAvatar
           size="sm"
           className="mt-1 shadow-sm ring-2 ring-emerald-500/15"
         />
@@ -25,7 +25,7 @@ export function AssistantMessageSlot({
       <div className="min-w-0 flex-1">
         {showLabel && showAvatar ? (
           <p className="mb-1.5 text-[11px] font-medium tracking-wide text-zinc-500">
-            Celina
+            Celeste
           </p>
         ) : null}
         {children}

@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-export const CELINA_LOGO_PATH = "/celina-logo.png";
+export const CELESTE_LOGO_PATH = "/celeste-logo.png";
 
 const LOGO_SIZES = {
   xs: 28,
@@ -9,10 +9,10 @@ const LOGO_SIZES = {
   lg: 48,
 } as const;
 
-type CelinaLogoSize = keyof typeof LOGO_SIZES;
+type CelesteLogoSize = keyof typeof LOGO_SIZES;
 
-interface CelinaLogoProps {
-  size?: CelinaLogoSize;
+interface CelesteLogoProps {
+  size?: CelesteLogoSize;
   className?: string;
   rounded?: "none" | "md" | "full";
 }
@@ -23,17 +23,17 @@ const ROUNDED_CLASS = {
   full: "rounded-full",
 } as const;
 
-export function CelinaLogo({
+export function CelesteLogo({
   size = "sm",
   className = "",
   rounded = "none",
-}: CelinaLogoProps) {
+}: CelesteLogoProps) {
   const px = LOGO_SIZES[size];
 
   return (
     <Image
-      src={CELINA_LOGO_PATH}
-      alt="Celina"
+      src={CELESTE_LOGO_PATH}
+      alt="Celeste"
       width={px}
       height={px}
       className={`object-contain ${ROUNDED_CLASS[rounded]} ${className}`}
@@ -41,8 +41,8 @@ export function CelinaLogo({
   );
 }
 
-interface CelinaLogoAvatarProps {
-  size?: CelinaLogoSize;
+interface CelesteLogoAvatarProps {
+  size?: CelesteLogoSize;
   className?: string;
   shape?: "circle" | "squircle";
 }
@@ -52,11 +52,11 @@ const SHAPE_CLASS = {
   squircle: "rounded-xl sm:rounded-lg",
 } as const;
 
-export function CelinaLogoAvatar({
+export function CelesteLogoAvatar({
   size = "sm",
   className = "",
   shape = "circle",
-}: CelinaLogoAvatarProps) {
+}: CelesteLogoAvatarProps) {
   const px = LOGO_SIZES[size];
 
   return (
@@ -64,10 +64,10 @@ export function CelinaLogoAvatar({
       className={`relative shrink-0 overflow-hidden bg-black ${SHAPE_CLASS[shape]} ${className}`}
       style={{ width: px, height: px }}
       aria-hidden={shape === "squircle"}
-      aria-label={shape === "circle" ? "Celina" : undefined}
+      aria-label={shape === "circle" ? "Celeste" : undefined}
     >
       <Image
-        src={CELINA_LOGO_PATH}
+        src={CELESTE_LOGO_PATH}
         alt=""
         fill
         sizes={`${px}px`}

@@ -1,7 +1,7 @@
 {
   "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
-  "name": "Celina",
-  "description": "Celina is a Celo mainnet assistant that helps you check balances, read on-chain data, and prepare transactions — token sends, Mento FX swaps, and Aave supply/withdraw — for confirmation in your wallet. Powered by Celina MCP and the Celina SDK, with 40+ tools for network status, governance, staking, ENS, and more.",
+  "name": "Celeste",
+  "description": "Celeste is a DeFAI chat UI for Celo mainnet — check balances, read on-chain data, and prepare transactions (token sends, Mento FX swaps, Aave supply/withdraw) for confirmation in your wallet. Powered by Celina MCP and the Celina SDK, with 40+ tools for network status, governance, staking, ENS, and more.",
   "image": "https://raw.githubusercontent.com/andrewkimjoseph/celina-mcp/main/assets/logo-yellow.png",
   "active": true,
   "x402Support": false,

@@ -1,7 +1,7 @@
 "use client";
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { CelinaLogoAvatar } from "@/components/celina-logo";
+import { CelesteLogoAvatar } from "@/components/celeste-logo";
 import { CELINA_SDK_DOCS_URL } from "@/lib/links";
 import { useMounted } from "@/hooks/use-mounted";
 import { useTransactions } from "@/hooks/use-transactions";
@@ -116,7 +116,7 @@ export function Header({
     <header className="border-b border-[var(--surface-2)] bg-[var(--surface-0)]/80 px-3 py-2.5 backdrop-blur-md sm:px-4 sm:py-3">
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
-          <CelinaLogoAvatar
+          <CelesteLogoAvatar
             size="md"
             shape="squircle"
             className="shadow-sm ring-1 ring-emerald-500/20"
@@ -124,7 +124,7 @@ export function Header({
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 sm:gap-2">
               <h1 className="truncate text-base font-semibold text-white sm:text-lg">
-                Celina Agent
+                Celeste
               </h1>
               <span className="hidden rounded-full border border-[var(--surface-2)] px-2 py-0.5 text-[10px] font-medium text-zinc-400 sm:inline-flex">
                 Celo mainnet
@@ -132,7 +132,7 @@ export function Header({
             </div>
             <p className="hidden truncate text-xs text-zinc-400 sm:block">
               {isConnected
-                ? "Your Celo wallet assistant"
+                ? "Your DeFAI assistant for Celo"
                 : "Connect your wallet to get started"}
             </p>
           </div>

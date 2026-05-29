@@ -5,7 +5,7 @@ import { celo } from "viem/chains";
 import { http } from "wagmi";
 
 export const wagmiConfig = getDefaultConfig({
-  appName: "Celina Agent",
+  appName: "Celeste",
   projectId:
     process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "00000000000000000000000000000000",
   chains: [celo],

@@ -1,7 +1,7 @@
 "use client";
 
 import type { UIMessage } from "ai";
-import { CelinaLogoAvatar } from "@/components/celina-logo";
+import { CelesteLogoAvatar } from "@/components/celeste-logo";
 import { MessagePart } from "@/components/chat/message-part";
 
 interface ChatMessageProps {
@@ -53,7 +53,7 @@ export function ChatMessage({
           <UserAvatar />
         </div>
       ) : (
-        <CelinaLogoAvatar
+        <CelesteLogoAvatar
           size="sm"
           className="mt-1 shadow-sm ring-2 ring-emerald-500/15"
         />
@@ -68,7 +68,7 @@ export function ChatMessage({
             isUser ? "sr-only" : "text-zinc-500"
           }`}
         >
-          {isUser ? "You" : "Celina"}
+          {isUser ? "You" : "Celeste"}
         </p>
         <div
           className={`space-y-2 break-words rounded-2xl px-3.5 py-2.5 shadow-sm [overflow-wrap:anywhere] sm:px-4 sm:py-3 ${

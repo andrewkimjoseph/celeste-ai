@@ -121,7 +121,7 @@ export function ChatMessageList({
       >
       {showConnectPrompt && (
         <div className="rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)]/60 px-4 py-6 text-center">
-          <p className="text-sm text-zinc-300">Connect your wallet to start chatting with Celina.</p>
+          <p className="text-sm text-zinc-300">Connect your wallet to start chatting with Celeste.</p>
           <p className="mt-1 text-xs text-zinc-500">
             Your balances will appear in the panel once connected.{" "}
             <a
@@ -138,7 +138,7 @@ export function ChatMessageList({
 
       {showEmptyState && (
         <div className="rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)]/60 px-4 py-6">
-          <h2 className="text-base font-semibold text-white">What can Celina do?</h2>
+          <h2 className="text-base font-semibold text-white">What can Celeste do?</h2>
           <p className="mt-1 text-sm text-zinc-400">
             Swaps, sends, Aave, balances, and more on Celo mainnet. Tap{" "}
             <span className="text-zinc-300">Balances</span> in the nav to see

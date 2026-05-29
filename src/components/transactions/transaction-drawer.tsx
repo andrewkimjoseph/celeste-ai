@@ -78,7 +78,7 @@ export function TransactionDrawer() {
             </h2>
             <p className="text-xs text-zinc-500">
               {transactions.length === 0
-                ? "Confirmed through Celina Agent"
+                ? "Confirmed through Celeste"
                 : `${transactions.length} confirmed`}
             </p>
           </div>

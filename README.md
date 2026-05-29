@@ -1,6 +1,6 @@
-# Celina Agent
+# Celeste
 
-Next.js chat UI for the Celina Agent. Connect a wallet, ask about balances, and prepare sends, swaps (Mento FX + Uniswap v4), and Aave actions — you sign in your wallet.
+DeFAI chat UI for Celo — applied Celina. Connect a wallet, ask about balances, and prepare sends, swaps (Mento FX + Uniswap v4), and Aave actions — you sign in your wallet.
 
 ## Setup
 

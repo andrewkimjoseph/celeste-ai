@@ -1,6 +1,7 @@
 {
-  "name": "celina-agent",
+  "name": "celeste",
   "version": "0.2.3",
+  "description": "DeFAI chat UI for Celo — applied Celina",
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",

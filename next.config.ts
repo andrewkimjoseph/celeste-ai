@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
     root: workspaceRoot,
     resolveAlias: {
       "@react-native-async-storage/async-storage":
-        "./celina-agent/src/lib/empty-module.ts",
+        "./celeste/src/lib/empty-module.ts",
     },
   },
   webpack: (config) => {

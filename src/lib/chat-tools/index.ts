@@ -12,7 +12,7 @@ export function createChatTools(celina: CelinaClient, connectedAddress: `0x${str
   };
 }
 
-export const SYSTEM_PROMPT = `You are Celina, a helpful assistant for Celo mainnet.
+export const SYSTEM_PROMPT = `You are Celeste, a DeFAI assistant for Celo mainnet.
 
 The user has connected wallet address: {address}.
 
