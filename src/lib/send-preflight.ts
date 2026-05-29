@@ -1,6 +1,6 @@
 import type { createCelinaClient } from "@andrewkimjoseph/celina-sdk";
 import { parseUnits } from "viem";
-import { normalizeRegistryTokenInput } from "@/lib/registry-token";
+import { normalizeRegistryTokenInput, formatTokenDisplaySymbol, GAS_UNITS_DISPLAY_LABEL } from "@/lib/registry-token";
 
 type CelinaClient = ReturnType<typeof createCelinaClient>;
 
@@ -72,7 +72,7 @@ export async function checkSendPreflight(
         amount,
         tokenBalance,
         celoBalance,
-        message: `Insufficient CELO. You have ${tokenBalance} CELO but need about ${amount} CELO plus gas.`,
+        message: `Insufficient ${GAS_UNITS_DISPLAY_LABEL}. You have ${tokenBalance} ${GAS_UNITS_DISPLAY_LABEL} but need about ${amount} ${GAS_UNITS_DISPLAY_LABEL} plus gas for fees.`,
       };
     }
 
@@ -92,7 +92,7 @@ export async function checkSendPreflight(
       amount,
       tokenBalance,
       celoBalance,
-      message: `Insufficient ${resolved.symbol}. You have ${tokenBalance} but tried to send ${amount}.`,
+      message: `Insufficient ${formatTokenDisplaySymbol(resolved.symbol)}. You have ${tokenBalance} but tried to send ${amount}.`,
     };
   }
 
@@ -103,7 +103,7 @@ export async function checkSendPreflight(
       amount,
       tokenBalance,
       celoBalance,
-      message: `Low CELO for gas. You have ${celoBalance} CELO; keep some CELO to pay network fees.`,
+      message: `Low ${GAS_UNITS_DISPLAY_LABEL} for fees. You have ${celoBalance} ${GAS_UNITS_DISPLAY_LABEL}; keep some ${GAS_UNITS_DISPLAY_LABEL} to pay network fees.`,
     };
   }
 

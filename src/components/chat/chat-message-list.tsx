@@ -17,10 +17,10 @@ const SUGGESTED_PROMPT_GROUPS = [
   {
     label: "Swaps & sends",
     prompts: [
-      "Swap 10 USDm to CELO",
-      "Get a quote to swap CELO to USDC",
+      "Swap 10 USDm to GAS units",
+      "Get a quote to swap GAS units to USDC",
       "Send 1 USDC to ",
-      "Send 0.1 CELO to ",
+      "Send 0.1 GAS units to ",
     ],
   },
   {

@@ -6,6 +6,7 @@ import type { PreparedTx } from "@/lib/prepared-flow";
 import { parseSendSummary } from "@/lib/send-preflight";
 import { formatFlowSummary, formatWalletError } from "@/lib/wallet-error";
 import { formatBalanceShort } from "@/lib/format-balance";
+import { formatTokenDisplaySymbol, GAS_UNITS_DISPLAY_LABEL } from "@/lib/registry-token";
 import { formatTransactionStep } from "@/lib/transaction-display";
 import { useState } from "react";
 import { useAccount, usePublicClient, useSendTransaction } from "wagmi";
@@ -225,11 +226,11 @@ export function TxConfirmCard({
             <p className="text-xs text-zinc-400">
               Your balance:{" "}
               <span className="text-zinc-200">
-                {formatBalanceShort(preflight.data.tokenBalance)} {preflight.data.token}
+                {formatBalanceShort(preflight.data.tokenBalance)} {formatTokenDisplaySymbol(preflight.data.token)}
               </span>
               {" · "}
               <span className="text-zinc-200">
-                {formatBalanceShort(preflight.data.celoBalance)} CELO
+                {formatBalanceShort(preflight.data.celoBalance)} {GAS_UNITS_DISPLAY_LABEL}
               </span>{" "}
               for gas
             </p>
@@ -247,7 +248,7 @@ export function TxConfirmCard({
           <p className="text-xs text-zinc-400">
             Gas balance:{" "}
             <span className="text-zinc-200">
-              {formatBalanceShort(walletBalances.celo.formatted)} CELO
+              {formatBalanceShort(walletBalances.celo.formatted)} {GAS_UNITS_DISPLAY_LABEL}
             </span>
           </p>
         </div>

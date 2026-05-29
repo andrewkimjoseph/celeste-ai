@@ -2,6 +2,7 @@
 
 import type { TokenBalanceRow } from "@/lib/balances";
 import { formatBalanceShort } from "@/lib/format-balance";
+import { formatTokenDisplaySymbol } from "@/lib/registry-token";
 
 interface BalanceRowProps {
   row: TokenBalanceRow;
@@ -31,7 +32,7 @@ export function BalanceRow({
     >
       <div className="min-w-0 flex-1">
         <p className={`truncate font-medium text-zinc-100 ${compact ? "text-xs" : "text-sm"}`}>
-          {row.symbol}
+          {formatTokenDisplaySymbol(row.symbol)}
           {row.readError && (
             <span className="ml-1.5 text-[10px] font-normal text-amber-400">
               unreadable
