@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { CELESTE_LOGO_PATH } from "@/components/celeste-logo";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,14 +15,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Celeste",
   description: "DeFAI chat for Celo — powered by Celina",
-  icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: CELESTE_LOGO_PATH, type: "image/png" },
-    ],
-    apple: CELESTE_LOGO_PATH,
-    shortcut: "/favicon.ico",
-  },
 };
 
 export const viewport: Viewport = {
