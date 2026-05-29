@@ -6,7 +6,7 @@ import type { PreparedTx } from "@/lib/prepared-flow";
 import { parseSendSummary } from "@/lib/send-preflight";
 import { formatFlowSummary, formatWalletError } from "@/lib/wallet-error";
 import { formatBalanceShort } from "@/lib/format-balance";
-import { formatHumanFlowText } from "@/lib/format-human-flow-text";
+import { formatTransactionStep } from "@/lib/transaction-display";
 import { useState } from "react";
 import { useAccount, usePublicClient, useSendTransaction } from "wagmi";
 
@@ -108,6 +108,7 @@ export function TxConfirmCard({
   onDismiss,
 }: TxConfirmCardProps) {
   const [status, setStatus] = useState<CardStatus>("idle");
+  const [signingStepIndex, setSigningStepIndex] = useState(0);
   const [errorDisplay, setErrorDisplay] = useState<ReturnType<
     typeof formatWalletError
   > | null>(null);
@@ -159,12 +160,15 @@ export function TxConfirmCard({
     }
 
     setStatus("signing");
+    setSigningStepIndex(0);
     setErrorDisplay(null);
     setShowTechnicalDetails(false);
     const hashes: string[] = [];
 
     try {
-      for (const step of steps) {
+      for (let index = 0; index < steps.length; index++) {
+        setSigningStepIndex(index);
+        const step = steps[index]!;
         const hash = await sendTransactionAsync({
           to: step.to,
           data: step.data,
@@ -198,7 +202,11 @@ export function TxConfirmCard({
           <p className="mt-1 text-sm leading-relaxed text-zinc-300">
             {displaySummary}
           </p>
-          <p className="mt-1.5 text-xs text-zinc-500">{copy.hint}</p>
+          <p className="mt-1.5 text-xs text-zinc-500">
+            {status === "signing" && steps.length > 1
+              ? `Step ${signingStepIndex + 1} of ${steps.length} — approve in your wallet.`
+              : copy.hint}
+          </p>
         </div>
       </div>
 
@@ -252,7 +260,7 @@ export function TxConfirmCard({
             className="flex gap-2 text-sm text-zinc-400"
           >
             <span className="font-medium text-zinc-500">{index + 1}.</span>
-            <span>{formatHumanFlowText(step.description)}</span>
+            <span>{formatTransactionStep(step.description)}</span>
           </li>
         ))}
       </ol>

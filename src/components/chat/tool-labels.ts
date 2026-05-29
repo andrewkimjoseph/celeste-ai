@@ -23,12 +23,24 @@ const TOOL_LABELS: Record<string, { inProgress: string; done: string }> = {
     inProgress: "Getting FX quote…",
     done: "Quote ready",
   },
+  get_swap_quote: {
+    inProgress: "Finding best swap route…",
+    done: "Quote ready",
+  },
+  get_uniswap_quote: {
+    inProgress: "Getting Uniswap quote…",
+    done: "Quote ready",
+  },
   estimate_send: {
     inProgress: "Estimating send gas…",
     done: "Send estimate ready",
   },
   estimate_mento_fx: {
     inProgress: "Estimating swap gas…",
+    done: "Swap estimate ready",
+  },
+  estimate_uniswap_swap: {
+    inProgress: "Estimating Uniswap swap gas…",
     done: "Swap estimate ready",
   },
   get_gas_fee_data: {
@@ -112,6 +124,14 @@ const TOOL_LABELS: Record<string, { inProgress: string; done: string }> = {
     done: "Transaction prepared",
   },
   prepare_mento_fx: {
+    inProgress: "Preparing transaction…",
+    done: "Transaction prepared",
+  },
+  prepare_swap: {
+    inProgress: "Preparing transaction…",
+    done: "Transaction prepared",
+  },
+  prepare_uniswap_swap: {
     inProgress: "Preparing transaction…",
     done: "Transaction prepared",
   },

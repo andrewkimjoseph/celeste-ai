@@ -13,6 +13,10 @@ import {
 } from "@/lib/aave-token";
 import { checkSendPreflight } from "@/lib/send-preflight";
 import { normalizeRegistryTokenInput } from "@/lib/registry-token";
+import {
+  prepareSwapWithFallback,
+  type SwapProtocol,
+} from "@/lib/swap-routing";
 
 const aaveTokenDescription = `Aave asset symbol on Celo (${AAVE_TOKEN_SYMBOLS.join(", ")}). Pass the symbol only — never a contract address from balance results.`;
 
@@ -61,7 +65,7 @@ export function createWriteTools(
 
     prepare_mento_fx: tool({
       description:
-        "Prepare unsigned Mento FX swap steps (approval + swap). User must sign in wallet.",
+        "Prepare Mento FX swap only. For general swaps after get_swap_quote, use prepare_swap with the quoted protocol.",
       inputSchema: z.object({
         token_in: z.string(),
         token_out: z.string(),
@@ -82,6 +86,85 @@ export function createWriteTools(
       }) => {
         const sender = resolveTargetAddress(connectedAddress, from);
         return celina.mentoFx.prepareFx(
+          sender,
+          normalizeRegistryTokenInput(token_in),
+          normalizeRegistryTokenInput(token_out),
+          amount,
+          {
+            recipient: recipient as `0x${string}` | undefined,
+            slippageTolerance: slippage_tolerance,
+            deadlineMinutes: deadline_minutes,
+          },
+        );
+      },
+    }),
+
+    prepare_swap: tool({
+      description:
+        "Prepare unsigned swap steps using the best route (Mento FX or Uniswap v4). Call after get_swap_quote. Pass protocol from the quote when available.",
+      inputSchema: z.object({
+        token_in: z.string(),
+        token_out: z.string(),
+        amount: z.string(),
+        protocol: z
+          .enum(["mento_fx", "uniswap_v4"])
+          .optional()
+          .describe("From get_swap_quote result; omit to auto-select best route"),
+        from: addressSchema.optional(),
+        recipient: addressSchema.optional(),
+        slippage_tolerance: z.number().min(0).max(20).optional(),
+        deadline_minutes: z.number().int().positive().optional(),
+      }),
+      execute: async ({
+        token_in,
+        token_out,
+        amount,
+        protocol,
+        from,
+        recipient,
+        slippage_tolerance,
+        deadline_minutes,
+      }) => {
+        const sender = resolveTargetAddress(connectedAddress, from);
+        return prepareSwapWithFallback(
+          celina,
+          sender,
+          normalizeRegistryTokenInput(token_in),
+          normalizeRegistryTokenInput(token_out),
+          amount,
+          {
+            recipient: recipient as `0x${string}` | undefined,
+            slippageTolerance: slippage_tolerance,
+            deadlineMinutes: deadline_minutes,
+          },
+          protocol as SwapProtocol | undefined,
+        );
+      },
+    }),
+
+    prepare_uniswap_swap: tool({
+      description:
+        "Prepare Uniswap v4 swap only. Prefer prepare_swap after get_swap_quote for automatic routing.",
+      inputSchema: z.object({
+        token_in: z.string(),
+        token_out: z.string(),
+        amount: z.string(),
+        from: addressSchema.optional(),
+        recipient: addressSchema.optional(),
+        slippage_tolerance: z.number().min(0).max(20).optional(),
+        deadline_minutes: z.number().int().positive().optional(),
+      }),
+      execute: async ({
+        token_in,
+        token_out,
+        amount,
+        from,
+        recipient,
+        slippage_tolerance,
+        deadline_minutes,
+      }) => {
+        const sender = resolveTargetAddress(connectedAddress, from);
+        return celina.uniswap.prepareSwap(
           sender,
           normalizeRegistryTokenInput(token_in),
           normalizeRegistryTokenInput(token_out),

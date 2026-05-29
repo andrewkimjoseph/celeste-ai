@@ -1,9 +1,13 @@
 "use client";
 
-import { formatHumanFlowText } from "@/lib/format-human-flow-text";
+import { formatFlowSummary } from "@/lib/wallet-error";
 import { formatTxHash } from "@/lib/format-balance";
 import { celoscanTxUrl } from "@/lib/links";
-import { formatFlowSummary } from "@/lib/wallet-error";
+import {
+  formatTransactionStep,
+  getTransactionProtocolLabel,
+  pairTransactionStepsWithHashes,
+} from "@/lib/transaction-display";
 import type { SessionTransaction } from "@/lib/transactions";
 import { useState, useEffect } from "react";
 
@@ -55,6 +59,13 @@ export function TransactionRow({
   const [expanded, setExpanded] = useState(selected);
   const [copiedHash, setCopiedHash] = useState<string | null>(null);
   const displaySummary = formatFlowSummary(transaction.summary);
+  const protocolLabel = getTransactionProtocolLabel(transaction.summary);
+  const stepEntries = pairTransactionStepsWithHashes(
+    transaction.steps,
+    transaction.hashes,
+  );
+  const multiStep = stepEntries.length > 1;
+  const primaryHash = transaction.hashes[transaction.hashes.length - 1];
 
   useEffect(() => {
     if (selected) {
@@ -70,6 +81,29 @@ export function TransactionRow({
     } catch {
       // Clipboard unavailable — ignore.
     }
+  }
+
+  function HashActions({ hash }: { hash: string }) {
+    return (
+      <div className="flex shrink-0 items-center gap-1.5">
+        <button
+          type="button"
+          onClick={() => void handleCopyHash(hash)}
+          className="rounded-md border border-[var(--surface-2)] bg-black/20 px-2 py-1 font-mono text-[11px] text-zinc-300 transition-colors hover:border-zinc-600 hover:text-white"
+          title="Copy transaction hash"
+        >
+          {copiedHash === hash ? "Copied" : formatTxHash(hash)}
+        </button>
+        <a
+          href={celoscanTxUrl(hash)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded-md border border-[var(--surface-2)] px-2 py-1 text-[11px] text-[var(--accent-hover)] transition-colors hover:border-emerald-500/30 hover:text-emerald-300"
+        >
+          View
+        </a>
+      </div>
+    );
   }
 
   return (
@@ -110,6 +144,16 @@ export function TransactionRow({
             <span className="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-emerald-200/90">
               Confirmed
             </span>
+            {protocolLabel && (
+              <span className="inline-flex items-center rounded-full border border-white/[0.08] bg-white/[0.04] px-2 py-0.5 text-[10px] font-medium text-zinc-300">
+                {protocolLabel}
+              </span>
+            )}
+            {multiStep && (
+              <span className="text-[10px] text-zinc-500">
+                {stepEntries.length} steps
+              </span>
+            )}
             <span className="text-[11px] text-zinc-500">
               {formatRelativeTime(transaction.timestamp)}
             </span>
@@ -122,38 +166,26 @@ export function TransactionRow({
         <ChevronIcon expanded={expanded} />
       </button>
 
-      <div className="mt-3 flex flex-wrap gap-2 pl-11">
-        {transaction.hashes.map((hash) => (
-          <div key={hash} className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => void handleCopyHash(hash)}
-              className="rounded-md border border-[var(--surface-2)] bg-black/20 px-2 py-1 font-mono text-[11px] text-zinc-300 transition-colors hover:border-zinc-600 hover:text-white"
-              title="Copy transaction hash"
-            >
-              {copiedHash === hash ? "Copied" : formatTxHash(hash)}
-            </button>
-            <a
-              href={celoscanTxUrl(hash)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-md border border-[var(--surface-2)] px-2 py-1 text-[11px] text-[var(--accent-hover)] transition-colors hover:border-emerald-500/30 hover:text-emerald-300"
-            >
-              View
-            </a>
-          </div>
-        ))}
-      </div>
+      {!expanded && primaryHash && (
+        <div className="mt-3 pl-11">
+          <HashActions hash={primaryHash} />
+        </div>
+      )}
 
-      {expanded && transaction.steps.length > 0 && (
-        <ol className="mt-3 space-y-1.5 border-t border-white/[0.06] pt-3 pl-11">
-          {transaction.steps.map((step, index) => (
+      {expanded && (
+        <ol className="mt-3 space-y-3 border-t border-white/[0.06] pt-3 pl-11">
+          {stepEntries.map((entry, index) => (
             <li
               key={`${transaction.id}-step-${index}`}
-              className="flex gap-2 text-sm text-zinc-400"
+              className="space-y-2"
             >
-              <span className="font-medium text-zinc-500">{index + 1}.</span>
-              <span>{formatHumanFlowText(step)}</span>
+              <div className="flex gap-2 text-sm text-zinc-300">
+                <span className="font-medium text-zinc-500">{index + 1}.</span>
+                <span className="min-w-0 flex-1 leading-relaxed">
+                  {formatTransactionStep(entry.step)}
+                </span>
+              </div>
+              {entry.hash && <HashActions hash={entry.hash} />}
             </li>
           ))}
         </ol>

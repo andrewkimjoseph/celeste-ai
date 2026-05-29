@@ -3,8 +3,11 @@ import { getToolName, isToolUIPart, type UIMessage } from "ai";
 type MessagePart = UIMessage["parts"][number];
 
 const RETRYABLE_READ_TOOLS = new Set([
+  "get_swap_quote",
   "get_mento_fx_quote",
+  "get_uniswap_quote",
   "estimate_mento_fx",
+  "estimate_uniswap_swap",
   "get_token_balance",
   "get_token_info",
 ]);

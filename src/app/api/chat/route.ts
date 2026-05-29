@@ -41,7 +41,7 @@ export async function POST(req: Request) {
     system: SYSTEM_PROMPT.replace("{address}", walletAddress),
     messages: await convertToModelMessages(messages),
     tools: createChatTools(celina, walletAddress),
-    stopWhen: stepCountIs(3),
+    stopWhen: stepCountIs(6),
     experimental_transform: smoothStream({
       delayInMs: 52,
       chunking: "word",

@@ -20,7 +20,7 @@ const BALANCE_TOOLS = new Set([
   "get_account",
 ]);
 
-function formatMentoQuote(output: unknown): string | null {
+function formatSwapQuote(output: unknown): string | null {
   if (typeof output !== "object" || output === null) {
     return null;
   }
@@ -30,14 +30,24 @@ function formatMentoQuote(output: unknown): string | null {
     tokenOut?: string;
     amountIn?: string;
     amountOut?: string;
+    expectedOut?: string;
+    protocol?: string;
   };
 
-  if (!quote.tokenIn || !quote.tokenOut || !quote.amountIn || !quote.amountOut) {
+  const amountOut = quote.expectedOut ?? quote.amountOut;
+  if (!quote.tokenIn || !quote.tokenOut || !quote.amountIn || !amountOut) {
     return null;
   }
 
+  const via =
+    quote.protocol === "uniswap_v4"
+      ? " via Uniswap"
+      : quote.protocol === "mento_fx"
+        ? " via Mento"
+        : "";
+
   return formatHumanFlowText(
-    `${quote.amountIn} ${quote.tokenIn} → ${quote.amountOut} ${quote.tokenOut}`,
+    `${quote.amountIn} ${quote.tokenIn} → ${amountOut} ${quote.tokenOut}${via}`,
   );
 }
 
@@ -118,9 +128,11 @@ export function ToolStatus({
           ? []
           : balanceRows;
 
-    const mentoSummary =
-      toolName === "get_mento_fx_quote"
-        ? formatMentoQuote(part.output)
+    const swapQuoteSummary =
+      toolName === "get_swap_quote" ||
+      toolName === "get_mento_fx_quote" ||
+      toolName === "get_uniswap_quote"
+        ? formatSwapQuote(part.output)
         : null;
 
     const governanceSummary =
@@ -135,8 +147,8 @@ export function ToolStatus({
             ✓
           </span>
           {labels.done}
-          {mentoSummary && (
-            <span className="text-emerald-100/80">· {mentoSummary}</span>
+          {swapQuoteSummary && (
+            <span className="text-emerald-100/80">· {swapQuoteSummary}</span>
           )}
           {governanceSummary && (
             <span className="text-emerald-100/80">· {governanceSummary}</span>

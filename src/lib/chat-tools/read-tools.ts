@@ -11,6 +11,9 @@ import {
   resolveTargetAddress,
 } from "@/lib/chat-tools/schemas";
 import { normalizeRegistryTokenInput } from "@/lib/registry-token";
+import {
+  getSwapQuoteWithFallback,
+} from "@/lib/swap-routing";
 
 type CelinaClient = ReturnType<typeof createCelinaClient>;
 
@@ -123,14 +126,47 @@ export function createReadTools(
 
     get_mento_fx_quote: tool({
       description:
-        "Get a Mento FX quote (no wallet required). Use registry symbols (GoodDollar or G$ for GoodDollar).",
+        "Mento FX oracle quote only (USDm, EURm, and other Mento stables). For general swap requests use get_swap_quote instead — it also tries Uniswap v4.",
       inputSchema: z.object({
-        token_in: z.string().describe("Registry symbol, e.g. GoodDollar, G$, USDC"),
-        token_out: z.string().describe("Registry symbol, e.g. USDT, USDm"),
+        token_in: z.string().describe("Registry symbol, e.g. USDm, EURm"),
+        token_out: z.string().describe("Registry symbol, e.g. EURm, USDm"),
         amount: z.string(),
       }),
       execute: async ({ token_in, token_out, amount }) =>
         celina.mentoFx.getFxQuote(
+          normalizeRegistryTokenInput(token_in),
+          normalizeRegistryTokenInput(token_out),
+          amount,
+        ),
+    }),
+
+    get_swap_quote: tool({
+      description:
+        "Get the best swap quote on Celo — tries Mento FX and Uniswap v4 in parallel and returns the best route. Use this for any swap request (e.g. G$ → USDT, CELO → USDC, USDm → EURm).",
+      inputSchema: z.object({
+        token_in: z.string().describe("Registry symbol, e.g. GoodDollar, G$, CELO, USDC"),
+        token_out: z.string().describe("Registry symbol, e.g. USDT, USDC, EURm"),
+        amount: z.string(),
+      }),
+      execute: async ({ token_in, token_out, amount }) =>
+        getSwapQuoteWithFallback(
+          celina,
+          normalizeRegistryTokenInput(token_in),
+          normalizeRegistryTokenInput(token_out),
+          amount,
+        ),
+    }),
+
+    get_uniswap_quote: tool({
+      description:
+        "Uniswap v4 AMM quote only. For general swaps use get_swap_quote instead — it falls back automatically when Mento FX has no route.",
+      inputSchema: z.object({
+        token_in: z.string().describe("Registry symbol, e.g. CELO, USDC, USDT"),
+        token_out: z.string().describe("Registry symbol, e.g. USDC, USDT"),
+        amount: z.string(),
+      }),
+      execute: async ({ token_in, token_out, amount }) =>
+        celina.uniswap.getSwapQuote(
           normalizeRegistryTokenInput(token_in),
           normalizeRegistryTokenInput(token_out),
           amount,
@@ -183,6 +219,42 @@ export function createReadTools(
       }) => {
         const sender = resolveTargetAddress(connectedAddress, from);
         return celina.mentoFx.estimateFx(
+          sender,
+          normalizeRegistryTokenInput(token_in),
+          normalizeRegistryTokenInput(token_out),
+          amount,
+          {
+            recipient: recipient as `0x${string}` | undefined,
+            slippageTolerance: slippage_tolerance,
+            deadlineMinutes: deadline_minutes,
+          },
+        );
+      },
+    }),
+
+    estimate_uniswap_swap: tool({
+      description:
+        "Estimate gas for a Uniswap v4 swap from the connected wallet, including ERC-20 and Permit2 approvals when needed.",
+      inputSchema: z.object({
+        token_in: z.string(),
+        token_out: z.string(),
+        amount: z.string(),
+        from: addressSchema.optional(),
+        recipient: addressSchema.optional(),
+        slippage_tolerance: z.number().min(0).max(20).optional(),
+        deadline_minutes: z.number().int().positive().optional(),
+      }),
+      execute: async ({
+        token_in,
+        token_out,
+        amount,
+        from,
+        recipient,
+        slippage_tolerance,
+        deadline_minutes,
+      }) => {
+        const sender = resolveTargetAddress(connectedAddress, from);
+        return celina.uniswap.estimateSwap(
           sender,
           normalizeRegistryTokenInput(token_in),
           normalizeRegistryTokenInput(token_out),
