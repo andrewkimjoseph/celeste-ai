@@ -98,7 +98,7 @@ export function TransactionRow({
           href={celoscanTxUrl(hash)}
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-md border border-[var(--surface-2)] px-2 py-1 text-[11px] text-[var(--accent-hover)] transition-colors hover:border-emerald-500/30 hover:text-emerald-300"
+          className="rounded-md border border-[var(--surface-2)] px-2 py-1 text-[11px] text-[var(--accent-hover)] transition-colors hover:border-[var(--accent)]/30 hover:text-[var(--accent-soft-text)]"
         >
           View
         </a>
@@ -110,7 +110,7 @@ export function TransactionRow({
     <article
       className={`rounded-xl border bg-gradient-to-b from-[var(--surface-1)] to-zinc-900/70 p-3.5 shadow-sm transition-colors ${
         selected
-          ? "border-emerald-500/40 ring-1 ring-emerald-500/20"
+          ? "border-[var(--accent)]/40 ring-1 ring-[var(--accent)]/20"
           : "border-white/[0.06]"
       }`}
     >
@@ -122,7 +122,7 @@ export function TransactionRow({
         }}
         className="flex w-full items-start gap-3 text-left"
       >
-        <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300">
+        <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-hover)]">
           <svg
             className="size-4"
             fill="none"
@@ -141,7 +141,7 @@ export function TransactionRow({
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-emerald-200/90">
+            <span className="inline-flex items-center rounded-full border border-[var(--accent-soft-border)] bg-[var(--accent-soft)] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[var(--accent-soft-text)]">
               Confirmed
             </span>
             {protocolLabel && (

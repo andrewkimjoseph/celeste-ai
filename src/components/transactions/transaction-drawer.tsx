@@ -65,7 +65,7 @@ export function TransactionDrawer() {
         className="absolute right-0 top-0 flex h-dvh w-full max-w-md translate-x-0 flex-col border-l border-[var(--surface-2)] bg-[var(--surface-0)] shadow-2xl shadow-black/40 transition-transform duration-300 ease-out"
         style={{
           backgroundImage:
-            "radial-gradient(ellipse 80% 40% at 50% 0%, rgb(5 150 105 / 0.08), transparent)",
+            "radial-gradient(ellipse 80% 40% at 50% 0%, rgb(108 180 238 / 0.08), transparent)",
         }}
       >
         <div className="flex items-center justify-between gap-3 border-b border-[var(--surface-2)] px-4 py-4">

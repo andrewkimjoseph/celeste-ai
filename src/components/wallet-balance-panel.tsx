@@ -193,7 +193,7 @@ function MobileBalanceAccordion({
             <span className="inline-block size-3 animate-spin rounded-full border-2 border-zinc-600 border-t-[var(--accent-hover)]" />
           ) : celoShort !== null ? (
             <>
-              <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-200/90">
+              <span className="rounded-full bg-[var(--accent-soft)] px-2 py-0.5 text-[11px] font-medium text-[var(--accent-soft-text)]">
                 {celoShort} CELO
               </span>
               {tokenCount > 0 && (
