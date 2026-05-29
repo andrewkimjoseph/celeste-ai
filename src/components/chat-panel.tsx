@@ -34,6 +34,9 @@ export function ChatPanel({
   const { addTransaction } = useTransactions();
   const [input, setInput] = useState("");
   const [dismissedFlowKey, setDismissedFlowKey] = useState<string | null>(null);
+  /** After dismiss, hide confirm cards until the user sends a new message. */
+  const [txCardBlockedUntilUserMessage, setTxCardBlockedUntilUserMessage] =
+    useState(false);
 
   const transport = useMemo(
     () => new DefaultChatTransport({ api: "/api/chat" }),
@@ -46,7 +49,15 @@ export function ChatPanel({
 
   const flowMeta = getActivePreparedFlowWithMeta(messages);
   const flowKey = flowMeta?.flowKey ?? null;
-  const showTxCard = Boolean(flowMeta && flowKey !== dismissedFlowKey);
+  const showTxCard = Boolean(
+    flowMeta &&
+      flowKey !== dismissedFlowKey &&
+      !txCardBlockedUntilUserMessage,
+  );
+
+  function clearTxCardBlock() {
+    setTxCardBlockedUntilUserMessage(false);
+  }
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -55,6 +66,7 @@ export function ChatPanel({
       return;
     }
 
+    clearTxCardBlock();
     setInput("");
     await sendMessage({ text }, { body: { address } });
   }
@@ -65,12 +77,14 @@ export function ChatPanel({
       return;
     }
 
+    clearTxCardBlock();
     await sendMessage({ text: prompt }, { body: { address } });
   }
 
   const handleNewChat = useCallback(() => {
     setMessages([]);
     setDismissedFlowKey(null);
+    setTxCardBlockedUntilUserMessage(false);
     setInput("");
   }, [setMessages]);
 
@@ -115,15 +129,7 @@ export function ChatPanel({
             if (flowKey) {
               setDismissedFlowKey(flowKey);
             }
-            const summary = flowMeta?.flow.summary;
-            void sendMessage(
-              {
-                text: summary
-                  ? `I dismissed the transaction confirmation card without signing. Prepared action: ${summary}`
-                  : "I dismissed the transaction confirmation card without signing.",
-              },
-              { body: { address } },
-            );
+            setTxCardBlockedUntilUserMessage(true);
           }}
         />
         <ChatComposer

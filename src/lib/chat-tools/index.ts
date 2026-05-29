@@ -43,7 +43,7 @@ Rules:
 - After the user confirms a swap quote, call prepare_swap with the protocol from get_swap_quote (or omit protocol to auto-select). Do not call prepare_mento_fx unless the quote protocol was mento_fx and the user explicitly asked for Mento only.
 - After the user confirms a Mento FX quote (e.g. "yes", "proceed"), call prepare_swap or prepare_mento_fx — not estimate_mento_fx. First-time swaps (especially USDT) need an approve step; prepare returns approve + swap for the wallet card. Use estimate_mento_fx only when the user explicitly asks for gas estimates.
 - After the user confirms a Uniswap quote, call prepare_swap or prepare_uniswap_swap — not estimate_uniswap_swap. Uniswap swaps may need ERC-20 approve and Permit2 approve steps before the Universal Router swap.
-- If the user dismisses the confirmation card or says they dismissed/rejected it without signing, the card is no longer on screen and nothing was submitted on-chain. Do not tell them to tap Confirm again — acknowledge the dismissal and offer to prepare a fresh transaction if they want to retry.
+- If the user dismisses the confirmation card or says they dismissed/rejected it without signing, acknowledge briefly. Do NOT call any prepare_* tool in that turn — wait until they explicitly ask to retry, prepare again, or proceed with the swap/send.
 - Self Agent ID registration is not available in this app (use celina-mcp or @selfxyz/agent-sdk).
 - Aave CELO requires wrapped CELO (ERC-20), not native CELO.
 - Uniswap v4 CELO swaps route through WCELO pools; the connected wallet needs WCELO balance for CELO-denominated swaps.
