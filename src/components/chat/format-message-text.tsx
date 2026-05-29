@@ -24,22 +24,22 @@ function parseInline(text: string, options: FormatOptions = {}): ReactNode[] {
 
   const boldClass =
     variant === "user"
-      ? "font-semibold text-white"
+      ? "font-semibold text-[var(--accent-foreground)]"
       : "font-semibold text-white";
 
   const linkClass =
     variant === "user"
-      ? "text-emerald-100 underline decoration-emerald-200/50 underline-offset-2 hover:text-white"
+      ? "text-[var(--accent-foreground)] underline decoration-[var(--accent-strong)]/50 underline-offset-2 hover:text-black"
       : "text-[var(--accent-hover)] underline decoration-[var(--accent-hover)]/30 underline-offset-2 hover:decoration-[var(--accent-hover)]";
 
   const codeClass =
     variant === "user"
-      ? "rounded bg-black/20 px-1.5 py-0.5 font-mono text-[0.85em] text-emerald-50"
-      : "rounded bg-black/30 px-1.5 py-0.5 font-mono text-[0.85em] text-emerald-100/90";
+      ? "rounded bg-black/10 px-1.5 py-0.5 font-mono text-[0.85em] text-[var(--accent-foreground)]"
+      : "rounded bg-black/30 px-1.5 py-0.5 font-mono text-[0.85em] text-[var(--accent-soft-text)]/90";
 
   const hashClass =
     variant === "user"
-      ? "break-all rounded bg-black/15 px-1 py-0.5 font-mono text-[0.8em] text-emerald-50"
+      ? "break-all rounded bg-black/10 px-1 py-0.5 font-mono text-[0.8em] text-[var(--accent-foreground)]"
       : "break-all rounded bg-black/25 px-1 py-0.5 font-mono text-[0.8em] text-zinc-200";
 
   while ((match = INLINE_PATTERN.exec(text)) !== null) {
@@ -74,7 +74,7 @@ function parseInline(text: string, options: FormatOptions = {}): ReactNode[] {
             key={`${keyPrefix}-${key++}`}
             type="button"
             onClick={() => onHashClick(token)}
-            className={`${hashClass} cursor-pointer transition-colors hover:text-emerald-200`}
+            className={`${hashClass} cursor-pointer transition-colors hover:text-[var(--accent-hover)]`}
             title="View in transactions"
           >
             {token}

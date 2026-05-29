@@ -17,7 +17,7 @@ export function AssistantMessageSlot({
       {showAvatar ? (
         <CelesteLogoAvatar
           size="sm"
-          className="mt-1 shadow-sm ring-2 ring-emerald-500/15"
+          className="mt-1 shadow-sm ring-2 ring-[var(--accent)]/15"
         />
       ) : (
         <div className="mt-1 size-7 shrink-0 sm:size-8" aria-hidden />

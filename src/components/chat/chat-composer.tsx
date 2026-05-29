@@ -51,7 +51,7 @@ export function ChatComposer({
         <button
           type="submit"
           disabled={!canChat || !input.trim() || isBusy}
-          className="h-[44px] shrink-0 rounded-xl bg-[var(--accent)] px-4 text-sm font-medium text-white transition-colors hover:bg-[var(--accent-hover)] disabled:opacity-50"
+          className="h-[44px] shrink-0 rounded-xl bg-[var(--accent-strong)] px-4 text-sm font-semibold text-white transition-colors hover:bg-[var(--accent)] disabled:cursor-not-allowed disabled:bg-[var(--surface-2)] disabled:text-zinc-500"
         >
           Send
         </button>

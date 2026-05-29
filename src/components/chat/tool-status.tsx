@@ -142,16 +142,16 @@ export function ToolStatus({
 
     return (
       <div className="space-y-2">
-        <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-200/90">
-          <span className="text-emerald-400" aria-hidden>
+        <div className="inline-flex items-center gap-1.5 rounded-full border border-[var(--accent-soft-border)] bg-[var(--accent-soft)] px-2.5 py-1 text-[11px] font-medium text-[var(--accent-soft-text)]">
+          <span className="text-[var(--accent-hover)]" aria-hidden>
             ✓
           </span>
           {labels.done}
           {swapQuoteSummary && (
-            <span className="text-emerald-100/80">· {swapQuoteSummary}</span>
+            <span className="text-[var(--accent-soft-text)]/80">· {swapQuoteSummary}</span>
           )}
           {governanceSummary && (
-            <span className="text-emerald-100/80">· {governanceSummary}</span>
+            <span className="text-[var(--accent-soft-text)]/80">· {governanceSummary}</span>
           )}
         </div>
 

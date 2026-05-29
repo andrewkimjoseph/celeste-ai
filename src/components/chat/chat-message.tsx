@@ -13,7 +13,7 @@ interface ChatMessageProps {
 function UserAvatar() {
   return (
     <svg
-      className="size-4 text-white"
+      className="size-4 text-[var(--accent-foreground)]"
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -47,7 +47,7 @@ export function ChatMessage({
     >
       {isUser ? (
         <div
-          className="mt-1 flex size-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 shadow-sm ring-2 ring-emerald-400/20 sm:size-8"
+          className="mt-1 flex size-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-strong)] shadow-sm ring-2 ring-[var(--accent)]/20 sm:size-8"
           aria-label="You"
         >
           <UserAvatar />
@@ -55,7 +55,7 @@ export function ChatMessage({
       ) : (
         <CelesteLogoAvatar
           size="sm"
-          className="mt-1 shadow-sm ring-2 ring-emerald-500/15"
+          className="mt-1 shadow-sm ring-2 ring-[var(--accent)]/15"
         />
       )}
       <div
@@ -73,7 +73,7 @@ export function ChatMessage({
         <div
           className={`space-y-2 break-words rounded-2xl px-3.5 py-2.5 shadow-sm [overflow-wrap:anywhere] sm:px-4 sm:py-3 ${
             isUser
-              ? "bg-gradient-to-br from-emerald-600 to-emerald-700 text-white shadow-emerald-950/20"
+              ? "bg-gradient-to-br from-[var(--accent)] to-[var(--accent-strong)] text-[var(--accent-foreground)] shadow-black/20"
               : "border border-white/[0.06] bg-gradient-to-b from-[var(--surface-1)] to-zinc-900/80 text-zinc-100 shadow-black/20"
           }`}
         >

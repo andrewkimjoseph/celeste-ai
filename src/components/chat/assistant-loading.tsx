@@ -7,7 +7,7 @@ export function AssistantLoading() {
     <div className="flex w-full gap-3">
       <CelesteLogoAvatar
         size="sm"
-        className="mt-1 shadow-sm ring-2 ring-emerald-500/15"
+        className="mt-1 shadow-sm ring-2 ring-[var(--accent)]/15"
       />
       <div className="min-w-0 flex-1">
         <p className="mb-1.5 text-[11px] font-medium tracking-wide text-zinc-500">
