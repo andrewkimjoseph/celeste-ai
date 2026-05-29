@@ -14,9 +14,10 @@ export async function POST(req: Request) {
   const body = (await req.json()) as {
     messages: UIMessage[];
     address?: string;
+    clientContext?: string;
   };
 
-  const { messages, address } = body;
+  const { messages, address, clientContext } = body;
 
   if (!address || !isAddress(address)) {
     return new Response(
@@ -36,9 +37,14 @@ export async function POST(req: Request) {
   const celina = getCelinaClient();
   const walletAddress = address as `0x${string}`;
 
+  let system = SYSTEM_PROMPT.replace("{address}", walletAddress);
+  if (clientContext?.trim()) {
+    system += `\n\nClient context for this turn:\n${clientContext.trim()}`;
+  }
+
   const result = streamText({
     model: getChatModel(),
-    system: SYSTEM_PROMPT.replace("{address}", walletAddress),
+    system,
     messages: await convertToModelMessages(messages),
     tools: createChatTools(celina, walletAddress),
     stopWhen: stepCountIs(6),

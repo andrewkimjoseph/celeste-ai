@@ -9,7 +9,10 @@ import { useMemo, useState, useEffect, useCallback } from "react";
 import { ChatComposer } from "@/components/chat/chat-composer";
 import { ChatMessageList } from "@/components/chat/chat-message-list";
 import { formatChatError } from "@/components/chat/chat-utils";
-import { getActivePreparedFlowWithMeta } from "@/lib/prepared-flow";
+import {
+  buildPreparedFlowClientContext,
+  getActivePreparedFlowWithMeta,
+} from "@/lib/prepared-flow";
 import { formatTxHashes } from "@/lib/format-balance";
 import { useMounted } from "@/hooks/use-mounted";
 import { useTransactions } from "@/hooks/use-transactions";
@@ -59,6 +62,11 @@ export function ChatPanel({
     setTxCardBlockedUntilUserMessage(false);
   }
 
+  function buildChatRequestBody() {
+    const clientContext = buildPreparedFlowClientContext(messages);
+    return clientContext ? { address, clientContext } : { address };
+  }
+
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     const text = input.trim();
@@ -68,7 +76,7 @@ export function ChatPanel({
 
     clearTxCardBlock();
     setInput("");
-    await sendMessage({ text }, { body: { address } });
+    await sendMessage({ text }, { body: buildChatRequestBody() });
   }
 
   async function handlePromptSelect(prompt: string) {
@@ -78,7 +86,7 @@ export function ChatPanel({
     }
 
     clearTxCardBlock();
-    await sendMessage({ text: prompt }, { body: { address } });
+    await sendMessage({ text: prompt }, { body: buildChatRequestBody() });
   }
 
   const handleNewChat = useCallback(() => {

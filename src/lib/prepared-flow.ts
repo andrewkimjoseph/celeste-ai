@@ -1,5 +1,5 @@
 import type { SerializedPreparedFlow, PreparedTx } from "@andrewkimjoseph/celina-sdk";
-import { isToolUIPart, type UIMessage } from "ai";
+import { isTextUIPart, isToolUIPart, type UIMessage } from "ai";
 
 const PREPARE_TOOL_PREFIX = "prepare_";
 
@@ -108,6 +108,82 @@ export function getActivePreparedFlowWithMeta(
   }
 
   return meta;
+}
+
+const CONFIRMED_TX_PREFIX = "Transaction confirmed";
+const DISMISSED_TX_SNIPPET = "dismissed the transaction confirmation card";
+
+function getMessageText(message: UIMessage): string {
+  return (
+    message.parts
+      ?.filter(isTextUIPart)
+      .map((part) => part.text)
+      .join("\n")
+      .trim() ?? ""
+  );
+}
+
+function isAutoPreparedFlowUserMessage(text: string): boolean {
+  return (
+    text.startsWith(CONFIRMED_TX_PREFIX) ||
+    text.includes(DISMISSED_TX_SNIPPET)
+  );
+}
+
+function getUserFollowUpsAfterPrepare(
+  messages: UIMessage[],
+  meta: PreparedFlowMeta,
+): string[] {
+  const preparedIndex = messages.findIndex((message) => message.id === meta.messageId);
+  if (preparedIndex === -1) {
+    return [];
+  }
+
+  const followUps: string[] = [];
+  for (let i = preparedIndex + 1; i < messages.length; i++) {
+    const message = messages[i];
+    if (message.role !== "user") {
+      continue;
+    }
+
+    const text = getMessageText(message);
+    if (text.length > 0 && !isAutoPreparedFlowUserMessage(text)) {
+      followUps.push(text);
+    }
+  }
+
+  return followUps;
+}
+
+/** Hidden LLM context when the user continues without signing a prepared transaction. */
+export function buildPreparedFlowClientContext(
+  messages: UIMessage[],
+): string | undefined {
+  const meta = getLatestPreparedFlowWithMeta(messages);
+  if (!meta) {
+    return undefined;
+  }
+
+  if (getActivePreparedFlowWithMeta(messages)) {
+    return [
+      `The user is sending a new message without signing the wallet confirm card for: "${meta.flow.summary}".`,
+      "After this message the card is hidden.",
+      "Do not tell them to click Confirm on that card.",
+      "Answer their new question.",
+      "Only call prepare_* again if they explicitly ask to proceed with the prepared action.",
+    ].join(" ");
+  }
+
+  const followUps = getUserFollowUpsAfterPrepare(messages, meta);
+  if (followUps.length === 0) {
+    return undefined;
+  }
+
+  return [
+    `The wallet confirm card for "${meta.flow.summary}" was not signed and is no longer visible.`,
+    "Do not tell the user to click Confirm on an old card.",
+    'If they agree to proceed (e.g. "OK", "yes", "go ahead"), call the appropriate prepare_* tool again with the same parameters.',
+  ].join(" ");
 }
 
 export type { PreparedTx, SerializedPreparedFlow };
