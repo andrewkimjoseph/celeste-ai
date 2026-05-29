@@ -101,11 +101,11 @@ export function createWriteTools(
 
     prepare_swap: tool({
       description:
-        "Prepare unsigned swap steps using the best route (Mento FX or Uniswap v4). Call after get_swap_quote. Pass protocol from the quote when available.",
+        "Prepare unsigned swap steps using the best route (Mento FX or Uniswap v4). Call after get_swap_quote once the user confirmed a quoted amount. Do not call with a guessed amount.",
       inputSchema: z.object({
         token_in: z.string(),
         token_out: z.string(),
-        amount: z.string(),
+        amount: z.string().describe("Same human-readable amount from the confirmed get_swap_quote"),
         protocol: z
           .enum(["mento_fx", "uniswap_v4"])
           .optional()

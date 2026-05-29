@@ -126,11 +126,11 @@ export function createReadTools(
 
     get_mento_fx_quote: tool({
       description:
-        "Mento FX oracle quote only (USDm, EURm, and other Mento stables). For general swap requests use get_swap_quote instead — it also tries Uniswap v4.",
+        "Mento FX oracle quote only (USDm, EURm, and other Mento stables). For general swap requests use get_swap_quote instead — it also tries Uniswap v4. Do not call without a user-specified amount — ask first if missing.",
       inputSchema: z.object({
         token_in: z.string().describe("Registry symbol, e.g. USDm, EURm"),
         token_out: z.string().describe("Registry symbol, e.g. EURm, USDm"),
-        amount: z.string(),
+        amount: z.string().describe("Human-readable amount the user asked to swap — never a guessed placeholder"),
       }),
       execute: async ({ token_in, token_out, amount }) =>
         celina.mentoFx.getFxQuote(
@@ -143,11 +143,11 @@ export function createReadTools(
 
     get_swap_quote: tool({
       description:
-        "Get the best swap quote on Celo — tries Mento FX and Uniswap v4 in parallel and returns the best route. Use this for any swap request (e.g. G$ → USDT, CELO → USDC, USDm → EURm).",
+        "Get the best swap quote on Celo — tries Mento FX and Uniswap v4 in parallel and returns the best route. Use for swap requests once the user has specified an amount (e.g. G$ → USDT, CELO → USDC). Do not call without a user-specified amount — ask how much to swap first.",
       inputSchema: z.object({
         token_in: z.string().describe("Registry symbol, e.g. GoodDollar, G$, CELO, USDC"),
         token_out: z.string().describe("Registry symbol, e.g. USDT, USDC, EURm"),
-        amount: z.string(),
+        amount: z.string().describe("Human-readable amount the user asked to swap — never a guessed placeholder"),
       }),
       execute: async ({ token_in, token_out, amount }) =>
         getSwapQuoteWithFallback(
@@ -161,11 +161,11 @@ export function createReadTools(
 
     get_uniswap_quote: tool({
       description:
-        "Uniswap v4 AMM quote only. For general swaps use get_swap_quote instead — it falls back automatically when Mento FX has no route.",
+        "Uniswap v4 AMM quote only. For general swaps use get_swap_quote instead — it falls back automatically when Mento FX has no route. Do not call without a user-specified amount — ask first if missing.",
       inputSchema: z.object({
         token_in: z.string().describe("Registry symbol, e.g. CELO, USDC, USDT"),
         token_out: z.string().describe("Registry symbol, e.g. USDC, USDT"),
-        amount: z.string(),
+        amount: z.string().describe("Human-readable amount the user asked to swap — never a guessed placeholder"),
       }),
       execute: async ({ token_in, token_out, amount }) =>
         celina.uniswap.getSwapQuote(
