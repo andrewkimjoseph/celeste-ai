@@ -19,30 +19,28 @@ export function ChatTurnRow({
   const showAssistantSlot = hasAssistant || showLoading;
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-x-8 lg:gap-x-12">
-      <div
-        className={`order-2 min-w-0 md:order-1 ${
-          showAssistantSlot ? "" : "hidden md:block md:invisible"
-        }`}
-      >
-        {showLoading && !hasAssistant ? (
-          <AssistantLoading />
-        ) : turn.assistant ? (
-          <ChatMessage
-            message={turn.assistant}
-            align="start"
-            hidePrepareToolDone={hidePrepareToolDone}
-          />
-        ) : null}
-      </div>
-
+    <div className="flex flex-col gap-4 sm:gap-5">
       {turn.user ? (
-        <div className="order-1 flex min-w-0 justify-end md:order-2">
+        <div className="flex min-w-0 justify-end md:w-1/2 md:self-end md:pl-4 lg:pl-6">
           <ChatMessage
             message={turn.user}
             align="end"
             hidePrepareToolDone={hidePrepareToolDone}
           />
+        </div>
+      ) : null}
+
+      {showAssistantSlot ? (
+        <div className="min-w-0 md:w-1/2 md:pr-4 lg:pr-6">
+          {showLoading && !hasAssistant ? (
+            <AssistantLoading />
+          ) : turn.assistant ? (
+            <ChatMessage
+              message={turn.assistant}
+              align="start"
+              hidePrepareToolDone={hidePrepareToolDone}
+            />
+          ) : null}
         </div>
       ) : null}
     </div>

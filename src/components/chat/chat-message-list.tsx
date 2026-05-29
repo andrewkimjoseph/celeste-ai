@@ -115,7 +115,7 @@ export function ChatMessageList({
         className={`w-full py-4 sm:py-5 ${
           isLandingView
             ? "mx-auto max-w-2xl px-3 sm:px-6"
-            : "space-y-6 px-4 sm:space-y-8 sm:px-5"
+            : "space-y-8 px-4 sm:space-y-10 sm:px-5"
         }`}
       >
       {showConnectPrompt && (

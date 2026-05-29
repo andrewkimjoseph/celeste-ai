@@ -36,8 +36,6 @@ export function AssistantMessageSlot({
 
 export function AssistantColumn({ children }: { children: ReactNode }) {
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-x-8 lg:gap-x-12">
-      <div className="order-2 min-w-0 md:order-1">{children}</div>
-    </div>
+    <div className="min-w-0 md:w-1/2 md:pr-4 lg:pr-6">{children}</div>
   );
 }
