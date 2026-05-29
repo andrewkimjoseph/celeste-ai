@@ -11,7 +11,6 @@ import {
   shouldShowAssistantLoading,
 } from "@/components/chat/chat-utils";
 import type { SerializedPreparedFlow } from "@/lib/prepared-flow";
-import { CELINA_SDK_DOCS_URL } from "@/lib/links";
 import { TxConfirmCard } from "@/components/tx-confirm-card";
 
 const SUGGESTED_PROMPT_GROUPS = [
@@ -123,15 +122,7 @@ export function ChatMessageList({
         <div className="rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)]/60 px-4 py-6 text-center">
           <p className="text-sm text-zinc-300">Connect your wallet to start chatting with Celeste.</p>
           <p className="mt-1 text-xs text-zinc-500">
-            Your balances will appear in the panel once connected.{" "}
-            <a
-              href={CELINA_SDK_DOCS_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[var(--accent-hover)] underline-offset-2 hover:underline"
-            >
-              Celina SDK docs
-            </a>
+            Your balances will show up once you&apos;re connected.
           </p>
         </div>
       )}
@@ -140,9 +131,8 @@ export function ChatMessageList({
         <div className="rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)]/60 px-4 py-6">
           <h2 className="text-base font-semibold text-white">What can Celeste do?</h2>
           <p className="mt-1 text-sm text-zinc-400">
-            Swaps, sends, Aave, balances, and more on Celo mainnet. Tap{" "}
-            <span className="text-zinc-300">Balances</span> in the nav to see
-            your wallet.
+            Ask in plain English — swap tokens, send money, check balances, and
+            more on Celo.
           </p>
           <div className="mt-4 space-y-3">
             {SUGGESTED_PROMPT_GROUPS.map((group) => (
@@ -165,19 +155,6 @@ export function ChatMessageList({
               </div>
             ))}
           </div>
-          <p className="mt-4 border-t border-[var(--surface-2)] pt-3 text-xs text-zinc-500">
-            Built on{" "}
-            <a
-              href={CELINA_SDK_DOCS_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[var(--accent-hover)] underline-offset-2 hover:underline"
-            >
-              Celina SDK
-            </a>
-            {" — "}
-            guides, wagmi integration, and API reference on GitBook.
-          </p>
         </div>
       )}
 

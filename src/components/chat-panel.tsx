@@ -130,6 +130,16 @@ export function ChatPanel({
               setDismissedFlowKey(flowKey);
             }
             setTxCardBlockedUntilUserMessage(true);
+
+            const summary = flowMeta?.flow.summary;
+            void sendMessage(
+              {
+                text: summary
+                  ? `I dismissed the transaction confirmation card without signing. Prepared action: ${summary}`
+                  : "I dismissed the transaction confirmation card without signing.",
+              },
+              { body: { address } },
+            );
           }}
         />
         <ChatComposer
