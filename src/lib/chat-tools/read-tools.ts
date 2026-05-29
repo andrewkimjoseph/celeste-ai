@@ -24,7 +24,7 @@ export function createReadTools(
   return {
     get_account: tool({
       description:
-        "Returns native GAS units (CELO) balance, nonce, and whether the address is a contract.",
+        "Returns native CELO balance, nonce, and whether the address is a contract.",
       inputSchema: z.object({
         address: addressSchema.optional(),
       }),
@@ -88,7 +88,7 @@ export function createReadTools(
 
     get_celo_balances: tool({
       description:
-        "Returns GAS units (native CELO) and ERC-20 balances for specific tokens. Defaults to connected wallet.",
+        "Returns CELO and ERC-20 balances for specific tokens. Defaults to connected wallet.",
       inputSchema: z.object({
         address: addressSchema.optional(),
         tokens: z.array(z.string()).optional(),
@@ -143,9 +143,9 @@ export function createReadTools(
 
     get_swap_quote: tool({
       description:
-        "Get the best swap quote on Celo — tries Mento FX and Uniswap v4 in parallel and returns the best route. Use for swap requests once the user has specified an amount (e.g. G$ → USDT, GAS units → USDC). Do not call without a user-specified amount — ask how much to swap first.",
+        "Get the best swap quote on Celo — tries Mento FX and Uniswap v4 in parallel and returns the best route. Use for swap requests once the user has specified an amount (e.g. G$ → USDT, CELO → USDC). Do not call without a user-specified amount — ask how much to swap first.",
       inputSchema: z.object({
-        token_in: z.string().describe("Registry symbol, e.g. GoodDollar, G$, CELO (GAS units), USDC"),
+        token_in: z.string().describe("Registry symbol, e.g. GoodDollar, G$, CELO, USDC"),
         token_out: z.string().describe("Registry symbol, e.g. USDT, USDC, EURm"),
         amount: z.string().describe("Human-readable amount the user asked to swap — never a guessed placeholder"),
       }),
@@ -163,7 +163,7 @@ export function createReadTools(
       description:
         "Uniswap v4 AMM quote only. For general swaps use get_swap_quote instead — it falls back automatically when Mento FX has no route. Do not call without a user-specified amount — ask first if missing.",
       inputSchema: z.object({
-        token_in: z.string().describe("Registry symbol, e.g. CELO (GAS units), USDC, USDT"),
+        token_in: z.string().describe("Registry symbol, e.g. CELO, USDC, USDT"),
         token_out: z.string().describe("Registry symbol, e.g. USDC, USDT"),
         amount: z.string().describe("Human-readable amount the user asked to swap — never a guessed placeholder"),
       }),
@@ -178,7 +178,7 @@ export function createReadTools(
 
     estimate_send: tool({
       description:
-        "Estimate gas for sending GAS units (native CELO) or an ERC-20 from the connected wallet. Recipient can be ENS.",
+        "Estimate gas for sending CELO or an ERC-20 from the connected wallet. Recipient can be ENS.",
       inputSchema: z.object({
         to: addressOrEnsSchema,
         token: z.string().optional(),

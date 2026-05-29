@@ -4,7 +4,6 @@ import { BalanceRow, GroupedBalanceList } from "@/components/balance-card";
 import { useWalletBalances } from "@/hooks/use-wallet-balances";
 import { groupTokensByUseCase } from "@/lib/balances";
 import { formatBalanceShort } from "@/lib/format-balance";
-import { GAS_UNITS_DISPLAY_LABEL } from "@/lib/registry-token";
 import { useState } from "react";
 
 interface WalletBalancePanelProps {
@@ -195,7 +194,7 @@ function MobileBalanceAccordion({
           ) : celoShort !== null ? (
             <>
               <span className="rounded-full bg-[var(--accent-soft)] px-2 py-0.5 text-[11px] font-medium text-[var(--accent-soft-text)]">
-                {celoShort} {GAS_UNITS_DISPLAY_LABEL}
+                {celoShort} CELO
               </span>
               {tokenCount > 0 && (
                 <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] text-zinc-400">

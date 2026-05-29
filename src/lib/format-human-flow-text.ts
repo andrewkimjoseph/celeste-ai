@@ -1,5 +1,4 @@
 import { formatUnits } from "viem";
-import { formatTokenDisplaySymbol } from "@/lib/registry-token";
 
 /** Common Celo mainnet token decimals for display normalization. */
 const TOKEN_DECIMALS: Record<string, number> = {
@@ -111,6 +110,6 @@ export function formatHumanFlowText(text: string): string {
   return text.replace(
     AMOUNT_TOKEN_PATTERN,
     (_match, tilde: string, amount: string, symbol: string) =>
-      `${tilde}${formatDisplayAmount(amount, symbol)} ${formatTokenDisplaySymbol(symbol)}`,
+      `${tilde}${formatDisplayAmount(amount, symbol)} ${symbol}`,
   );
 }
