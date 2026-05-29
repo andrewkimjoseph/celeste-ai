@@ -9,7 +9,7 @@ import { useMemo, useState, useEffect, useCallback } from "react";
 import { ChatComposer } from "@/components/chat/chat-composer";
 import { ChatMessageList } from "@/components/chat/chat-message-list";
 import { formatChatError } from "@/components/chat/chat-utils";
-import { getLatestPreparedFlowWithMeta } from "@/lib/prepared-flow";
+import { getActivePreparedFlowWithMeta } from "@/lib/prepared-flow";
 import { formatTxHashes } from "@/lib/format-balance";
 import { useMounted } from "@/hooks/use-mounted";
 import { useTransactions } from "@/hooks/use-transactions";
@@ -44,7 +44,7 @@ export function ChatPanel({
     transport,
   });
 
-  const flowMeta = getLatestPreparedFlowWithMeta(messages);
+  const flowMeta = getActivePreparedFlowWithMeta(messages);
   const flowKey = flowMeta?.flowKey ?? null;
   const showTxCard = Boolean(flowMeta && flowKey !== dismissedFlowKey);
 

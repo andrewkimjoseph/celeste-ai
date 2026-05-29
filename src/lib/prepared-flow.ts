@@ -84,4 +84,30 @@ export function getLatestPreparedFlowWithMeta(
   return extractPreparedFlowMetas(messages).at(-1);
 }
 
+/**
+ * Prepared flow to show in `TxConfirmCard` — only while the user has not sent a
+ * follow-up message after it was prepared (clarifications, corrections, etc.).
+ */
+export function getActivePreparedFlowWithMeta(
+  messages: UIMessage[],
+): PreparedFlowMeta | undefined {
+  const meta = getLatestPreparedFlowWithMeta(messages);
+  if (!meta) {
+    return undefined;
+  }
+
+  const preparedIndex = messages.findIndex((message) => message.id === meta.messageId);
+  if (preparedIndex === -1) {
+    return meta;
+  }
+
+  for (let i = preparedIndex + 1; i < messages.length; i++) {
+    if (messages[i].role === "user") {
+      return undefined;
+    }
+  }
+
+  return meta;
+}
+
 export type { PreparedTx, SerializedPreparedFlow };
