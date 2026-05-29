@@ -1,5 +1,5 @@
 /**
- * Next.js config for monorepo dev and wallet libraries.
+ * Next.js config for Celeste and wallet libraries.
  * serverExternalPackages: SDK/Mento stay on Node resolution path.
  * turbopack.root + async-storage stub: bundler workarounds for RainbowKit/MetaMask.
  */
@@ -8,7 +8,6 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
-const workspaceRoot = path.join(projectRoot, "..");
 
 const nextConfig: NextConfig = {
   serverExternalPackages: [
@@ -16,10 +15,10 @@ const nextConfig: NextConfig = {
     "@mento-protocol/mento-sdk",
   ],
   turbopack: {
-    root: workspaceRoot,
+    root: projectRoot,
     resolveAlias: {
       "@react-native-async-storage/async-storage":
-        "./celeste/src/lib/empty-module.ts",
+        "./src/lib/empty-module.ts",
     },
   },
   webpack: (config) => {
