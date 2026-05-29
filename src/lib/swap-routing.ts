@@ -38,13 +38,22 @@ function isUniswapRouteError(message: string): boolean {
   return /no uniswap v4 route|insufficient liquidity in uniswap v4/i.test(message);
 }
 
+function isInsufficientBalanceError(message: string): boolean {
+  return /insufficient .+ balance/i.test(message);
+}
+
+function rejectionMessage(reason: unknown): string {
+  return reason instanceof Error ? reason.message : String(reason);
+}
+
 async function tryMentoQuote(
   celina: CelinaClient,
   tokenIn: string,
   tokenOut: string,
   amount: string,
+  from?: `0x${string}`,
 ) {
-  const quote = await celina.mentoFx.getFxQuote(tokenIn, tokenOut, amount);
+  const quote = await celina.mentoFx.getFxQuote(tokenIn, tokenOut, amount, from);
   return {
     protocol: "mento_fx" as const,
     tokenIn: quote.tokenIn,
@@ -61,8 +70,9 @@ async function tryUniswapQuote(
   tokenIn: string,
   tokenOut: string,
   amount: string,
+  from?: `0x${string}`,
 ) {
-  const quote = await celina.uniswap.getSwapQuote(tokenIn, tokenOut, amount);
+  const quote = await celina.uniswap.getSwapQuote(tokenIn, tokenOut, amount, from);
   return {
     protocol: "uniswap_v4" as const,
     tokenIn: quote.tokenIn,
@@ -82,10 +92,11 @@ export async function getSwapQuoteWithFallback(
   tokenIn: string,
   tokenOut: string,
   amount: string,
+  from?: `0x${string}`,
 ): Promise<SwapQuoteResult> {
   const [mentoResult, uniswapResult] = await Promise.allSettled([
-    tryMentoQuote(celina, tokenIn, tokenOut, amount),
-    tryUniswapQuote(celina, tokenIn, tokenOut, amount),
+    tryMentoQuote(celina, tokenIn, tokenOut, amount, from),
+    tryUniswapQuote(celina, tokenIn, tokenOut, amount, from),
   ]);
 
   const successes: SwapQuoteResult[] = [];
@@ -116,6 +127,15 @@ export async function getSwapQuoteWithFallback(
   }
 
   if (successes.length === 0) {
+    const failures = [mentoResult, uniswapResult]
+      .filter((result) => result.status === "rejected")
+      .map((result) => rejectionMessage(result.reason));
+
+    const balanceError = failures.find(isInsufficientBalanceError);
+    if (balanceError) {
+      throw new Error(balanceError);
+    }
+
     throw new Error(
       `No swap route for ${tokenIn} → ${tokenOut} via Mento FX or Uniswap v4.`,
     );
@@ -148,7 +168,8 @@ export async function prepareSwapWithFallback(
 ) {
   const chosen =
     protocol ??
-    (await getSwapQuoteWithFallback(celina, tokenIn, tokenOut, amount)).protocol;
+    (await getSwapQuoteWithFallback(celina, tokenIn, tokenOut, amount, from))
+      .protocol;
 
   if (chosen === "mento_fx") {
     return celina.mentoFx.prepareFx(from, tokenIn, tokenOut, amount, {

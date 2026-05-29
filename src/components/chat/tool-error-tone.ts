@@ -17,6 +17,7 @@ const NOTICE_PATTERNS: RegExp[] = [
   /token .+ is not supported/i,
   /unknown token/i,
   /did you mean/i,
+  /insufficient .+ balance/i,
 ];
 
 /** Expected or informational tool outcomes — not system failures. */

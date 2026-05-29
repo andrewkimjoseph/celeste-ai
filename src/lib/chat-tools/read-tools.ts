@@ -137,6 +137,7 @@ export function createReadTools(
           normalizeRegistryTokenInput(token_in),
           normalizeRegistryTokenInput(token_out),
           amount,
+          connectedAddress,
         ),
     }),
 
@@ -154,6 +155,7 @@ export function createReadTools(
           normalizeRegistryTokenInput(token_in),
           normalizeRegistryTokenInput(token_out),
           amount,
+          connectedAddress,
         ),
     }),
 
@@ -170,6 +172,7 @@ export function createReadTools(
           normalizeRegistryTokenInput(token_in),
           normalizeRegistryTokenInput(token_out),
           amount,
+          connectedAddress,
         ),
     }),
 
