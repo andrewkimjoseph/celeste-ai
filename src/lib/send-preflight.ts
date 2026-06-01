@@ -7,12 +7,17 @@ type CelinaClient = ReturnType<typeof createCelinaClient>;
 /** Minimum native CELO reserved for gas (approximate). */
 const MIN_CELO_FOR_GAS = parseUnits("0.01", 18);
 
+export type SendPreflightOptions = {
+  supportsFeeAbstraction?: boolean;
+};
+
 export type SendPreflightResult = {
   ok: boolean;
   token: string;
   amount: string;
   tokenBalance: string;
   celoBalance: string;
+  supportsFeeAbstraction?: boolean;
   message?: string;
 };
 
@@ -34,7 +39,9 @@ export async function checkSendPreflight(
   address: `0x${string}`,
   token: string,
   amount: string,
+  options?: SendPreflightOptions,
 ): Promise<SendPreflightResult> {
+  const supportsFeeAbstraction = options?.supportsFeeAbstraction === true;
   const resolved = celina.token.resolveToken(normalizeRegistryTokenInput(token));
   const { balances } = await celina.token.getBalances(address, [
     resolved.symbol,
@@ -59,12 +66,15 @@ export async function checkSendPreflight(
       amount,
       tokenBalance,
       celoBalance,
+      supportsFeeAbstraction,
       message: `Invalid amount "${amount}".`,
     };
   }
 
   if (resolved.address === "native") {
-    const totalNeeded = amountWei + MIN_CELO_FOR_GAS;
+    const totalNeeded = supportsFeeAbstraction
+      ? amountWei
+      : amountWei + MIN_CELO_FOR_GAS;
     if (tokenRaw < totalNeeded) {
       return {
         ok: false,
@@ -72,7 +82,10 @@ export async function checkSendPreflight(
         amount,
         tokenBalance,
         celoBalance,
-        message: `Insufficient CELO. You have ${tokenBalance} CELO but need about ${amount} CELO plus gas.`,
+        supportsFeeAbstraction,
+        message: supportsFeeAbstraction
+          ? `Insufficient CELO. You have ${tokenBalance} CELO but tried to send ${amount}.`
+          : `Insufficient CELO. You have ${tokenBalance} CELO but need about ${amount} CELO plus gas.`,
       };
     }
 
@@ -82,6 +95,7 @@ export async function checkSendPreflight(
       amount,
       tokenBalance,
       celoBalance,
+      supportsFeeAbstraction,
     };
   }
 
@@ -92,17 +106,19 @@ export async function checkSendPreflight(
       amount,
       tokenBalance,
       celoBalance,
+      supportsFeeAbstraction,
       message: `Insufficient ${resolved.symbol}. You have ${tokenBalance} but tried to send ${amount}.`,
     };
   }
 
-  if (celoRaw < MIN_CELO_FOR_GAS) {
+  if (!supportsFeeAbstraction && celoRaw < MIN_CELO_FOR_GAS) {
     return {
       ok: false,
       token: resolved.symbol,
       amount,
       tokenBalance,
       celoBalance,
+      supportsFeeAbstraction,
       message: `Low CELO for gas. You have ${celoBalance} CELO; keep some CELO to pay network fees.`,
     };
   }
@@ -113,5 +129,6 @@ export async function checkSendPreflight(
     amount,
     tokenBalance,
     celoBalance,
+    supportsFeeAbstraction,
   };
 }

@@ -15,9 +15,10 @@ export async function POST(req: Request) {
     messages: UIMessage[];
     address?: string;
     clientContext?: string;
+    supportsFeeAbstraction?: boolean;
   };
 
-  const { messages, address, clientContext } = body;
+  const { messages, address, clientContext, supportsFeeAbstraction } = body;
 
   if (!address || !isAddress(address)) {
     return new Response(
@@ -38,6 +39,10 @@ export async function POST(req: Request) {
   const walletAddress = address as `0x${string}`;
 
   let system = SYSTEM_PROMPT.replace("{address}", walletAddress);
+  if (supportsFeeAbstraction === true) {
+    system +=
+      "\n\nConnected via MiniPay — gas can be paid from USDC, USDT, USDm, or CELO; zero CELO is OK if stablecoin balances cover fees.";
+  }
   if (clientContext?.trim()) {
     system += `\n\nClient context for this turn:\n${clientContext.trim()}`;
   }
@@ -46,7 +51,9 @@ export async function POST(req: Request) {
     model: getChatModel(),
     system,
     messages: await convertToModelMessages(messages),
-    tools: createChatTools(celina, walletAddress),
+    tools: createChatTools(celina, walletAddress, {
+      supportsFeeAbstraction: supportsFeeAbstraction === true,
+    }),
     stopWhen: stepCountIs(6),
     experimental_transform: smoothStream({
       delayInMs: 52,

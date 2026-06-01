@@ -1,6 +1,7 @@
 "use client";
 
 import type { SendPreflightResult } from "@/lib/send-preflight";
+import { useWalletCapabilities } from "@/hooks/use-wallet-capabilities";
 import { useEffect, useState } from "react";
 
 type PreflightState =
@@ -13,6 +14,7 @@ export function useTxPreflight(
   address: string | undefined,
   summary: string,
 ): PreflightState {
+  const { supportsFeeAbstraction } = useWalletCapabilities();
   const [state, setState] = useState<PreflightState | null>(null);
 
   useEffect(() => {
@@ -29,7 +31,7 @@ export function useTxPreflight(
         const res = await fetch("/api/preflight", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ address, summary }),
+          body: JSON.stringify({ address, summary, supportsFeeAbstraction }),
         });
         const data = (await res.json()) as SendPreflightResult & {
           error?: string;
@@ -58,7 +60,7 @@ export function useTxPreflight(
     return () => {
       cancelled = true;
     };
-  }, [address, summary]);
+  }, [address, summary, supportsFeeAbstraction]);
 
   if (!address) {
     return { status: "idle" };

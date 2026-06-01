@@ -16,6 +16,7 @@ import {
 import { formatTxHashes } from "@/lib/format-balance";
 import { useMounted } from "@/hooks/use-mounted";
 import { useTransactions } from "@/hooks/use-transactions";
+import { useWalletCapabilities } from "@/hooks/use-wallet-capabilities";
 
 interface ChatPanelProps {
   address?: `0x${string}`;
@@ -35,6 +36,7 @@ export function ChatPanel({
   const isConnected = isConnectedProp ?? false;
   const canChat = mounted && isConnected && Boolean(address);
   const { addTransaction } = useTransactions();
+  const { supportsFeeAbstraction } = useWalletCapabilities();
   const [input, setInput] = useState("");
   const [dismissedFlowKey, setDismissedFlowKey] = useState<string | null>(null);
   /** After dismiss, hide confirm cards until the user sends a new message. */
@@ -64,7 +66,8 @@ export function ChatPanel({
 
   function buildChatRequestBody() {
     const clientContext = buildPreparedFlowClientContext(messages);
-    return clientContext ? { address, clientContext } : { address };
+    const base = { address, supportsFeeAbstraction };
+    return clientContext ? { ...base, clientContext } : base;
   }
 
   async function handleSubmit(event: React.FormEvent) {
@@ -130,7 +133,7 @@ export function ChatPanel({
               {
                 text: `Transaction confirmed. Hash${hashes.length > 1 ? "es" : ""}: ${formatTxHashes(hashes)}`,
               },
-              { body: { address } },
+              { body: { address, supportsFeeAbstraction } },
             );
           }}
           onTxReject={() => {
@@ -146,7 +149,7 @@ export function ChatPanel({
                   ? `I dismissed the transaction confirmation card without signing. Prepared action: ${summary}`
                   : "I dismissed the transaction confirmation card without signing.",
               },
-              { body: { address } },
+              { body: { address, supportsFeeAbstraction } },
             );
           }}
         />

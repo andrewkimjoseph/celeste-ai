@@ -2,6 +2,7 @@
 
 import { useTxPreflight } from "@/hooks/use-tx-preflight";
 import { useWalletBalances } from "@/hooks/use-wallet-balances";
+import { useWalletCapabilities } from "@/hooks/use-wallet-capabilities";
 import type { PreparedTx } from "@/lib/prepared-flow";
 import { parseSendSummary } from "@/lib/send-preflight";
 import { formatFlowSummary, formatWalletError } from "@/lib/wallet-error";
@@ -118,6 +119,7 @@ export function TxConfirmCard({
   const publicClient = usePublicClient();
   const preflight = useTxPreflight(address, summary);
   const { data: walletBalances } = useWalletBalances(address);
+  const { supportsFeeAbstraction } = useWalletCapabilities();
   const isSendFlow = parseSendSummary(summary) !== null;
   const preflightBlocked =
     isSendFlow &&
@@ -227,11 +229,20 @@ export function TxConfirmCard({
               <span className="text-zinc-200">
                 {formatBalanceShort(preflight.data.tokenBalance)} {preflight.data.token}
               </span>
-              {" · "}
-              <span className="text-zinc-200">
-                {formatBalanceShort(preflight.data.celoBalance)} CELO
-              </span>{" "}
-              for gas
+              {preflight.data.supportsFeeAbstraction || supportsFeeAbstraction ? (
+                <>
+                  {" · "}
+                  <span className="text-zinc-200">Gas paid from stablecoins (MiniPay)</span>
+                </>
+              ) : (
+                <>
+                  {" · "}
+                  <span className="text-zinc-200">
+                    {formatBalanceShort(preflight.data.celoBalance)} CELO
+                  </span>{" "}
+                  for gas
+                </>
+              )}
             </p>
           )}
           {preflightBlocked && preflight.status === "ready" && (
@@ -245,10 +256,19 @@ export function TxConfirmCard({
       {!isSendFlow && walletBalances && (
         <div className="mt-3 border-t border-[var(--warn)]/15 pt-3">
           <p className="text-xs text-zinc-400">
-            Gas balance:{" "}
-            <span className="text-zinc-200">
-              {formatBalanceShort(walletBalances.celo.formatted)} CELO
-            </span>
+            {supportsFeeAbstraction ? (
+              <>
+                Gas:{" "}
+                <span className="text-zinc-200">paid from stablecoins (MiniPay)</span>
+              </>
+            ) : (
+              <>
+                Gas balance:{" "}
+                <span className="text-zinc-200">
+                  {formatBalanceShort(walletBalances.celo.formatted)} CELO
+                </span>
+              </>
+            )}
           </p>
         </div>
       )}

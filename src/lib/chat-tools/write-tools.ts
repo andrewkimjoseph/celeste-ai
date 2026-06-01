@@ -25,6 +25,7 @@ type CelinaClient = ReturnType<typeof createCelinaClient>;
 export function createWriteTools(
   celina: CelinaClient,
   connectedAddress: `0x${string}`,
+  options?: { supportsFeeAbstraction?: boolean },
 ) {
   return {
     prepare_send: tool({
@@ -43,6 +44,7 @@ export function createWriteTools(
           sender,
           normalizeRegistryTokenInput(token),
           amount,
+          { supportsFeeAbstraction: options?.supportsFeeAbstraction === true },
         );
         if (!preflight.ok) {
           throw new Error(

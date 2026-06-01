@@ -4,11 +4,19 @@ import { createWriteTools } from "@/lib/chat-tools/write-tools";
 
 type CelinaClient = ReturnType<typeof createCelinaClient>;
 
+export type ChatToolsOptions = {
+  supportsFeeAbstraction?: boolean;
+};
+
 /** Vercel AI SDK tools for `/api/chat` — celina-sdk reads + prepare_* wallet flows. */
-export function createChatTools(celina: CelinaClient, connectedAddress: `0x${string}`) {
+export function createChatTools(
+  celina: CelinaClient,
+  connectedAddress: `0x${string}`,
+  options?: ChatToolsOptions,
+) {
   return {
     ...createReadTools(celina, connectedAddress),
-    ...createWriteTools(celina, connectedAddress),
+    ...createWriteTools(celina, connectedAddress, options),
   };
 }
 

@@ -8,9 +8,10 @@ export async function POST(req: Request) {
     summary?: string;
     token?: string;
     amount?: string;
+    supportsFeeAbstraction?: boolean;
   };
 
-  const { address, summary, token, amount } = body;
+  const { address, summary, token, amount, supportsFeeAbstraction } = body;
 
   if (!address || !isAddress(address)) {
     return Response.json({ error: "Invalid wallet address." }, { status: 400 });
@@ -36,6 +37,7 @@ export async function POST(req: Request) {
     address as `0x${string}`,
     parsed.token,
     parsed.amount,
+    { supportsFeeAbstraction: supportsFeeAbstraction === true },
   );
 
   return Response.json(result);

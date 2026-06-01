@@ -9,7 +9,7 @@
     {
       "name": "MCP",
       "endpoint": "https://mcp.usecelina.xyz/api/mcp",
-      "version": "0.7.5"
+      "version": "0.7.14"
     },
     {
       "name": "Self Agent ID",
