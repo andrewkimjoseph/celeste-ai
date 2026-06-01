@@ -210,5 +210,17 @@ export function createWriteTools(
         return celina.aave.prepareWithdraw(sender, symbol, amount, withdraw_max);
       },
     }),
+
+    prepare_claim_daily_gooddollar_ubi: tool({
+      description:
+        "Prepare unsigned GoodDollar daily UBI claim for the connected wallet. User must sign in wallet. Call get_gooddollar_ubi_entitlement first when eligibility is unclear.",
+      inputSchema: z.object({
+        from: addressSchema.optional(),
+      }),
+      execute: async ({ from }) => {
+        const sender = resolveTargetAddress(connectedAddress, from);
+        return celina.gooddollar.prepareClaimUbi(sender);
+      },
+    }),
   };
 }

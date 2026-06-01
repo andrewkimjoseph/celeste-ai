@@ -71,7 +71,7 @@ export function createReadTools(
 
     get_stablecoin_balances: tool({
       description:
-        "Returns stablecoin balances for a wallet on Celo mainnet. Defaults to the connected wallet.",
+        "Scan all registry stablecoins for an address in one call (Mento stables, USDC, USDT, GoodDollar, etc.). Omits zero balances by default. Defaults to the connected wallet.",
       inputSchema: z.object({
         address: addressSchema.optional(),
         stablecoins: z.array(z.string()).optional(),
@@ -88,7 +88,7 @@ export function createReadTools(
 
     get_celo_balances: tool({
       description:
-        "Returns CELO and ERC-20 balances for specific tokens. Defaults to connected wallet.",
+        "Balances for named registry tokens on Celo mainnet. Default tokens: CELO + USDm. Pass tokens for specific symbols (USDC, WETH, EURm, …). Defaults to the connected wallet.",
       inputSchema: z.object({
         address: addressSchema.optional(),
         tokens: z.array(z.string()).optional(),
@@ -102,7 +102,7 @@ export function createReadTools(
 
     get_token_info: tool({
       description:
-        "Returns metadata for a Celo mainnet registry token (symbol or registry address).",
+        "Registry token metadata (symbol, address, decimals). Does not read balances.",
       inputSchema: z.object({
         token: z.string(),
       }),
@@ -112,7 +112,7 @@ export function createReadTools(
 
     get_token_balance: tool({
       description:
-        "Returns balance for a Celo mainnet registry token. Pass a symbol (USDC, USDT, USDm, …).",
+        "Balance for one registry token. Pass a symbol (USDC, USDm, CELO, …) or a known registry contract address. Defaults to the connected wallet.",
       inputSchema: z.object({
         token: z.string(),
         address: addressSchema.optional(),
@@ -305,6 +305,18 @@ export function createReadTools(
       }),
       execute: async ({ address }) =>
         celina.gooddollar.getWhitelistingInfo(
+          resolveTargetAddress(connectedAddress, address),
+        ),
+    }),
+
+    get_gooddollar_ubi_entitlement: tool({
+      description:
+        "Check daily GoodDollar UBI claim eligibility: whitelist root, claimable G$, already claimed, and reasons when not eligible.",
+      inputSchema: z.object({
+        address: addressSchema.optional(),
+      }),
+      execute: async ({ address }) =>
+        celina.gooddollar.getUbiClaimEligibility(
           resolveTargetAddress(connectedAddress, address),
         ),
     }),

@@ -55,6 +55,10 @@ const TOOL_LABELS: Record<string, { inProgress: string; done: string }> = {
     inProgress: "Checking GoodDollar status…",
     done: "GoodDollar status loaded",
   },
+  get_gooddollar_ubi_entitlement: {
+    inProgress: "Checking GoodDollar UBI eligibility…",
+    done: "UBI eligibility loaded",
+  },
   resolve_ens: {
     inProgress: "Resolving ENS name…",
     done: "ENS resolved",
@@ -142,6 +146,10 @@ const TOOL_LABELS: Record<string, { inProgress: string; done: string }> = {
   prepare_aave_withdraw: {
     inProgress: "Preparing transaction…",
     done: "Transaction prepared",
+  },
+  prepare_claim_daily_gooddollar_ubi: {
+    inProgress: "Preparing UBI claim…",
+    done: "UBI claim prepared",
   },
 };
 
