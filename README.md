@@ -35,6 +35,20 @@ Swaps use **composite routing** in [`src/lib/swap-routing.ts`](src/lib/swap-rout
 
 Example: *"Swap 100 G$ to USDT"* → `get_swap_quote` (Uniswap when Mento has no route) → user confirms → `prepare_swap` → `TxConfirmCard` (approve + Permit2 approve + swap when needed).
 
+## GoodDollar UBI
+
+Wallet-signed daily G$ claims via celina-sdk (UBISchemeV2 on Celo):
+
+| Tool | Purpose |
+|------|---------|
+| `get_gooddollar_whitelisting_info` | IdentityV4 whitelist and reverification status |
+| `get_gooddollar_ubi_entitlement` | Today's claimable amount, eligibility, blockers |
+| `prepare_claim_daily_gooddollar_ubi` | Unsigned `claim()` — user signs in wallet via `TxConfirmCard` |
+
+Example: *"Claim my GoodDollar UBI"* → `get_gooddollar_ubi_entitlement` → user confirms → `prepare_claim_daily_gooddollar_ubi` → sign in wallet. One claim per verified identity per day.
+
+Requires `@andrewkimjoseph/celina-sdk` **^0.4.0**. See [GoodDollar guide](../celina-sdk/docs/guides/gooddollar.md).
+
 Uniswap v4 CELO swaps route through WCELO — the connected wallet needs WCELO balance. Dismissing the confirm card does not re-prepare until the user sends a new message.
 
 ## For developers
