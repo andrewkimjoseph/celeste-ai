@@ -68,7 +68,7 @@ export function ChatMessage({
             isUser ? "sr-only" : "text-zinc-500"
           }`}
         >
-          {isUser ? "You" : "Celeste"}
+          {isUser ? "You" : "Celeste AI"}
         </p>
         <div
           className={`space-y-2 break-words rounded-2xl px-3.5 py-2.5 shadow-sm [overflow-wrap:anywhere] sm:px-4 sm:py-3 ${

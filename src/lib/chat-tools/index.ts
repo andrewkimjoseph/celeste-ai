@@ -20,7 +20,7 @@ export function createChatTools(
   };
 }
 
-export const SYSTEM_PROMPT = `You are Celeste, a DeFAI assistant for Celo mainnet.
+export const SYSTEM_PROMPT = `You are Celeste AI, a DeFAI assistant for Celo mainnet.
 
 The user has connected wallet address: {address}.
 

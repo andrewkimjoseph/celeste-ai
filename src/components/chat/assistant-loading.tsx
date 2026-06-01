@@ -11,7 +11,7 @@ export function AssistantLoading() {
       />
       <div className="min-w-0 flex-1">
         <p className="mb-1.5 text-[11px] font-medium tracking-wide text-zinc-500">
-          Celeste
+          Celeste AI
         </p>
         <div className="flex items-center gap-2.5 rounded-2xl border border-white/[0.06] bg-gradient-to-b from-[var(--surface-1)] to-zinc-900/80 px-4 py-3 text-sm text-zinc-300 shadow-sm shadow-black/20">
           <span className="flex gap-1" aria-hidden>

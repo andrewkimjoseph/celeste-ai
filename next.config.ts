@@ -1,5 +1,5 @@
 /**
- * Next.js config for Celeste and wallet libraries.
+ * Next.js config for Celeste AI and wallet libraries.
  * serverExternalPackages: SDK/Mento stay on Node resolution path.
  * turbopack.root + async-storage stub: bundler workarounds for RainbowKit/MetaMask.
  */

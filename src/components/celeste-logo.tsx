@@ -33,7 +33,7 @@ export function CelesteLogo({
   return (
     <Image
       src={CELESTE_LOGO_PATH}
-      alt="Celeste"
+      alt="Celeste AI"
       width={px}
       height={px}
       className={`object-contain ${ROUNDED_CLASS[rounded]} ${className}`}
@@ -53,7 +53,7 @@ const SHAPE_CLASS = {
   squircle: "rounded-xl sm:rounded-lg",
 } as const;
 
-/** Celeste assistant avatar — always the brand logo on black. */
+/** Celeste AI assistant avatar — always the brand logo on black. */
 export function CelesteLogoAvatar({
   size = "sm",
   className = "",
@@ -66,7 +66,7 @@ export function CelesteLogoAvatar({
       className={`relative shrink-0 overflow-hidden bg-black ${SHAPE_CLASS[shape]} ${className}`}
       style={{ width: px, height: px }}
       role="img"
-      aria-label="Celeste"
+      aria-label="Celeste AI"
     >
       <Image
         src={CELESTE_LOGO_PATH}

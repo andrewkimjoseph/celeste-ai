@@ -123,7 +123,7 @@ export function Header({
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 sm:gap-2">
               <h1 className="truncate text-base font-semibold text-white sm:text-lg">
-                Celeste
+                Celeste AI
               </h1>
               <span className="hidden rounded-full border border-[var(--surface-2)] px-2 py-0.5 text-[10px] font-medium text-zinc-400 sm:inline-flex">
                 Celo mainnet

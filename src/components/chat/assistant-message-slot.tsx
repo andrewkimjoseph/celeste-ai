@@ -25,7 +25,7 @@ export function AssistantMessageSlot({
       <div className="min-w-0 flex-1">
         {showLabel && showAvatar ? (
           <p className="mb-1.5 text-[11px] font-medium tracking-wide text-zinc-500">
-            Celeste
+            Celeste AI
           </p>
         ) : null}
         {children}

@@ -9,7 +9,7 @@ class TransactionDatabase extends Dexie {
   transactions!: Table<SessionTransaction, string>;
 
   constructor() {
-    super("celeste");
+    super("celeste-ai");
     this.version(1).stores({
       transactions: "id, address, timestamp",
     });

@@ -26,7 +26,7 @@ function createChatProvider() {
           headers: {
             "HTTP-Referer":
               process.env.OPENROUTER_HTTP_REFERER ?? "http://localhost:3000",
-            "X-Title": process.env.OPENROUTER_APP_NAME ?? "Celeste",
+            "X-Title": process.env.OPENROUTER_APP_NAME ?? "Celeste AI",
           },
         }
       : {}),

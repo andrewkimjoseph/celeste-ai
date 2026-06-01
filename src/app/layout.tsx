@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Celeste",
+  title: "Celeste AI",
   description: "DeFAI chat for Celo — powered by Celina",
 };
 
