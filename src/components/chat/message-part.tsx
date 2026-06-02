@@ -7,7 +7,7 @@ import {
 import { isTextUIPart, isToolUIPart, type UIMessage } from "ai";
 import { StreamingCursor } from "@/components/chat/streaming-cursor";
 import { ToolStatus } from "@/components/chat/tool-status";
-import { shouldHideSupersededToolError } from "@/components/chat/tool-utils";
+import { shouldHideToolError } from "@/components/chat/tool-utils";
 import { useTransactions } from "@/hooks/use-transactions";
 
 type MessagePartType = UIMessage["parts"][number];
@@ -33,7 +33,7 @@ export function MessagePart({
     if (
       messageParts &&
       partIndex !== undefined &&
-      shouldHideSupersededToolError(messageParts, partIndex)
+      shouldHideToolError(messageParts, partIndex)
     ) {
       return null;
     }
