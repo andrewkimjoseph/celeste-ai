@@ -10,7 +10,7 @@ import {
   groupMessagesIntoTurns,
   shouldShowAssistantLoading,
 } from "@/components/chat/chat-utils";
-import type { SerializedPreparedFlow } from "@/lib/prepared-flow";
+import type { PreparedFlowWithExtras } from "@/lib/prepared-flow";
 import { TxConfirmCard } from "@/components/tx-confirm-card";
 
 const SUGGESTED_PROMPT_GROUPS = [
@@ -50,7 +50,7 @@ interface ChatMessageListProps {
   isConnected: boolean;
   errorMessage: string | null;
   showTxCard: boolean;
-  latestFlow: SerializedPreparedFlow | undefined;
+  latestFlow: PreparedFlowWithExtras | undefined;
   onPromptSelect: (prompt: string) => void;
   onTxComplete: (hashes: string[]) => void;
   onTxReject: () => void;
@@ -181,6 +181,9 @@ export function ChatMessageList({
               summary={latestFlow.summary}
               steps={latestFlow.steps}
               recipientLabel={recipientLabel}
+              warnings={latestFlow.warnings}
+              deepLink={latestFlow.deep_link}
+              carbonDetails={latestFlow.carbonDetails}
               onComplete={onTxComplete}
               onDismiss={onTxReject}
             />
