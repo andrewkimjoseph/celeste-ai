@@ -24,22 +24,22 @@ function parseInline(text: string, options: FormatOptions = {}): ReactNode[] {
 
   const boldClass =
     variant === "user"
-      ? "font-semibold text-[var(--accent-foreground)]"
+      ? "font-semibold text-white"
       : "font-semibold text-white";
 
   const linkClass =
     variant === "user"
-      ? "text-[var(--accent-foreground)] underline decoration-[var(--accent-strong)]/50 underline-offset-2 hover:text-black"
+      ? "text-white underline decoration-white/50 underline-offset-2 hover:decoration-white"
       : "text-[var(--accent-hover)] underline decoration-[var(--accent-hover)]/30 underline-offset-2 hover:decoration-[var(--accent-hover)]";
 
   const codeClass =
     variant === "user"
-      ? "rounded bg-black/10 px-1.5 py-0.5 font-mono text-[0.85em] text-[var(--accent-foreground)]"
+      ? "rounded bg-white/20 px-1.5 py-0.5 font-mono text-[0.85em] text-white"
       : "rounded bg-black/30 px-1.5 py-0.5 font-mono text-[0.85em] text-[var(--accent-soft-text)]/90";
 
   const hashClass =
     variant === "user"
-      ? "break-all rounded bg-black/10 px-1 py-0.5 font-mono text-[0.8em] text-[var(--accent-foreground)]"
+      ? "break-all rounded bg-white/15 px-1.5 py-0.5 font-mono text-[0.8em] text-white ring-1 ring-white/20"
       : "break-all rounded bg-black/25 px-1 py-0.5 font-mono text-[0.8em] text-zinc-200";
 
   while ((match = INLINE_PATTERN.exec(text)) !== null) {
@@ -74,7 +74,11 @@ function parseInline(text: string, options: FormatOptions = {}): ReactNode[] {
             key={`${keyPrefix}-${key++}`}
             type="button"
             onClick={() => onHashClick(token)}
-            className={`${hashClass} cursor-pointer transition-colors hover:text-[var(--accent-hover)]`}
+            className={`${hashClass} cursor-pointer transition-colors ${
+              variant === "user"
+                ? "hover:bg-white/25"
+                : "hover:text-[var(--accent-hover)]"
+            }`}
             title="View in transactions"
           >
             {token}

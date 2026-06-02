@@ -73,7 +73,7 @@ export function ChatMessage({
         <div
           className={`space-y-2 break-words rounded-2xl px-3.5 py-2.5 shadow-sm [overflow-wrap:anywhere] sm:px-4 sm:py-3 ${
             isUser
-              ? "bg-gradient-to-br from-[var(--accent)] to-[var(--accent-strong)] text-[var(--accent-foreground)] shadow-black/20"
+              ? "bg-gradient-to-br from-[var(--accent)] to-[var(--accent-strong)] text-white shadow-black/20"
               : "border border-white/[0.06] bg-gradient-to-b from-[var(--surface-1)] to-zinc-900/80 text-zinc-100 shadow-black/20"
           }`}
         >
