@@ -14,6 +14,7 @@ import {
   getActivePreparedFlowWithMeta,
 } from "@/lib/prepared-flow";
 import { formatTxHashes } from "@/lib/format-balance";
+import { formatFlowSummary } from "@/lib/wallet-error";
 import { useMounted } from "@/hooks/use-mounted";
 import { useTransactions } from "@/hooks/use-transactions";
 import { useWalletCapabilities } from "@/hooks/use-wallet-capabilities";
@@ -143,11 +144,14 @@ export function ChatPanel({
             setTxCardBlockedUntilUserMessage(true);
 
             const summary = flowMeta?.flow.summary;
+            const actionLabel = summary
+              ? formatFlowSummary(summary)
+              : null;
             void sendMessage(
               {
-                text: summary
-                  ? `I dismissed the transaction confirmation card without signing. Prepared action: ${summary}`
-                  : "I dismissed the transaction confirmation card without signing.",
+                text: actionLabel
+                  ? `Cancelled signing — was: ${actionLabel}`
+                  : "Cancelled signing on the confirmation card.",
               },
               { body: { address, supportsFeeAbstraction } },
             );
