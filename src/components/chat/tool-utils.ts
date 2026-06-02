@@ -1,4 +1,5 @@
 import { getToolName, isToolUIPart, type UIMessage } from "ai";
+import { isHiddenCarbonPrepareError } from "@/lib/carbon-error-patterns";
 
 type MessagePart = UIMessage["parts"][number];
 
@@ -11,6 +12,42 @@ const RETRYABLE_READ_TOOLS = new Set([
   "get_token_balance",
   "get_token_info",
 ]);
+
+const HIDDEN_CARBON_ERROR_TOOLS = /^prepare_carbon_/;
+
+/** Hide internal Carbon prepare failures — server retries Uniswap pricing; LLM explains. */
+export function shouldHideToolError(
+  parts: MessagePart[],
+  partIndex: number,
+): boolean {
+  if (shouldHideSupersededToolError(parts, partIndex)) {
+    return true;
+  }
+
+  const part = parts[partIndex];
+  if (!isToolUIPart(part) || part.state !== "output-error") {
+    return false;
+  }
+
+  const toolName = getToolName(part);
+  const errorText = part.errorText ?? "";
+
+  if (
+    HIDDEN_CARBON_ERROR_TOOLS.test(toolName) &&
+    isHiddenCarbonPrepareError(errorText)
+  ) {
+    return true;
+  }
+
+  if (
+    toolName === "get_carbon_trade_quote" &&
+    isHiddenCarbonPrepareError(errorText)
+  ) {
+    return true;
+  }
+
+  return false;
+}
 
 /** Hide probe failures when the model retries and gets a later tool result. */
 export function shouldHideSupersededToolError(
