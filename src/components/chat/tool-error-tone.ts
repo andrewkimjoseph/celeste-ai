@@ -1,3 +1,8 @@
+import {
+  formatToolErrorMessage,
+  isExpectedToolError,
+} from "@/lib/format-tool-error";
+
 export type ToolErrorTone = "notice" | "error";
 
 const NOTICE_PATTERNS: RegExp[] = [
@@ -21,10 +26,17 @@ const NOTICE_PATTERNS: RegExp[] = [
 ];
 
 /** Expected or informational tool outcomes — not system failures. */
-export function getToolErrorTone(errorText: string): ToolErrorTone {
+export function getToolErrorTone(
+  errorText: string,
+  toolName?: string,
+): ToolErrorTone {
   const text = errorText.trim();
   if (!text) {
     return "error";
+  }
+
+  if (toolName && isExpectedToolError(toolName, text)) {
+    return "notice";
   }
 
   if (NOTICE_PATTERNS.some((pattern) => pattern.test(text))) {
