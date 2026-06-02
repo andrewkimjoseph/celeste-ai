@@ -1,6 +1,7 @@
 import type { createCelinaClient } from "@andrewkimjoseph/celina-sdk";
 import { createReadTools } from "@/lib/chat-tools/read-tools";
 import { createWriteTools } from "@/lib/chat-tools/write-tools";
+import { createCarbonWriteTools } from "@/lib/chat-tools/carbon-write-tools";
 
 type CelinaClient = ReturnType<typeof createCelinaClient>;
 
@@ -17,6 +18,7 @@ export function createChatTools(
   return {
     ...createReadTools(celina, connectedAddress),
     ...createWriteTools(celina, connectedAddress, options),
+    ...createCarbonWriteTools(celina, connectedAddress),
   };
 }
 
@@ -31,6 +33,7 @@ Capabilities (tools):
 - Mento FX only: get_mento_fx_quote, estimate_mento_fx, prepare_mento_fx
 - Uniswap v4 only: get_uniswap_quote, estimate_uniswap_swap, prepare_uniswap_swap
 - Aave V3: prepare_aave_supply, prepare_aave_withdraw
+- Carbon DeFi: get_carbon_strategies, explore_carbon_pair, get_carbon_trade_quote, simulate_carbon_strategy, get_carbon_activity, carbon_help; prepare_carbon_limit_order, prepare_carbon_range_order, prepare_carbon_recurring_strategy, prepare_carbon_concentrated_strategy, prepare_carbon_full_range_strategy, prepare_carbon_reprice_strategy, prepare_carbon_edit_strategy, prepare_carbon_deposit_budget, prepare_carbon_withdraw_budget, prepare_carbon_pause_strategy, prepare_carbon_resume_strategy, prepare_carbon_delete_strategy, prepare_carbon_trade
 - ENS: resolve_ens
 - Chain: get_network_status, get_block, get_latest_blocks, get_transaction
 - Governance: get_governance_proposals, get_proposal_details
@@ -64,4 +67,6 @@ Rules:
 - GoodDollar is \`GoodDollar\` or \`G$\` in tools — never \`GD\`.
 - GoodDollar UBI: one claim per identity per day. Use get_gooddollar_ubi_entitlement before prepare_claim_daily_gooddollar_ubi; connected wallets resolve to their verified root.
 - If a token tool returns unknown token, check the balance panel and registry aliases, retry once with the correct symbol, and do not mention the failed probe to the user.
+- Carbon DeFi: prices are quote per 1 base; buy budget in quote token, sell budget in base. Call get_carbon_strategies and explore_carbon_pair before creating strategies. Use simulate_carbon_strategy before committing capital when sizing ranges.
+- After prepare_carbon_* succeeds, share the deep_link from the tool result in your reply (Carbon trade UI reference) and point the user to the orange Confirm button on the transaction card below — only in that same turn.
 - Keep responses concise and friendly.`;
