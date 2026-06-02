@@ -7,6 +7,7 @@ import {
   getToolErrorTone,
   TOOL_ERROR_TONE_CLASS,
 } from "@/components/chat/tool-error-tone";
+import { formatToolErrorMessage } from "@/lib/format-tool-error";
 import { parseToolBalanceRows } from "@/lib/balances";
 import { formatHumanFlowText } from "@/lib/format-human-flow-text";
 
@@ -101,8 +102,9 @@ export function ToolStatus({
   }
 
   if (part.state === "output-error") {
-    const errorText = part.errorText ?? `${labels.done} failed`;
-    const tone = getToolErrorTone(errorText);
+    const rawError = part.errorText ?? `${labels.done} failed`;
+    const errorText = formatToolErrorMessage(toolName, rawError);
+    const tone = getToolErrorTone(rawError, toolName);
 
     return (
       <p className={TOOL_ERROR_TONE_CLASS[tone]}>{errorText}</p>
