@@ -31,7 +31,7 @@ function createCarbonPrepareTool(
       const { from: _from, ...rest } = args;
       const body = { ...rest, wallet_address: sender } as CarbonWriteBody;
       const prepared = await prepareFn(body);
-      return finalizeCarbonPrepare(celina, sender, prepared, body);
+      return finalizeCarbonPrepare(celina.carbon, sender, prepared, body);
     },
   });
 }
