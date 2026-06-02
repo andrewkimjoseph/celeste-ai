@@ -514,7 +514,7 @@ export function createReadTools(
 
     get_carbon_strategies: tool({
       description:
-        "Fetch active Carbon DeFi maker strategies for a wallet on Celo. Call before create or manage operations.",
+        "List this wallet's active Carbon DeFi maker strategies on Celo. An empty list does not mean the pair is unavailable — only that the wallet has no existing positions.",
       inputSchema: z.object({
         wallet_address: addressSchema.optional(),
       }),
@@ -524,15 +524,63 @@ export function createReadTools(
         ),
     }),
 
+    get_carbon_strategy: tool({
+      description:
+        "Fetch one Carbon DeFi strategy by NFT id on Celo (pair, prices, budgets, status).",
+      inputSchema: z.object({
+        strategy_id: z.string(),
+      }),
+      execute: async ({ strategy_id }) => celina.carbon.getStrategy(strategy_id),
+    }),
+
     explore_carbon_pair: tool({
       description:
-        "Market liquidity and top strategies for a token pair on Carbon DeFi (Celo).",
+        "Carbon pair liquidity and top maker strategies on Celo. Optional context only — does not return prepare-time market_price. Go straight to prepare_carbon_* for orders (market auto-fetched on prepare).",
       inputSchema: z.object({
         base_token: z.string(),
         quote_token: z.string(),
       }),
       execute: async ({ base_token, quote_token }) =>
         celina.carbon.explorePair({ base_token, quote_token }),
+    }),
+
+    resolve_carbon_token: tool({
+      description:
+        "Resolve a token symbol or name to its Celo address for Carbon (Carbon API with Celina registry fallback).",
+      inputSchema: z.object({
+        token: z.string(),
+      }),
+      execute: async ({ token }) => celina.carbon.resolveToken(token),
+    }),
+
+    find_carbon_opportunities: tool({
+      description:
+        "Find discount buys and premium sells vs market on a Carbon pair on Celo.",
+      inputSchema: z.object({
+        base_token: z.string(),
+        quote_token: z.string(),
+      }).passthrough(),
+      execute: async (args) => celina.carbon.findOpportunities(args),
+    }),
+
+    get_carbon_protocol_stats: tool({
+      description:
+        "Carbon DeFi protocol-wide TVL, volume, and fees on Celo (optional period_days up to 30). Not pair spot price — do not use before maker orders.",
+      inputSchema: z.object({
+        period_days: z.number().int().positive().max(30).optional(),
+      }).passthrough(),
+      execute: async (args) => celina.carbon.getProtocolStats(args),
+    }),
+
+    get_carbon_price_history: tool({
+      description:
+        "Historical OHLC candles for a Carbon pair on Celo. Only when the user explicitly asks for price history or charts — not for spot price before maker orders. May return 400 for some pairs.",
+      inputSchema: z.object({
+        base_token: z.string(),
+        quote_token: z.string(),
+        period_days: z.number().int().positive().optional(),
+      }).passthrough(),
+      execute: async (args) => celina.carbon.getPriceHistory(args),
     }),
 
     get_carbon_trade_quote: tool({
@@ -549,7 +597,7 @@ export function createReadTools(
 
     simulate_carbon_strategy: tool({
       description:
-        "Backtest a Carbon strategy configuration against historical prices before committing capital.",
+        "Backtest a Carbon strategy against historical prices when the user explicitly asks to simulate or backtest. Not for discovering market price before a simple prepare.",
       inputSchema: z.object({}).passthrough(),
       execute: async (args) => celina.carbon.simulateStrategy(args),
     }),
@@ -574,6 +622,15 @@ export function createReadTools(
         topic: z.string().optional(),
       }),
       execute: async ({ topic }) => celina.carbon.help(topic),
+    }),
+
+    carbon_learn: tool({
+      description:
+        "Carbon DeFi protocol education on Celo (e.g. topic recurring_strategy).",
+      inputSchema: z.object({
+        topic: z.string().optional(),
+      }),
+      execute: async ({ topic }) => celina.carbon.learn(topic),
     }),
   };
 }
