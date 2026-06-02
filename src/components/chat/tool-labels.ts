@@ -151,6 +151,82 @@ const TOOL_LABELS: Record<string, { inProgress: string; done: string }> = {
     inProgress: "Preparing UBI claim…",
     done: "UBI claim prepared",
   },
+  get_carbon_strategies: {
+    inProgress: "Loading Carbon strategies…",
+    done: "Carbon strategies loaded",
+  },
+  explore_carbon_pair: {
+    inProgress: "Exploring Carbon pair…",
+    done: "Carbon pair loaded",
+  },
+  get_carbon_trade_quote: {
+    inProgress: "Getting Carbon trade quote…",
+    done: "Carbon quote ready",
+  },
+  simulate_carbon_strategy: {
+    inProgress: "Simulating Carbon strategy…",
+    done: "Simulation complete",
+  },
+  get_carbon_activity: {
+    inProgress: "Loading Carbon activity…",
+    done: "Carbon activity loaded",
+  },
+  carbon_help: {
+    inProgress: "Loading Carbon help…",
+    done: "Carbon help loaded",
+  },
+  prepare_carbon_limit_order: {
+    inProgress: "Preparing Carbon limit order…",
+    done: "Carbon limit order prepared",
+  },
+  prepare_carbon_range_order: {
+    inProgress: "Preparing Carbon range order…",
+    done: "Carbon range order prepared",
+  },
+  prepare_carbon_recurring_strategy: {
+    inProgress: "Preparing Carbon recurring strategy…",
+    done: "Carbon recurring strategy prepared",
+  },
+  prepare_carbon_concentrated_strategy: {
+    inProgress: "Preparing Carbon concentrated strategy…",
+    done: "Carbon concentrated strategy prepared",
+  },
+  prepare_carbon_full_range_strategy: {
+    inProgress: "Preparing Carbon full-range strategy…",
+    done: "Carbon full-range strategy prepared",
+  },
+  prepare_carbon_reprice_strategy: {
+    inProgress: "Preparing Carbon reprice…",
+    done: "Carbon reprice prepared",
+  },
+  prepare_carbon_edit_strategy: {
+    inProgress: "Preparing Carbon strategy edit…",
+    done: "Carbon strategy edit prepared",
+  },
+  prepare_carbon_deposit_budget: {
+    inProgress: "Preparing Carbon deposit…",
+    done: "Carbon deposit prepared",
+  },
+  prepare_carbon_withdraw_budget: {
+    inProgress: "Preparing Carbon withdraw…",
+    done: "Carbon withdraw prepared",
+  },
+  prepare_carbon_pause_strategy: {
+    inProgress: "Preparing Carbon pause…",
+    done: "Carbon pause prepared",
+  },
+  prepare_carbon_resume_strategy: {
+    inProgress: "Preparing Carbon resume…",
+    done: "Carbon resume prepared",
+  },
+  prepare_carbon_delete_strategy: {
+    inProgress: "Preparing Carbon delete…",
+    done: "Carbon delete prepared",
+  },
+  prepare_carbon_trade: {
+    inProgress: "Preparing Carbon trade…",
+    done: "Carbon trade prepared",
+  },
 };
 
 export function getToolLabels(toolName: string): {

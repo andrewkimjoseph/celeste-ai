@@ -511,5 +511,69 @@ export function createReadTools(
           value,
         }),
     }),
+
+    get_carbon_strategies: tool({
+      description:
+        "Fetch active Carbon DeFi maker strategies for a wallet on Celo. Call before create or manage operations.",
+      inputSchema: z.object({
+        wallet_address: addressSchema.optional(),
+      }),
+      execute: async ({ wallet_address }) =>
+        celina.carbon.getStrategies(
+          resolveTargetAddress(connectedAddress, wallet_address),
+        ),
+    }),
+
+    explore_carbon_pair: tool({
+      description:
+        "Market liquidity and top strategies for a token pair on Carbon DeFi (Celo).",
+      inputSchema: z.object({
+        base_token: z.string(),
+        quote_token: z.string(),
+      }),
+      execute: async ({ base_token, quote_token }) =>
+        celina.carbon.explorePair({ base_token, quote_token }),
+    }),
+
+    get_carbon_trade_quote: tool({
+      description:
+        "Quote a taker swap against Carbon DeFi maker liquidity on Celo.",
+      inputSchema: z.object({
+        source_token: z.string(),
+        target_token: z.string(),
+        amount: z.string(),
+        is_trade_by_target: z.boolean().optional(),
+      }),
+      execute: async (args) => celina.carbon.getTradeQuote(args),
+    }),
+
+    simulate_carbon_strategy: tool({
+      description:
+        "Backtest a Carbon strategy configuration against historical prices before committing capital.",
+      inputSchema: z.object({}).passthrough(),
+      execute: async (args) => celina.carbon.simulateStrategy(args),
+    }),
+
+    get_carbon_activity: tool({
+      description: "Trade and event history for a wallet on Carbon DeFi (Celo).",
+      inputSchema: z.object({
+        wallet_address: addressSchema.optional(),
+      }),
+      execute: async (args) =>
+        celina.carbon.getActivity({
+          wallet_address: resolveTargetAddress(
+            connectedAddress,
+            args.wallet_address,
+          ),
+        }),
+    }),
+
+    carbon_help: tool({
+      description: "Per-tool guidance for Carbon DeFi operations on Celo.",
+      inputSchema: z.object({
+        topic: z.string().optional(),
+      }),
+      execute: async ({ topic }) => celina.carbon.help(topic),
+    }),
   };
 }
