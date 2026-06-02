@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { trimTrailingUrlPunctuation } from "@/lib/trim-url-punctuation";
 
 export type MessageTextVariant = "assistant" | "user";
 
@@ -92,17 +93,21 @@ function parseInline(text: string, options: FormatOptions = {}): ReactNode[] {
         );
       }
     } else {
+      const { href, trailing } = trimTrailingUrlPunctuation(token);
       nodes.push(
         <a
           key={`${keyPrefix}-${key++}`}
-          href={token}
+          href={href}
           target="_blank"
           rel="noopener noreferrer"
           className={linkClass}
         >
-          {token}
+          {href}
         </a>,
       );
+      if (trailing) {
+        nodes.push(trailing);
+      }
     }
 
     lastIndex = match.index + token.length;
