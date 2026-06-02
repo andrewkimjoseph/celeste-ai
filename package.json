@@ -1,6 +1,6 @@
 {
   "name": "celeste-ai",
-  "version": "0.2.7",
+  "version": "0.2.9",
   "description": "DeFAI chat UI for Celo — applied Celina (unofficial Celo MCP server). Connect a wallet, ask about balances, and prepare sends, swaps (Mento FX + Uniswap v4), and Aave actions — you sign in your wallet.",
   "private": true,
   "scripts": {
@@ -12,7 +12,7 @@
   "dependencies": {
     "@ai-sdk/openai": "^3.0.65",
     "@ai-sdk/react": "^3.0.193",
-    "@andrewkimjoseph/celina-sdk": "0.4.2",
+    "@andrewkimjoseph/celina-sdk": "0.4.7",
     "@rainbow-me/rainbowkit": "^2.2.11",
     "@tanstack/react-query": "^5.100.14",
     "ai": "^6.0.191",
