@@ -304,7 +304,7 @@ export function TxConfirmCard({
             className="flex gap-2 text-sm text-zinc-400"
           >
             <span className="font-medium text-zinc-500">{index + 1}.</span>
-            <span>{formatTransactionStep(step.description)}</span>
+            <span>{formatTransactionStep(step.description, { carbonDetails, summary })}</span>
           </li>
         ))}
       </ol>

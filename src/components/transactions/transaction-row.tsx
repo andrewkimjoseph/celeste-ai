@@ -182,7 +182,9 @@ export function TransactionRow({
               <div className="flex gap-2 text-sm text-zinc-300">
                 <span className="font-medium text-zinc-500">{index + 1}.</span>
                 <span className="min-w-0 flex-1 leading-relaxed">
-                  {formatTransactionStep(entry.step)}
+                  {formatTransactionStep(entry.step, {
+                    summary: transaction.summary,
+                  })}
                 </span>
               </div>
               {entry.hash && <HashActions hash={entry.hash} />}
