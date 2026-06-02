@@ -4,9 +4,10 @@ import { useTxPreflight } from "@/hooks/use-tx-preflight";
 import { useWalletBalances } from "@/hooks/use-wallet-balances";
 import { useWalletCapabilities } from "@/hooks/use-wallet-capabilities";
 import type { PreparedTx } from "@/lib/prepared-flow";
+import type { CarbonOrderDisplay } from "@/lib/carbon-order-display";
+import { CarbonOrderSummary } from "@/components/carbon-order-summary";
 import { parseSendSummary } from "@/lib/send-preflight";
 import { formatFlowSummary, formatWalletError } from "@/lib/wallet-error";
-import { formatBalanceShort } from "@/lib/format-balance";
 import { formatTransactionStep } from "@/lib/transaction-display";
 import { useState } from "react";
 import { useAccount, usePublicClient, useSendTransaction } from "wagmi";
@@ -17,6 +18,9 @@ interface TxConfirmCardProps {
   summary: string;
   steps: PreparedTx[];
   recipientLabel?: string;
+  warnings?: string[];
+  deepLink?: string;
+  carbonDetails?: CarbonOrderDisplay;
   onComplete: (hashes: string[]) => void;
   onDismiss: () => void;
 }
@@ -105,6 +109,9 @@ export function TxConfirmCard({
   summary,
   steps,
   recipientLabel,
+  warnings,
+  deepLink,
+  carbonDetails,
   onComplete,
   onDismiss,
 }: TxConfirmCardProps) {
@@ -121,6 +128,10 @@ export function TxConfirmCard({
   const { data: walletBalances } = useWalletBalances(address);
   const { supportsFeeAbstraction } = useWalletCapabilities();
   const isSendFlow = parseSendSummary(summary) !== null;
+  const celoBalance = Number(walletBalances?.celo?.formatted ?? 0);
+  const insufficientGas =
+    !supportsFeeAbstraction && !isSendFlow && celoBalance <= 0;
+  const invalidCarbonBudget = carbonDetails?.budgetValid === false;
   const preflightBlocked =
     isSendFlow &&
     preflight.status === "ready" &&
@@ -132,12 +143,18 @@ export function TxConfirmCard({
   const confirmDisabled =
     isBusy ||
     preflightBlocked ||
+    insufficientGas ||
+    invalidCarbonBudget ||
     (isSendFlow && preflight.status === "loading");
 
   const cardTitle =
-    preflightBlocked && preflight.status === "ready"
-      ? "Insufficient balance"
-      : copy.title;
+    invalidCarbonBudget
+      ? "Invalid order amount"
+      : insufficientGas
+        ? "Insufficient CELO for gas"
+        : preflightBlocked && preflight.status === "ready"
+          ? "Insufficient balance"
+          : copy.title;
 
   const iconStyles =
     status === "error"
@@ -204,6 +221,7 @@ export function TxConfirmCard({
           <p className="mt-1 text-sm leading-relaxed text-zinc-300">
             {displaySummary}
           </p>
+          {carbonDetails && <CarbonOrderSummary details={carbonDetails} />}
           <p className="mt-1.5 text-xs text-zinc-500">
             {status === "signing" && steps.length > 1
               ? `Step ${signingStepIndex + 1} of ${steps.length} — approve in your wallet.`
@@ -212,64 +230,70 @@ export function TxConfirmCard({
         </div>
       </div>
 
-      {isSendFlow && (
-        <div className="mt-3 border-t border-[var(--warn)]/15 pt-3">
-          {preflight.status === "loading" && (
-            <p className="flex items-center gap-2 text-xs text-zinc-400">
-              <span
-                className="inline-block size-3 shrink-0 animate-spin rounded-full border-2 border-zinc-500 border-t-[var(--accent-hover)]"
-                aria-hidden
-              />
-              Checking your balance…
-            </p>
-          )}
-          {preflight.status === "ready" && preflight.data.ok && (
-            <p className="text-xs text-zinc-400">
-              Your balance:{" "}
-              <span className="text-zinc-200">
-                {formatBalanceShort(preflight.data.tokenBalance)} {preflight.data.token}
-              </span>
-              {preflight.data.supportsFeeAbstraction || supportsFeeAbstraction ? (
-                <>
-                  {" · "}
-                  <span className="text-zinc-200">Gas paid from stablecoins (MiniPay)</span>
-                </>
-              ) : (
-                <>
-                  {" · "}
-                  <span className="text-zinc-200">
-                    {formatBalanceShort(preflight.data.celoBalance)} CELO
-                  </span>{" "}
-                  for gas
-                </>
-              )}
-            </p>
-          )}
-          {preflightBlocked && preflight.status === "ready" && (
-            <p className="text-xs text-amber-200/90" role="alert">
-              {preflight.data.message}
-            </p>
-          )}
+      {warnings && warnings.length > 0 && (
+        <div
+          className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2.5"
+          role="status"
+        >
+          <p className="text-xs font-medium text-amber-100">Carbon warnings</p>
+          <ul className="mt-1.5 list-inside list-disc space-y-1 text-xs text-amber-100/90">
+            {warnings.map((warning) => (
+              <li key={warning}>{warning}</li>
+            ))}
+          </ul>
         </div>
       )}
 
-      {!isSendFlow && walletBalances && (
-        <div className="mt-3 border-t border-[var(--warn)]/15 pt-3">
-          <p className="text-xs text-zinc-400">
-            {supportsFeeAbstraction ? (
-              <>
-                Gas:{" "}
-                <span className="text-zinc-200">paid from stablecoins (MiniPay)</span>
-              </>
-            ) : (
-              <>
-                Gas balance:{" "}
-                <span className="text-zinc-200">
-                  {formatBalanceShort(walletBalances.celo.formatted)} CELO
-                </span>
-              </>
+      {deepLink && (
+        <p className="mt-3">
+          <a
+            href={deepLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-medium text-amber-300 underline-offset-2 hover:text-amber-200 hover:underline"
+          >
+            View on Carbon
+          </a>
+        </p>
+      )}
+
+      {isSendFlow &&
+        (preflight.status === "loading" || preflightBlocked) && (
+          <div className="mt-3 border-t border-[var(--warn)]/15 pt-3">
+            {preflight.status === "loading" && (
+              <p className="flex items-center gap-2 text-xs text-zinc-400">
+                <span
+                  className="inline-block size-3 shrink-0 animate-spin rounded-full border-2 border-zinc-500 border-t-[var(--accent-hover)]"
+                  aria-hidden
+                />
+                Checking your balance…
+              </p>
             )}
-          </p>
+            {preflightBlocked && preflight.status === "ready" && (
+              <p className="text-xs text-amber-200/90" role="alert">
+                {preflight.data.message}
+              </p>
+            )}
+          </div>
+        )}
+
+      {!isSendFlow && (insufficientGas || invalidCarbonBudget) && (
+        <div className="mt-3 border-t border-[var(--warn)]/15 pt-3">
+          {insufficientGas && (
+            <p className="text-xs text-amber-200/90" role="alert">
+              You need a small CELO balance to pay network fees. Add CELO to your
+              wallet, then try again.
+            </p>
+          )}
+          {invalidCarbonBudget && (
+            <p
+              className={`text-xs text-amber-200/90${insufficientGas ? " mt-1.5" : ""}`}
+              role="alert"
+            >
+              This order has no spend amount. Ask Celeste to prepare again with
+              how much you want to use (e.g. 50 USDT).
+            </p>
+          )}
         </div>
       )}
 
