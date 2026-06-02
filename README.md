@@ -37,6 +37,22 @@ Swaps use **composite routing** in [`src/lib/swap-routing.ts`](src/lib/swap-rout
 
 Example: *"Swap 100 G$ to USDT"* → `get_swap_quote` (Uniswap when Mento has no route) → user confirms → `prepare_swap` → `TxConfirmCard` (approve + Permit2 approve + swap when needed).
 
+## Carbon DeFi
+
+Carbon on Celo uses **maker strategies** (limit, recurring, concentrated) and **taker swaps** against maker liquidity. Celeste exposes 12 read tools and 13 `prepare_carbon_*` tools via celina-sdk (REST-primary; no `execute_carbon_*` — you sign in the wallet).
+
+| Intent | Tools |
+|--------|--------|
+| Buy/sell at a limit or % vs market | `prepare_carbon_limit_order`, `prepare_carbon_recurring_strategy`, `prepare_carbon_concentrated_strategy`, … |
+| Immediate swap on Carbon | `get_carbon_trade_quote` → `prepare_carbon_trade` |
+| Instant Mento/Uniswap swap | `get_swap_quote` → `prepare_swap` (when user does **not** ask for Carbon) |
+
+Market price is **auto-fetched** on prepare when omitted — if Carbon lacks pair data, Celeste **retries with a Uniswap v4 reference price** (pricing only, not an instant swap). Do not use `get_carbon_price_history` for spot price before orders (historical OHLC only; often 400 on some pairs). An empty `get_carbon_strategies` result only means the wallet has no existing strategies.
+
+Example: *"Buy CELO with 50 USDT at 10% below market via Carbon"* → ask budget if missing → `prepare_carbon_concentrated_strategy` (base CELO, quote USDT, `spread_percentage: 10`, `buy_budget`) → `TxConfirmCard` (warnings + Carbon deep link when returned). Use `get_carbon_price_history` only when the user asks for charts/history.
+
+See [Carbon guide](../celina-sdk/docs/guides/carbon.md).
+
 ## GoodDollar UBI
 
 Wallet-signed daily G$ claims via celina-sdk (UBISchemeV2 on Celo):
@@ -60,7 +76,7 @@ Uniswap v4 CELO swaps route through WCELO — the connected wallet needs WCELO b
 1. User connects wallet (wagmi + RainbowKit).
 2. `ChatPanel` sends messages + `{ address }` to `POST /api/chat`.
 3. `resolveTargetAddress` in `src/lib/chat-tools/schemas.ts` defaults tool inputs to that connected address (SDK always needs an explicit `0x…`; this is Celeste’s equivalent of Celina MCP’s optional-address session wallet on stdio).
-4. LLM calls tools from `src/lib/chat-tools.ts` (reads via SDK, writes via `prepare_*`).
+4. LLM calls tools from `src/lib/chat-tools/` (reads via SDK, writes via `prepare_*`).
 5. `prepare_*` tools return `SerializedPreparedFlow` from celina-sdk.
 6. `ChatPanel` detects the flow in message parts and renders `TxConfirmCard`.
 7. User confirms — `TxConfirmCard` signs each step sequentially via wagmi.
@@ -107,7 +123,7 @@ Dev script uses `--webpack` for compatibility; adjust if Turbopack-only dev is p
 
 ### Adding a chat tool
 
-1. Add a `tool({ description, inputSchema, execute })` entry in `createChatTools()` in [`src/lib/chat-tools.ts`](src/lib/chat-tools.ts).
+1. Add a `tool({ description, inputSchema, execute })` entry in `createChatTools()` under [`src/lib/chat-tools/`](src/lib/chat-tools/).
 2. Call the matching celina-sdk method; use `connectedAddress` as default `from`.
 3. For writes, use `prepare_*` naming to match MCP conventions where possible.
 4. Update `SYSTEM_PROMPT` if the LLM needs new behavior rules.
