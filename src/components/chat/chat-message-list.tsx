@@ -28,6 +28,7 @@ const SUGGESTED_PROMPT_GROUPS = [
     prompts: [
       "Supply 0.05 USDT to Aave",
       "Withdraw my USDC from Aave",
+      "Place a limit buy for CELO with USDT",
       "What's the gas price?",
     ],
   },
