@@ -1,10 +1,21 @@
 import type { SerializedPreparedFlow, PreparedTx } from "@andrewkimjoseph/celina-sdk";
+import type { CarbonOrderDisplay } from "@/lib/carbon-order-display";
 import { isTextUIPart, isToolUIPart, type UIMessage } from "ai";
 
 const PREPARE_TOOL_PREFIX = "prepare_";
 
+/** Prepared flow with optional Carbon REST extras from finalizeCarbonPrepare. */
+export type PreparedFlowWithExtras = SerializedPreparedFlow & {
+  deep_link?: string;
+  warnings?: string[];
+  strategyPreview?: unknown;
+  market_price?: number;
+  market_price_source?: "uniswap_v4";
+  carbonDetails?: CarbonOrderDisplay;
+};
+
 /** Type guard for `SerializedPreparedFlow` objects from prepare_* tool outputs. */
-export function isPreparedFlow(value: unknown): value is SerializedPreparedFlow {
+export function isPreparedFlow(value: unknown): value is PreparedFlowWithExtras {
   return (
     typeof value === "object" &&
     value !== null &&
@@ -19,7 +30,7 @@ function isPrepareToolName(toolName: string): boolean {
 }
 
 type PreparedFlowMeta = {
-  flow: SerializedPreparedFlow;
+  flow: PreparedFlowWithExtras;
   flowKey: string;
   messageId: string;
   toolCallId: string;
@@ -66,14 +77,14 @@ export function extractPreparedFlowMetas(messages: UIMessage[]): PreparedFlowMet
 }
 
 /** Collect all prepared flows from assistant tool-result parts in chat messages. */
-export function extractPreparedFlows(messages: UIMessage[]): SerializedPreparedFlow[] {
+export function extractPreparedFlows(messages: UIMessage[]): PreparedFlowWithExtras[] {
   return extractPreparedFlowMetas(messages).map((meta) => meta.flow);
 }
 
 /** Return the most recent prepared flow, if any — used to show `TxConfirmCard`. */
 export function getLatestPreparedFlow(
   messages: UIMessage[],
-): SerializedPreparedFlow | undefined {
+): PreparedFlowWithExtras | undefined {
   return extractPreparedFlowMetas(messages).at(-1)?.flow;
 }
 
@@ -111,7 +122,10 @@ export function getActivePreparedFlowWithMeta(
 }
 
 const CONFIRMED_TX_PREFIX = "Transaction confirmed";
-const DISMISSED_TX_SNIPPET = "dismissed the transaction confirmation card";
+const DISMISSED_TX_SNIPPETS = [
+  "dismissed the transaction confirmation card",
+  "Cancelled signing",
+] as const;
 
 function getMessageText(message: UIMessage): string {
   return (
@@ -126,7 +140,7 @@ function getMessageText(message: UIMessage): string {
 function isAutoPreparedFlowUserMessage(text: string): boolean {
   return (
     text.startsWith(CONFIRMED_TX_PREFIX) ||
-    text.includes(DISMISSED_TX_SNIPPET)
+    DISMISSED_TX_SNIPPETS.some((snippet) => text.includes(snippet))
   );
 }
 
