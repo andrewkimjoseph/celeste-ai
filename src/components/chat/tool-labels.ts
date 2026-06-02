@@ -155,9 +155,29 @@ const TOOL_LABELS: Record<string, { inProgress: string; done: string }> = {
     inProgress: "Loading Carbon strategies…",
     done: "Carbon strategies loaded",
   },
+  get_carbon_strategy: {
+    inProgress: "Loading Carbon strategy…",
+    done: "Carbon strategy loaded",
+  },
   explore_carbon_pair: {
     inProgress: "Exploring Carbon pair…",
     done: "Carbon pair loaded",
+  },
+  resolve_carbon_token: {
+    inProgress: "Resolving Carbon token…",
+    done: "Carbon token resolved",
+  },
+  find_carbon_opportunities: {
+    inProgress: "Finding Carbon opportunities…",
+    done: "Carbon opportunities loaded",
+  },
+  get_carbon_protocol_stats: {
+    inProgress: "Loading Carbon protocol stats…",
+    done: "Carbon stats loaded",
+  },
+  get_carbon_price_history: {
+    inProgress: "Loading Carbon price history…",
+    done: "Carbon price history loaded",
   },
   get_carbon_trade_quote: {
     inProgress: "Getting Carbon trade quote…",
@@ -174,6 +194,10 @@ const TOOL_LABELS: Record<string, { inProgress: string; done: string }> = {
   carbon_help: {
     inProgress: "Loading Carbon help…",
     done: "Carbon help loaded",
+  },
+  carbon_learn: {
+    inProgress: "Loading Carbon learn…",
+    done: "Carbon learn loaded",
   },
   prepare_carbon_limit_order: {
     inProgress: "Preparing Carbon limit order…",
