@@ -2,6 +2,8 @@
 
 DeFAI chat UI for Celo — applied Celina. Connect a wallet, ask about balances, and prepare sends, swaps (Mento FX + Uniswap v4), and Aave actions — you sign in your wallet.
 
+**Celeste is independent of Celina MCP.** It does not run `@andrewkimjoseph/celina-mcp`, does not use `CELO_PRIVATE_KEY` or `get_wallet_address`, and is not the same product as [usecelina.xyz](https://usecelina.xyz). It is a Next.js app that calls **`@andrewkimjoseph/celina-sdk`** with the connected wallet address from wagmi (same pattern as any custom SDK + wagmi frontend).
+
 ## Setup
 
 ```bash
@@ -11,7 +13,7 @@ npm install
 npm run dev
 ```
 
-Installs `@andrewkimjoseph/celina-sdk` from npm.
+Installs `@andrewkimjoseph/celina-sdk` **`^0.4.8`** from npm.
 
 ## Stack
 
@@ -47,7 +49,7 @@ Wallet-signed daily G$ claims via celina-sdk (UBISchemeV2 on Celo):
 
 Example: *"Claim my GoodDollar UBI"* → `get_gooddollar_ubi_entitlement` → user confirms → `prepare_claim_daily_gooddollar_ubi` → sign in wallet. One claim per verified identity per day.
 
-Requires `@andrewkimjoseph/celina-sdk` **^0.4.0**. See [GoodDollar guide](../celina-sdk/docs/guides/gooddollar.md).
+Requires `@andrewkimjoseph/celina-sdk` **^0.4.8**. See [GoodDollar guide](../celina-sdk/docs/guides/gooddollar.md).
 
 Uniswap v4 CELO swaps route through WCELO — the connected wallet needs WCELO balance. Dismissing the confirm card does not re-prepare until the user sends a new message.
 
@@ -57,12 +59,13 @@ Uniswap v4 CELO swaps route through WCELO — the connected wallet needs WCELO b
 
 1. User connects wallet (wagmi + RainbowKit).
 2. `ChatPanel` sends messages + `{ address }` to `POST /api/chat`.
-3. LLM calls tools from `src/lib/chat-tools.ts` (reads via SDK, writes via `prepare_*`).
-4. `prepare_*` tools return `SerializedPreparedFlow` from celina-sdk.
-5. `ChatPanel` detects the flow in message parts and renders `TxConfirmCard`.
-6. User confirms — `TxConfirmCard` signs each step sequentially via wagmi.
+3. `resolveTargetAddress` in `src/lib/chat-tools/schemas.ts` defaults tool inputs to that connected address (SDK always needs an explicit `0x…`; this is Celeste’s equivalent of Celina MCP’s optional-address session wallet on stdio).
+4. LLM calls tools from `src/lib/chat-tools.ts` (reads via SDK, writes via `prepare_*`).
+5. `prepare_*` tools return `SerializedPreparedFlow` from celina-sdk.
+6. `ChatPanel` detects the flow in message parts and renders `TxConfirmCard`.
+7. User confirms — `TxConfirmCard` signs each step sequentially via wagmi.
 
-Chat tools mirror **celina-sdk** reads and `prepare_*` wallet flows (aligned with celina-mcp read tools). Server-key writes (`send_token`, `execute_mento_fx`, `execute_uniswap_swap`) and **Self Agent ID** are only in [celina-mcp](../celina-mcp) or [`@selfxyz/agent-sdk`](https://www.npmjs.com/package/@selfxyz/agent-sdk).
+Chat tools mirror **celina-sdk** reads and `prepare_*` wallet flows (naming is similar to celina-mcp for familiarity, but Celeste does not call MCP). Server-key writes (`send_token`, `execute_mento_fx`, `execute_uniswap_swap`, `execute_carbon_*`) and **Self Agent ID** registration flows are only in [celina-mcp](../celina-mcp) or [`@selfxyz/agent-sdk`](https://www.npmjs.com/package/@selfxyz/agent-sdk).
 
 ### Directory map
 
