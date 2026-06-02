@@ -13,7 +13,7 @@ const carbonWriteSchema = z
   .object({
     from: addressSchema.optional(),
   })
-  .passthrough();
+  .loose();
 
 function createCarbonPrepareTool(
   celina: CelinaClient,
