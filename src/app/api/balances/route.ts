@@ -1,9 +1,11 @@
 import { formatUnits } from "viem";
 import { isAddress } from "viem";
 import { buildWalletBalancesResponse } from "@/lib/balances";
+import { scheduleAmplitudeFlush } from "@/lib/amplitude-flush";
 import { getCelinaClient } from "@/lib/celina";
 
 export async function GET(req: Request) {
+  scheduleAmplitudeFlush();
   const { searchParams } = new URL(req.url);
   const addressParam = searchParams.get("address");
   const includeZero = searchParams.get("includeZero") === "true";
