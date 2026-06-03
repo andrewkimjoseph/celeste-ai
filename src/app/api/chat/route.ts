@@ -6,11 +6,13 @@ import { convertToModelMessages, smoothStream, stepCountIs, streamText, UIMessag
 import { isAddress } from "viem";
 import { assertChatApiKeyConfigured, getChatModel } from "@/lib/chat-model";
 import { createChatTools, SYSTEM_PROMPT } from "@/lib/chat-tools";
+import { scheduleAmplitudeFlush } from "@/lib/amplitude-flush";
 import { getCelinaClient } from "@/lib/celina";
 
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
+  scheduleAmplitudeFlush();
   const body = (await req.json()) as {
     messages: UIMessage[];
     address?: string;
