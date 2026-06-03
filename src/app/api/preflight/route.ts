@@ -1,8 +1,10 @@
 import { isAddress } from "viem";
 import { checkSendPreflight, parseSendSummary } from "@/lib/send-preflight";
+import { scheduleAmplitudeFlush } from "@/lib/amplitude-flush";
 import { getCelinaClient } from "@/lib/celina";
 
 export async function POST(req: Request) {
+  scheduleAmplitudeFlush();
   const body = (await req.json()) as {
     address?: string;
     summary?: string;
