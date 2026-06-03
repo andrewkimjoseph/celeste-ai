@@ -12,6 +12,7 @@ const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 const nextConfig: NextConfig = {
   serverExternalPackages: [
     "@andrewkimjoseph/celina-sdk",
+    "@amplitude/analytics-node",
     "@mento-protocol/mento-sdk",
   ],
   turbopack: {
