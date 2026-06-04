@@ -8,8 +8,6 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
-/** Turbopack needs project-relative aliases (not absolute paths). */
-const celinaSdkTools = "../celina-sdk/build/tools/index.js";
 
 const nextConfig: NextConfig = {
   serverExternalPackages: [
@@ -23,7 +21,6 @@ const nextConfig: NextConfig = {
     resolveAlias: {
       "@react-native-async-storage/async-storage":
         "./src/lib/empty-module.ts",
-      "@andrewkimjoseph/celina-sdk/tools": celinaSdkTools,
     },
   },
   webpack: (config) => {
@@ -33,10 +30,6 @@ const nextConfig: NextConfig = {
       "@react-native-async-storage/async-storage": path.join(
         projectRoot,
         "src/lib/empty-module.ts",
-      ),
-      "@andrewkimjoseph/celina-sdk/tools": path.join(
-        projectRoot,
-        celinaSdkTools,
       ),
     };
     return config;
