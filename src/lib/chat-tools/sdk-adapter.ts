@@ -1,4 +1,4 @@
-import { tool } from "ai";
+import { dynamicTool, type FlexibleSchema, type ToolSet } from "ai";
 import type { createCelinaClient } from "@andrewkimjoseph/celina-sdk";
 import {
   ALL_TOOL_DEFINITIONS,
@@ -10,6 +10,7 @@ import {
   prepareCarbonConcentratedWithLimitFallback,
   prepareCarbonWithMarketFallback,
 } from "@/lib/carbon-market-price";
+import type { CarbonPrepareFn } from "@/lib/carbon-prepare";
 import { enrichCarbonPrepareFlow } from "@/lib/carbon-prepare-enrich";
 import { finalizeCarbonPrepare } from "@andrewkimjoseph/celina-sdk";
 import { checkSendPreflight } from "@/lib/send-preflight";
@@ -67,7 +68,7 @@ function createCelesteRuntime(
             const flow = await prepareCarbonWithMarketFallback(
               celina,
               sender,
-              prepareFn,
+              prepareFn as CarbonPrepareFn,
               body,
             );
             return enrichCarbonPrepareFlow(flow, body, {
@@ -82,10 +83,7 @@ function createCelesteRuntime(
             prepared as Parameters<typeof finalizeCarbonPrepare>[2],
             body,
           );
-          return enrichCarbonPrepareFlow(
-            { ...prepared, preparedFlow },
-            body,
-          );
+          return enrichCarbonPrepareFlow(preparedFlow, body);
         },
       },
     },
@@ -99,17 +97,20 @@ export function createChatToolsFromSdk(
 ) {
   const runtime = createCelesteRuntime(celina, connectedAddress, options);
   const definitions = filterToolDefinitions(ALL_TOOL_DEFINITIONS, {
-    surface: "celeste",
+    surface: "browser",
     carbonPrepareEnabled: true,
     carbonExecuteEnabled: false,
   });
 
-  const tools: Record<string, ReturnType<typeof tool>> = {};
+  const tools: ToolSet = {};
   for (const def of definitions) {
-    tools[def.name] = tool({
+    tools[def.name] = dynamicTool({
       description: def.description,
-      inputSchema: def.inputSchema,
-      execute: async (input) => def.handler(runtime, input as Record<string, unknown>),
+      inputSchema: def.inputSchema as unknown as FlexibleSchema<
+        Record<string, unknown>
+      >,
+      execute: async (input) =>
+        def.handler(runtime, input as Record<string, unknown>),
     });
   }
   return tools;
