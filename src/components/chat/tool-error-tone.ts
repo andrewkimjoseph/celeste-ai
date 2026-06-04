@@ -1,7 +1,4 @@
-import {
-  formatToolErrorMessage,
-  isExpectedToolError,
-} from "@/lib/format-tool-error";
+import { isExpectedToolError } from "@/lib/format-tool-error";
 
 export type ToolErrorTone = "notice" | "error";
 

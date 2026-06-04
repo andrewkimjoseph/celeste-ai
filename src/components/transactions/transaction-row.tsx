@@ -9,7 +9,7 @@ import {
   pairTransactionStepsWithHashes,
 } from "@/lib/transaction-display";
 import type { SessionTransaction } from "@/lib/transactions";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 function formatRelativeTime(timestamp: number): string {
   const diffMs = Date.now() - timestamp;
@@ -26,6 +26,37 @@ function formatRelativeTime(timestamp: number): string {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function HashActions({
+  hash,
+  copiedHash,
+  onCopy,
+}: {
+  hash: string;
+  copiedHash: string | null;
+  onCopy: (hash: string) => void;
+}) {
+  return (
+    <div className="flex shrink-0 items-center gap-1.5">
+      <button
+        type="button"
+        onClick={() => onCopy(hash)}
+        className="rounded-md border border-[var(--surface-2)] bg-black/20 px-2 py-1 font-mono text-[11px] text-zinc-300 transition-colors hover:border-zinc-600 hover:text-white"
+        title="Copy transaction hash"
+      >
+        {copiedHash === hash ? "Copied" : formatTxHash(hash)}
+      </button>
+      <a
+        href={celoscanTxUrl(hash)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="rounded-md border border-[var(--surface-2)] px-2 py-1 text-[11px] text-[var(--accent-hover)] transition-colors hover:border-[var(--accent)]/30 hover:text-[var(--accent-soft-text)]"
+      >
+        View
+      </a>
+    </div>
+  );
 }
 
 function ChevronIcon({ expanded }: { expanded: boolean }) {
@@ -56,7 +87,8 @@ export function TransactionRow({
   selected = false,
   onSelect,
 }: TransactionRowProps) {
-  const [expanded, setExpanded] = useState(selected);
+  const [expandedOverride, setExpandedOverride] = useState<boolean | null>(null);
+  const expanded = expandedOverride ?? selected;
   const [copiedHash, setCopiedHash] = useState<string | null>(null);
   const displaySummary = formatFlowSummary(transaction.summary);
   const protocolLabel = getTransactionProtocolLabel(transaction.summary);
@@ -67,12 +99,6 @@ export function TransactionRow({
   const multiStep = stepEntries.length > 1;
   const primaryHash = transaction.hashes[transaction.hashes.length - 1];
 
-  useEffect(() => {
-    if (selected) {
-      setExpanded(true);
-    }
-  }, [selected]);
-
   async function handleCopyHash(hash: string) {
     try {
       await navigator.clipboard.writeText(hash);
@@ -81,29 +107,6 @@ export function TransactionRow({
     } catch {
       // Clipboard unavailable — ignore.
     }
-  }
-
-  function HashActions({ hash }: { hash: string }) {
-    return (
-      <div className="flex shrink-0 items-center gap-1.5">
-        <button
-          type="button"
-          onClick={() => void handleCopyHash(hash)}
-          className="rounded-md border border-[var(--surface-2)] bg-black/20 px-2 py-1 font-mono text-[11px] text-zinc-300 transition-colors hover:border-zinc-600 hover:text-white"
-          title="Copy transaction hash"
-        >
-          {copiedHash === hash ? "Copied" : formatTxHash(hash)}
-        </button>
-        <a
-          href={celoscanTxUrl(hash)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="rounded-md border border-[var(--surface-2)] px-2 py-1 text-[11px] text-[var(--accent-hover)] transition-colors hover:border-[var(--accent)]/30 hover:text-[var(--accent-soft-text)]"
-        >
-          View
-        </a>
-      </div>
-    );
   }
 
   return (
@@ -117,7 +120,7 @@ export function TransactionRow({
       <button
         type="button"
         onClick={() => {
-          setExpanded((value) => !value);
+          setExpandedOverride((value) => !(value ?? selected));
           onSelect?.();
         }}
         className="flex w-full items-start gap-3 text-left"
@@ -168,7 +171,11 @@ export function TransactionRow({
 
       {!expanded && primaryHash && (
         <div className="mt-3 pl-11">
-          <HashActions hash={primaryHash} />
+          <HashActions
+            hash={primaryHash}
+            copiedHash={copiedHash}
+            onCopy={(hash) => void handleCopyHash(hash)}
+          />
         </div>
       )}
 
@@ -187,7 +194,13 @@ export function TransactionRow({
                   })}
                 </span>
               </div>
-              {entry.hash && <HashActions hash={entry.hash} />}
+              {entry.hash && (
+                <HashActions
+                  hash={entry.hash}
+                  copiedHash={copiedHash}
+                  onCopy={(hash) => void handleCopyHash(hash)}
+                />
+              )}
             </li>
           ))}
         </ol>

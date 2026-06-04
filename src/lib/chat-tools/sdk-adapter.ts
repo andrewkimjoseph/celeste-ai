@@ -1,5 +1,5 @@
 import { tool } from "ai";
-import type { createCelinaClient } from "@andrewkimjoseph/celina-sdk";
+import type { CarbonWriteBody, createCelinaClient } from "@andrewkimjoseph/celina-sdk";
 import {
   ALL_TOOL_DEFINITIONS,
   filterToolDefinitions,
@@ -48,7 +48,8 @@ function createCelesteRuntime(
         }
       },
       carbon: {
-        validateBody: validateCarbonPrepareBody,
+        validateBody: (toolName, body) =>
+          validateCarbonPrepareBody(toolName, body as CarbonWriteBody),
         prepare: async (toolName, sender, prepareFn, body, opts) => {
           if (opts?.concentrated) {
             const flow = await prepareCarbonConcentratedWithLimitFallback(

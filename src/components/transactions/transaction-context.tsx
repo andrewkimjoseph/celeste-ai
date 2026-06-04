@@ -31,51 +31,61 @@ interface TransactionContextValue {
 
 const TransactionContext = createContext<TransactionContextValue | null>(null);
 
+const EMPTY_TRANSACTIONS: SessionTransaction[] = [];
+
 interface TransactionProviderProps {
   address?: `0x${string}`;
   children: ReactNode;
 }
 
+type TransactionCache = {
+  address: string;
+  rows: SessionTransaction[];
+};
+
 export function TransactionProvider({
   address,
   children,
 }: TransactionProviderProps) {
-  const [transactions, setTransactions] = useState<SessionTransaction[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [cache, setCache] = useState<TransactionCache | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
+  const walletAddress = address?.toLowerCase();
+
   useEffect(() => {
-    if (!address) {
-      setTransactions([]);
-      setIsLoading(false);
+    if (!address || !walletAddress) {
       return;
     }
 
     let cancelled = false;
-    setIsLoading(true);
 
     void listTransactions(address)
       .then((rows) => {
         if (!cancelled) {
-          setTransactions(rows);
+          setCache({ address: walletAddress, rows });
         }
       })
       .catch(() => {
         if (!cancelled) {
-          setTransactions([]);
-        }
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setIsLoading(false);
+          setCache({ address: walletAddress, rows: [] });
         }
       });
 
     return () => {
       cancelled = true;
     };
-  }, [address]);
+  }, [address, walletAddress]);
+
+  const transactions = useMemo(
+    () =>
+      walletAddress && cache?.address === walletAddress
+        ? cache.rows
+        : EMPTY_TRANSACTIONS,
+    [walletAddress, cache],
+  );
+  const isLoading =
+    Boolean(walletAddress) && cache?.address !== walletAddress;
 
   const openDrawer = useCallback(() => {
     setIsOpen(true);
@@ -106,7 +116,12 @@ export function TransactionProvider({
         timestamp: Date.now(),
       };
 
-      setTransactions((current) => [optimistic, ...current]);
+      setCache((current) => {
+        if (current?.address === walletAddress) {
+          return { address: walletAddress, rows: [optimistic, ...current.rows] };
+        }
+        return { address: walletAddress, rows: [optimistic] };
+      });
 
       try {
         const saved = await addTransactionToDb({
@@ -114,20 +129,34 @@ export function TransactionProvider({
           address,
         });
 
-        setTransactions((current) => [
-          saved,
-          ...current.filter((row) => row.id !== optimistic.id),
-        ]);
+        setCache((current) => {
+          if (current?.address !== walletAddress) {
+            return current;
+          }
+          return {
+            address: walletAddress,
+            rows: [
+              saved,
+              ...current.rows.filter((row) => row.id !== optimistic.id),
+            ],
+          };
+        });
 
         return saved;
       } catch {
-        setTransactions((current) =>
-          current.filter((row) => row.id !== optimistic.id),
-        );
+        setCache((current) => {
+          if (current?.address !== walletAddress) {
+            return current;
+          }
+          return {
+            address: walletAddress,
+            rows: current.rows.filter((row) => row.id !== optimistic.id),
+          };
+        });
         return null;
       }
     },
-    [address],
+    [address, walletAddress],
   );
 
   const openTransactionByHash = useCallback(
