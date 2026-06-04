@@ -123,7 +123,7 @@ Dev script uses `--webpack` for compatibility; adjust if Turbopack-only dev is p
 
 ### Adding a chat tool
 
-1. Add a `tool({ description, inputSchema, execute })` entry in `createChatTools()` under [`src/lib/chat-tools/`](src/lib/chat-tools/).
-2. Call the matching celina-sdk method; use `connectedAddress` as default `from`.
-3. For writes, use `prepare_*` naming to match MCP conventions where possible.
-4. Update `SYSTEM_PROMPT` if the LLM needs new behavior rules.
+1. Add a `ToolDefinition` in **celina-sdk** [`src/tools/domains/`](../celina-sdk/src/tools/domains/) (exported via `@andrewkimjoseph/celina-sdk/tools`). Set `surfaces: ["celeste"]` or both.
+2. Celeste wires tools through [`src/lib/chat-tools/sdk-adapter.ts`](src/lib/chat-tools/sdk-adapter.ts); add hooks there if the tool needs host-specific behavior (e.g. send preflight, Carbon enrich).
+3. Update `SYSTEM_PROMPT` in [`src/lib/chat-tools/index.ts`](src/lib/chat-tools/index.ts) if the LLM needs new rules.
+4. Requires `@andrewkimjoseph/celina-sdk` **^0.5.0** with the `./tools` export.
