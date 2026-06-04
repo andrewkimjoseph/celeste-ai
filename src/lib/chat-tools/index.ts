@@ -1,7 +1,5 @@
 import type { createCelinaClient } from "@andrewkimjoseph/celina-sdk";
-import { createReadTools } from "@/lib/chat-tools/read-tools";
-import { createWriteTools } from "@/lib/chat-tools/write-tools";
-import { createCarbonWriteTools } from "@/lib/chat-tools/carbon-write-tools";
+import { createChatToolsFromSdk } from "@/lib/chat-tools/sdk-adapter";
 
 type CelinaClient = ReturnType<typeof createCelinaClient>;
 
@@ -9,17 +7,13 @@ export type ChatToolsOptions = {
   supportsFeeAbstraction?: boolean;
 };
 
-/** Vercel AI SDK tools for `/api/chat` — celina-sdk reads + prepare_* wallet flows. */
+/** Vercel AI SDK tools for `/api/chat` — from @andrewkimjoseph/celina-sdk/tools. */
 export function createChatTools(
   celina: CelinaClient,
   connectedAddress: `0x${string}`,
   options?: ChatToolsOptions,
 ) {
-  return {
-    ...createReadTools(celina, connectedAddress),
-    ...createWriteTools(celina, connectedAddress, options),
-    ...createCarbonWriteTools(celina, connectedAddress),
-  };
+  return createChatToolsFromSdk(celina, connectedAddress, options);
 }
 
 export const SYSTEM_PROMPT = `You are Celeste AI, a DeFAI assistant for Celo mainnet.
