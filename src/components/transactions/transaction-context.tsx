@@ -109,18 +109,23 @@ export function TransactionProvider({
         return null;
       }
 
+      const normalizedAddress = address.toLowerCase();
+
       const optimistic: SessionTransaction = {
         ...tx,
         id: crypto.randomUUID(),
-        address: address.toLowerCase(),
+        address: normalizedAddress,
         timestamp: Date.now(),
       };
 
       setCache((current) => {
-        if (current?.address === walletAddress) {
-          return { address: walletAddress, rows: [optimistic, ...current.rows] };
+        if (current?.address === normalizedAddress) {
+          return {
+            address: normalizedAddress,
+            rows: [optimistic, ...current.rows],
+          };
         }
-        return { address: walletAddress, rows: [optimistic] };
+        return { address: normalizedAddress, rows: [optimistic] };
       });
 
       try {
@@ -130,11 +135,11 @@ export function TransactionProvider({
         });
 
         setCache((current) => {
-          if (current?.address !== walletAddress) {
+          if (current?.address !== normalizedAddress) {
             return current;
           }
           return {
-            address: walletAddress,
+            address: normalizedAddress,
             rows: [
               saved,
               ...current.rows.filter((row) => row.id !== optimistic.id),
@@ -145,18 +150,18 @@ export function TransactionProvider({
         return saved;
       } catch {
         setCache((current) => {
-          if (current?.address !== walletAddress) {
+          if (current?.address !== normalizedAddress) {
             return current;
           }
           return {
-            address: walletAddress,
+            address: normalizedAddress,
             rows: current.rows.filter((row) => row.id !== optimistic.id),
           };
         });
         return null;
       }
     },
-    [address, walletAddress],
+    [address],
   );
 
   const openTransactionByHash = useCallback(
