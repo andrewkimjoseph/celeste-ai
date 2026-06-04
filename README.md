@@ -13,7 +13,7 @@ npm install
 npm run dev
 ```
 
-Installs `@andrewkimjoseph/celina-sdk` **`^0.4.12`** from npm.
+Installs `@andrewkimjoseph/celina-sdk` **`^0.6.0`** from npm (not a monorepo file link — required for Vercel deploys).
 
 ## Stack
 
@@ -65,7 +65,7 @@ Wallet-signed daily G$ claims via celina-sdk (UBISchemeV2 on Celo):
 
 Example: *"Claim my GoodDollar UBI"* → `get_gooddollar_ubi_entitlement` → user confirms → `prepare_claim_daily_gooddollar_ubi` → sign in wallet. One claim per verified identity per day.
 
-Requires `@andrewkimjoseph/celina-sdk` **^0.4.12**. See [GoodDollar guide](../celina-sdk/docs/guides/gooddollar.md).
+Requires `@andrewkimjoseph/celina-sdk` **^0.6.0**. See [GoodDollar guide](../celina-sdk/docs/guides/gooddollar.md).
 
 Uniswap v4 CELO swaps route through WCELO — the connected wallet needs WCELO balance. Dismissing the confirm card does not re-prepare until the user sends a new message.
 
@@ -126,4 +126,4 @@ Dev script uses `--webpack` for compatibility; adjust if Turbopack-only dev is p
 1. Add a `ToolDefinition` in **celina-sdk** — see [LLM tool catalog](../celina-sdk/docs/guides/tool-catalog.md) (`src/tools/domains/`, `surfaces: ["browser"]` or both).
 2. Celeste wires tools through [`src/lib/chat-tools/sdk-adapter.ts`](src/lib/chat-tools/sdk-adapter.ts); add `ToolRuntime.hooks` there if the tool needs host-specific behavior (e.g. send preflight, Carbon enrich). Use **`dynamicTool`** when wrapping the catalog (documented in the SDK guide).
 3. Update `SYSTEM_PROMPT` in [`src/lib/chat-tools/index.ts`](src/lib/chat-tools/index.ts) if the LLM needs new rules.
-4. Requires `@andrewkimjoseph/celina-sdk` **^0.5.0** with the `./tools` export.
+4. Requires `@andrewkimjoseph/celina-sdk` **^0.6.0** with the `./tools` export.
