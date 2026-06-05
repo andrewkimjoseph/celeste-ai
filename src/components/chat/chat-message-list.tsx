@@ -11,6 +11,7 @@ import {
   shouldShowAssistantLoading,
 } from "@/components/chat/chat-utils";
 import type { PreparedFlowWithExtras } from "@/lib/prepared-flow";
+import { CelesteLogoMark } from "@/components/celeste-logo";
 import { TxConfirmCard } from "@/components/tx-confirm-card";
 
 const SUGGESTED_PROMPT_GROUPS = [
@@ -27,17 +28,23 @@ const SUGGESTED_PROMPT_GROUPS = [
     prompts: [
       "Swap 10 USDm to CELO",
       "Get a quote to swap CELO to USDC",
-      "Swap 100 G$ to USDT",
+      "Swap 100 G$ to USDm",
       "What's the best swap rate for 50 USDT to CELO?",
     ],
   },
   {
-    label: "Foreign exchange",
+    label: "FX",
     prompts: [
       "Convert 50 USDm to EURm",
-      "Exchange 100 USDm for CELO",
       "What's the Mento rate for USDm to EURm?",
       "Convert 20 EURm to USDC",
+    ],
+  },
+  {
+    label: "Earn",
+    prompts: [
+      "Save 10 USDT to Aave",
+      "Withdraw my entire Aave savings",
     ],
   },
 ] as const;
@@ -129,12 +136,15 @@ export function ChatMessageList({
 
       {showEmptyState && (
         <div className="rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)]/60 px-4 py-6">
-          <h2 className="text-base font-semibold text-white">What can Celeste AI do?</h2>
-          <p className="mt-1 text-sm text-zinc-400">
-            Ask in plain English — send money, swap tokens, and exchange
-            currencies on Celo.
+          <h2 className="text-center text-base font-semibold text-white">
+            What can Celeste AI do?
+          </h2>
+          <p className="mt-1 text-center text-sm text-zinc-400">
+            Ask in plain English — send, swap, FX, and earn on Aave, all on
+            Celo.
           </p>
-          <div className="mt-4 space-y-3">
+          <CelesteLogoMark className="my-6 sm:my-8" />
+          <div className="space-y-3">
             {SUGGESTED_PROMPT_GROUPS.map((group) => (
               <div key={group.label}>
                 <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wide text-zinc-500">

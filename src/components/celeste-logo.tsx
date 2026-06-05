@@ -1,6 +1,4 @@
-import Image from "next/image";
-
-export const CELESTE_LOGO_PATH = "/celeste-logo.png";
+export const CELESTE_LOGO_SRC = "/logo.svg";
 
 const LOGO_SIZES = {
   xs: 28,
@@ -31,13 +29,13 @@ export function CelesteLogo({
   const px = LOGO_SIZES[size];
 
   return (
-    <Image
-      src={CELESTE_LOGO_PATH}
+    // eslint-disable-next-line @next/next/no-img-element -- SVG brand mark; public/logo.svg
+    <img
+      src={CELESTE_LOGO_SRC}
       alt="Celeste AI"
       width={px}
       height={px}
       className={`object-contain ${ROUNDED_CLASS[rounded]} ${className}`}
-      priority
     />
   );
 }
@@ -53,7 +51,21 @@ const SHAPE_CLASS = {
   squircle: "rounded-xl sm:rounded-lg",
 } as const;
 
-/** Celeste AI assistant avatar — always the brand logo on black. */
+/** Large centered brand mark for empty states and landing hero. */
+export function CelesteLogoMark({ className = "" }: { className?: string }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- SVG brand mark; public/logo.svg
+    <img
+      src={CELESTE_LOGO_SRC}
+      alt="Celeste AI"
+      width={192}
+      height={192}
+      className={`mx-auto size-36 object-contain drop-shadow-[0_0_24px_rgb(108_180_238/0.55)] sm:size-44 md:size-48 ${className}`}
+    />
+  );
+}
+
+/** Celeste AI assistant avatar — brand logo on black. */
 export function CelesteLogoAvatar({
   size = "sm",
   className = "",
@@ -68,13 +80,11 @@ export function CelesteLogoAvatar({
       role="img"
       aria-label="Celeste AI"
     >
-      <Image
-        src={CELESTE_LOGO_PATH}
+      {/* eslint-disable-next-line @next/next/no-img-element -- SVG brand mark; public/logo.svg */}
+      <img
+        src={CELESTE_LOGO_SRC}
         alt=""
-        fill
-        sizes={`${px}px`}
-        className="object-contain p-[10%]"
-        priority={size === "md"}
+        className="absolute inset-[10%] size-[80%] object-contain"
       />
     </div>
   );

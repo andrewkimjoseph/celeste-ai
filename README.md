@@ -35,7 +35,7 @@ Swaps use **composite routing** in [`src/lib/swap-routing.ts`](src/lib/swap-rout
 | `get_uniswap_quote` / `prepare_uniswap_swap` | Uniswap v4 only |
 | `estimate_mento_fx` / `estimate_uniswap_swap` | Gas estimates (when user asks) |
 
-Example: *"Swap 100 G$ to USDT"* → `get_swap_quote` (Uniswap when Mento has no route) → user confirms → `prepare_swap` → `TxConfirmCard` (approve + Permit2 approve + swap when needed).
+Example: *"Swap 100 G$ to USDm"* → `get_swap_quote` (Uniswap when Mento has no route) → user confirms → `prepare_swap` → `TxConfirmCard` (approve + Permit2 approve + swap when needed).
 
 ## Carbon DeFi
 
