@@ -45,7 +45,9 @@ function formatSwapQuote(output: unknown): string | null {
       ? " via Uniswap"
       : quote.protocol === "mento_fx"
         ? " via Mento"
-        : "";
+        : quote.protocol === "gooddollar_reserve"
+          ? " via GoodDollar reserve"
+          : "";
 
   return formatHumanFlowText(
     `${quote.amountIn} ${quote.tokenIn} → ${amountOut} ${quote.tokenOut}${via}`,
@@ -133,7 +135,8 @@ export function ToolStatus({
     const swapQuoteSummary =
       toolName === "get_swap_quote" ||
       toolName === "get_mento_fx_quote" ||
-      toolName === "get_uniswap_quote"
+      toolName === "get_uniswap_quote" ||
+      toolName === "get_gooddollar_reserve_quote"
         ? formatSwapQuote(part.output)
         : null;
 

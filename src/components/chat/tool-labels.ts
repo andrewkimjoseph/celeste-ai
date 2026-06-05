@@ -59,6 +59,10 @@ const TOOL_LABELS: Record<string, { inProgress: string; done: string }> = {
     inProgress: "Checking GoodDollar UBI eligibility…",
     done: "UBI eligibility loaded",
   },
+  get_gooddollar_reserve_quote: {
+    inProgress: "Getting GoodDollar reserve quote…",
+    done: "Reserve quote ready",
+  },
   resolve_ens: {
     inProgress: "Resolving ENS name…",
     done: "ENS resolved",
@@ -150,6 +154,10 @@ const TOOL_LABELS: Record<string, { inProgress: string; done: string }> = {
   prepare_claim_daily_gooddollar_ubi: {
     inProgress: "Preparing UBI claim…",
     done: "UBI claim prepared",
+  },
+  prepare_gooddollar_reserve_swap: {
+    inProgress: "Preparing GoodDollar reserve swap…",
+    done: "Reserve swap prepared",
   },
   get_carbon_strategies: {
     inProgress: "Loading Carbon strategies…",
