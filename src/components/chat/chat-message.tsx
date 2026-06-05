@@ -10,25 +10,6 @@ interface ChatMessageProps {
   align?: "start" | "end";
 }
 
-function UserAvatar() {
-  return (
-    <svg
-      className="size-4 text-[var(--accent-foreground)]"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2}
-      aria-hidden
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0"
-      />
-    </svg>
-  );
-}
-
 export function ChatMessage({
   message,
   hidePrepareToolDone = false,
@@ -46,12 +27,13 @@ export function ChatMessage({
       }`}
     >
       {isUser ? (
-        <div
-          className="mt-1 flex size-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-strong)] shadow-sm ring-2 ring-[var(--accent)]/20 sm:size-8"
+        <span
+          className="mt-1 flex size-7 shrink-0 items-center justify-center text-lg sm:size-8 sm:text-xl"
           aria-label="You"
+          role="img"
         >
-          <UserAvatar />
-        </div>
+          🙂
+        </span>
       ) : (
         <CelesteLogoAvatar
           size="sm"

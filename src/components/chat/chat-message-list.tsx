@@ -15,30 +15,29 @@ import { TxConfirmCard } from "@/components/tx-confirm-card";
 
 const SUGGESTED_PROMPT_GROUPS = [
   {
-    label: "Swaps & sends",
+    label: "Send",
+    prompts: [
+      "Send 1 USDC to ",
+      "Send 0.1 CELO to ",
+      "Send 5 USDm to andrewkimjoseph.celo.eth",
+    ],
+  },
+  {
+    label: "Swap",
     prompts: [
       "Swap 10 USDm to CELO",
       "Get a quote to swap CELO to USDC",
-      "Send 1 USDC to ",
-      "Send 0.1 CELO to ",
+      "Swap 100 G$ to USDT",
+      "What's the best swap rate for 50 USDT to CELO?",
     ],
   },
   {
-    label: "DeFi",
+    label: "Foreign exchange",
     prompts: [
-      "Supply 0.05 USDT to Aave",
-      "Withdraw my USDC from Aave",
-      "Place a limit buy for CELO with USDT",
-      "What's the gas price?",
-    ],
-  },
-  {
-    label: "Explore",
-    prompts: [
-      "Check my GoodDollar status",
-      "Show my staking balances",
-      "Show recent governance proposals",
-      "Resolve vitalik.eth on Celo",
+      "Convert 50 USDm to EURm",
+      "Exchange 100 USDm for CELO",
+      "What's the Mento rate for USDm to EURm?",
+      "Convert 20 EURm to USDC",
     ],
   },
 ] as const;
@@ -132,8 +131,8 @@ export function ChatMessageList({
         <div className="rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)]/60 px-4 py-6">
           <h2 className="text-base font-semibold text-white">What can Celeste AI do?</h2>
           <p className="mt-1 text-sm text-zinc-400">
-            Ask in plain English — swap tokens, send money, check balances, and
-            more on Celo.
+            Ask in plain English — send money, swap tokens, and exchange
+            currencies on Celo.
           </p>
           <div className="mt-4 space-y-3">
             {SUGGESTED_PROMPT_GROUPS.map((group) => (
