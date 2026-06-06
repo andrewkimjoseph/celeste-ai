@@ -70,7 +70,7 @@ Example (UBI): *"Claim my GoodDollar UBI"* → `get_gooddollar_ubi_entitlement` 
 
 Example (reserve): *"Swap 100 G$ to USDm"* → `get_swap_quote` (or `get_gooddollar_reserve_quote`) → user confirms → `prepare_swap` → sign in wallet.
 
-Requires `@andrewkimjoseph/celina-sdk` **^0.7.0**. See [GoodDollar guide](../celina-sdk/docs/guides/gooddollar.md).
+Requires `@andrewkimjoseph/celina-sdk` **^0.7.0**. Reserve **execute** (`execute_gooddollar_reserve_swap`) is MCP stdio only — Celeste uses `prepare_swap` + wallet signing. See [GoodDollar guide](../celina-sdk/docs/guides/gooddollar.md).
 
 Uniswap v4 CELO swaps route through WCELO — the connected wallet needs WCELO balance. Dismissing the confirm card does not re-prepare until the user sends a new message.
 
