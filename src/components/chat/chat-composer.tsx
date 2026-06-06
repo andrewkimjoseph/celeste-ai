@@ -28,6 +28,10 @@ export function ChatComposer({
     }
   }
 
+  function handleFocus() {
+    window.scrollTo(0, 0);
+  }
+
   return (
     <form
       onSubmit={onSubmit}
@@ -38,6 +42,7 @@ export function ChatComposer({
           value={input}
           onChange={(event) => onInputChange(event.target.value)}
           onKeyDown={handleKeyDown}
+          onFocus={handleFocus}
           placeholder={
             canChat
               ? "Ask about swaps, sends, or DeFi on Celo…"

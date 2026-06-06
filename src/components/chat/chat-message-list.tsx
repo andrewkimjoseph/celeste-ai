@@ -96,11 +96,34 @@ export function ChatMessageList({
       return;
     }
 
-    bottom.scrollIntoView({
+    container.scrollTo({
+      top: container.scrollHeight,
       behavior: isStreaming ? "auto" : "smooth",
-      block: "end",
     });
   }, [messages, status, showTxCard, showLoading, isStreaming]);
+
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!viewport) {
+      return;
+    }
+
+    function scrollMessagesForKeyboard() {
+      const container = scrollContainerRef.current;
+      const active = document.activeElement;
+      if (!container || active?.tagName !== "TEXTAREA") {
+        return;
+      }
+
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: "auto",
+      });
+    }
+
+    viewport.addEventListener("resize", scrollMessagesForKeyboard);
+    return () => viewport.removeEventListener("resize", scrollMessagesForKeyboard);
+  }, []);
 
   const showEmptyState = mounted && isConnected && messages.length === 0;
   const showConnectPrompt = mounted && !isConnected && messages.length === 0;
@@ -116,8 +139,8 @@ export function ChatMessageList({
   return (
     <div
       ref={scrollContainerRef}
-      className={`flex-1 overflow-y-auto overscroll-contain ${
-        isLandingView ? "flex min-h-0 flex-col justify-center" : ""
+      className={`min-h-0 flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] ${
+        isLandingView ? "flex flex-col justify-center" : ""
       }`}
     >
       <div
