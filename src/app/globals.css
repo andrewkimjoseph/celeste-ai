@@ -16,6 +16,7 @@
   --warn: #f59e0b;
   --app-height: 100dvh;
   --app-offset-top: 0px;
+  --composer-extra-bottom: 0px;
 }
 
 @theme inline {
@@ -59,11 +60,12 @@ body {
   max-height: var(--app-height);
 }
 
-/* Home-indicator padding only when installed as PWA — not in mobile browser tabs. */
-@media (display-mode: standalone) {
-  .composer-safe-bottom {
-    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
-  }
+.composer-safe-bottom {
+  padding-bottom: max(
+    0.75rem,
+    env(safe-area-inset-bottom, 0px),
+    var(--composer-extra-bottom, 0px)
+  );
 }
 
 .streaming-text {

@@ -11,9 +11,16 @@ export function useVisualViewportSync() {
       const viewport = window.visualViewport;
       const height = viewport?.height ?? window.innerHeight;
       const offsetTop = viewport?.offsetTop ?? 0;
+      const layoutHeight = window.innerHeight;
+      const keyboardOpen =
+        layoutHeight - height - offsetTop > 80 || height < layoutHeight * 0.75;
 
       root.style.setProperty("--app-height", `${height}px`);
       root.style.setProperty("--app-offset-top", `${offsetTop}px`);
+      root.style.setProperty(
+        "--composer-extra-bottom",
+        keyboardOpen ? "1rem" : "0px",
+      );
     }
 
     sync();

@@ -7,6 +7,10 @@
   "x402Support": false,
   "services": [
     {
+      "name": "web",
+      "endpoint": "https://celeste.usecelina.xyz"
+    },
+    {
       "name": "MCP",
       "endpoint": "https://mcp.usecelina.xyz/api/mcp",
       "version": "0.7.14"
