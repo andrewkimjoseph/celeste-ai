@@ -14,7 +14,7 @@ export function useTxPreflight(
   address: string | undefined,
   summary: string,
 ): PreflightState {
-  const { supportsFeeAbstraction } = useWalletCapabilities();
+  const { supportsFeeAbstraction, blocksCeloSend } = useWalletCapabilities();
   const [state, setState] = useState<PreflightState | null>(null);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export function useTxPreflight(
         const res = await fetch("/api/preflight", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ address, summary, supportsFeeAbstraction }),
+          body: JSON.stringify({ address, summary, supportsFeeAbstraction, blocksCeloSend }),
         });
         const data = (await res.json()) as SendPreflightResult & {
           error?: string;
@@ -60,7 +60,7 @@ export function useTxPreflight(
     return () => {
       cancelled = true;
     };
-  }, [address, summary, supportsFeeAbstraction]);
+  }, [address, summary, supportsFeeAbstraction, blocksCeloSend]);
 
   if (!address) {
     return { status: "idle" };

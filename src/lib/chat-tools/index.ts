@@ -5,6 +5,7 @@ type CelinaClient = ReturnType<typeof createCelinaClient>;
 
 export type ChatToolsOptions = {
   supportsFeeAbstraction?: boolean;
+  blocksCeloSend?: boolean;
 };
 
 /** Vercel AI SDK tools for `/api/chat` — from @andrewkimjoseph/celina-sdk/tools. */

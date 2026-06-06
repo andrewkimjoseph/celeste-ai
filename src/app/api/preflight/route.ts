@@ -11,9 +11,11 @@ export async function POST(req: Request) {
     token?: string;
     amount?: string;
     supportsFeeAbstraction?: boolean;
+    blocksCeloSend?: boolean;
   };
 
-  const { address, summary, token, amount, supportsFeeAbstraction } = body;
+  const { address, summary, token, amount, supportsFeeAbstraction, blocksCeloSend } =
+    body;
 
   if (!address || !isAddress(address)) {
     return Response.json({ error: "Invalid wallet address." }, { status: 400 });
@@ -39,7 +41,7 @@ export async function POST(req: Request) {
     address as `0x${string}`,
     parsed.token,
     parsed.amount,
-    { supportsFeeAbstraction: supportsFeeAbstraction === true },
+    { supportsFeeAbstraction: supportsFeeAbstraction === true, blocksCeloSend: blocksCeloSend === true },
   );
 
   return Response.json(result);

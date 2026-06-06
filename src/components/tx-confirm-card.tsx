@@ -136,6 +136,10 @@ export function TxConfirmCard({
     isSendFlow &&
     preflight.status === "ready" &&
     !preflight.data.ok;
+  const celoSendBlocked =
+    preflightBlocked &&
+    preflight.status === "ready" &&
+    preflight.data.blocksCeloSend === true;
 
   const copy = CARD_COPY[status];
   const displaySummary = formatFlowSummary(summary, recipientLabel);
@@ -152,9 +156,11 @@ export function TxConfirmCard({
       ? "Invalid order amount"
       : insufficientGas
         ? "Insufficient CELO for gas"
-        : preflightBlocked && preflight.status === "ready"
-          ? "Insufficient balance"
-          : copy.title;
+        : celoSendBlocked
+          ? "CELO sends not supported"
+          : preflightBlocked && preflight.status === "ready"
+            ? "Insufficient balance"
+            : copy.title;
 
   const iconStyles =
     status === "error"

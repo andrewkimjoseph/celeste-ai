@@ -14,10 +14,13 @@ export function isMiniPayWallet(): boolean {
 
 export type WalletCapabilities = {
   supportsFeeAbstraction: boolean;
+  blocksCeloSend: boolean;
 };
 
 export function getWalletCapabilities(): WalletCapabilities {
+  const isMiniPay = isMiniPayWallet();
   return {
-    supportsFeeAbstraction: isMiniPayWallet(),
+    supportsFeeAbstraction: isMiniPay,
+    blocksCeloSend: isMiniPay,
   };
 }

@@ -9,6 +9,7 @@ const MIN_CELO_FOR_GAS = parseUnits("0.01", 18);
 
 export type SendPreflightOptions = {
   supportsFeeAbstraction?: boolean;
+  blocksCeloSend?: boolean;
 };
 
 export type SendPreflightResult = {
@@ -18,8 +19,16 @@ export type SendPreflightResult = {
   tokenBalance: string;
   celoBalance: string;
   supportsFeeAbstraction?: boolean;
+  blocksCeloSend?: boolean;
   message?: string;
 };
+
+const MINIPAY_CELO_SEND_MESSAGE =
+  "Sending CELO is not supported in MiniPay. You can send stablecoins like USDC, USDT, or USDm instead.";
+
+function isCeloSendToken(resolved: { symbol: string }): boolean {
+  return resolved.symbol === "CELO";
+}
 
 /** Parse summaries like "Send 1 USDT to 0x…". */
 export function parseSendSummary(summary: string): {
@@ -42,7 +51,22 @@ export async function checkSendPreflight(
   options?: SendPreflightOptions,
 ): Promise<SendPreflightResult> {
   const supportsFeeAbstraction = options?.supportsFeeAbstraction === true;
+  const blocksCeloSend = options?.blocksCeloSend === true;
   const resolved = celina.token.resolveToken(normalizeRegistryTokenInput(token));
+
+  if (blocksCeloSend && isCeloSendToken(resolved)) {
+    return {
+      ok: false,
+      token: resolved.symbol,
+      amount,
+      tokenBalance: "0",
+      celoBalance: "0",
+      supportsFeeAbstraction,
+      blocksCeloSend: true,
+      message: MINIPAY_CELO_SEND_MESSAGE,
+    };
+  }
+
   const { balances } = await celina.token.getBalances(address, [
     resolved.symbol,
     "CELO",

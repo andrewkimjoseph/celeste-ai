@@ -4,11 +4,14 @@ import { isMiniPayWallet, type WalletCapabilities } from "@/lib/wallet-capabilit
 import { useSyncExternalStore } from "react";
 
 export function useWalletCapabilities(): WalletCapabilities {
-  const supportsFeeAbstraction = useSyncExternalStore(
+  const isMiniPay = useSyncExternalStore(
     () => () => {},
     () => isMiniPayWallet(),
     () => false,
   );
 
-  return { supportsFeeAbstraction };
+  return {
+    supportsFeeAbstraction: isMiniPay,
+    blocksCeloSend: isMiniPay,
+  };
 }

@@ -18,9 +18,11 @@ export async function POST(req: Request) {
     address?: string;
     clientContext?: string;
     supportsFeeAbstraction?: boolean;
+    blocksCeloSend?: boolean;
   };
 
-  const { messages, address, clientContext, supportsFeeAbstraction } = body;
+  const { messages, address, clientContext, supportsFeeAbstraction, blocksCeloSend } =
+    body;
 
   if (!address || !isAddress(address)) {
     return new Response(
@@ -45,6 +47,10 @@ export async function POST(req: Request) {
     system +=
       "\n\nConnected via MiniPay — gas can be paid from USDC, USDT, USDm, or CELO; zero CELO is OK if stablecoin balances cover fees.";
   }
+  if (blocksCeloSend === true) {
+    system +=
+      "\n\nMiniPay does not allow sending CELO or WCELO to other wallets. Never call prepare_send with token CELO or WCELO. Offer stablecoin sends (USDC, USDT, USDm, etc.) instead.";
+  }
   if (clientContext?.trim()) {
     system += `\n\nClient context for this turn:\n${clientContext.trim()}`;
   }
@@ -55,6 +61,7 @@ export async function POST(req: Request) {
     messages: await convertToModelMessages(messages),
     tools: createChatTools(celina, walletAddress, {
       supportsFeeAbstraction: supportsFeeAbstraction === true,
+      blocksCeloSend: blocksCeloSend === true,
     }),
     stopWhen: stepCountIs(6),
     experimental_transform: smoothStream({

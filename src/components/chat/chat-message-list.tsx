@@ -13,6 +13,7 @@ import {
 import type { PreparedFlowWithExtras } from "@/lib/prepared-flow";
 import { CelesteLogoMark } from "@/components/celeste-logo";
 import { TxConfirmCard } from "@/components/tx-confirm-card";
+import { useWalletCapabilities } from "@/hooks/use-wallet-capabilities";
 
 const SUGGESTED_PROMPT_GROUPS = [
   {
@@ -74,6 +75,7 @@ export function ChatMessageList({
   onTxComplete,
   onTxReject,
 }: ChatMessageListProps) {
+  const { blocksCeloSend } = useWalletCapabilities();
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const showLoading = shouldShowAssistantLoading(status, messages);
@@ -145,13 +147,19 @@ export function ChatMessageList({
           </p>
           <CelesteLogoMark className="my-6 sm:my-8" />
           <div className="space-y-3">
-            {SUGGESTED_PROMPT_GROUPS.map((group) => (
+            {SUGGESTED_PROMPT_GROUPS.map((group) => {
+              const prompts =
+                group.label === "Send" && blocksCeloSend
+                  ? group.prompts.filter((prompt) => !/^Send .* CELO to /i.test(prompt))
+                  : group.prompts;
+
+              return (
               <div key={group.label}>
                 <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wide text-zinc-500">
                   {group.label}
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {group.prompts.map((prompt) => (
+                  {prompts.map((prompt) => (
                     <button
                       key={prompt}
                       type="button"
@@ -163,7 +171,8 @@ export function ChatMessageList({
                   ))}
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

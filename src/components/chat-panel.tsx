@@ -37,7 +37,7 @@ export function ChatPanel({
   const isConnected = isConnectedProp ?? false;
   const canChat = mounted && isConnected && Boolean(address);
   const { addTransaction } = useTransactions();
-  const { supportsFeeAbstraction } = useWalletCapabilities();
+  const { supportsFeeAbstraction, blocksCeloSend } = useWalletCapabilities();
   const [input, setInput] = useState("");
   const [dismissedFlowKey, setDismissedFlowKey] = useState<string | null>(null);
   /** After dismiss, hide confirm cards until the user sends a new message. */
@@ -67,7 +67,7 @@ export function ChatPanel({
 
   function buildChatRequestBody() {
     const clientContext = buildPreparedFlowClientContext(messages);
-    const base = { address, supportsFeeAbstraction };
+    const base = { address, supportsFeeAbstraction, blocksCeloSend };
     return clientContext ? { ...base, clientContext } : base;
   }
 
@@ -134,7 +134,7 @@ export function ChatPanel({
               {
                 text: `Transaction confirmed. Hash${hashes.length > 1 ? "es" : ""}: ${formatTxHashes(hashes)}`,
               },
-              { body: { address, supportsFeeAbstraction } },
+              { body: { address, supportsFeeAbstraction, blocksCeloSend } },
             );
           }}
           onTxReject={() => {
@@ -153,7 +153,7 @@ export function ChatPanel({
                   ? `Cancelled signing — was: ${actionLabel}`
                   : "Cancelled signing on the confirmation card.",
               },
-              { body: { address, supportsFeeAbstraction } },
+              { body: { address, supportsFeeAbstraction, blocksCeloSend } },
             );
           }}
         />

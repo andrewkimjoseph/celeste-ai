@@ -27,7 +27,7 @@ export function resolveTargetAddress(
 function createCelesteRuntime(
   celina: CelinaClient,
   connectedAddress: `0x${string}`,
-  options?: { supportsFeeAbstraction?: boolean },
+  options?: { supportsFeeAbstraction?: boolean; blocksCeloSend?: boolean },
 ): ToolRuntime {
   return {
     celina,
@@ -40,6 +40,7 @@ function createCelesteRuntime(
       beforePrepareSend: async ({ sender, token, amount }) => {
         const preflight = await checkSendPreflight(celina, sender, token, amount, {
           supportsFeeAbstraction: options?.supportsFeeAbstraction === true,
+          blocksCeloSend: options?.blocksCeloSend === true,
         });
         if (!preflight.ok) {
           throw new Error(
@@ -93,7 +94,7 @@ function createCelesteRuntime(
 export function createChatToolsFromSdk(
   celina: CelinaClient,
   connectedAddress: `0x${string}`,
-  options?: { supportsFeeAbstraction?: boolean },
+  options?: { supportsFeeAbstraction?: boolean; blocksCeloSend?: boolean },
 ) {
   const runtime = createCelesteRuntime(celina, connectedAddress, options);
   const definitions = filterToolDefinitions(ALL_TOOL_DEFINITIONS, {
