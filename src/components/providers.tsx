@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RainbowKitProvider, darkTheme } from "@rainbow-me/rainbowkit";
 import { WagmiProvider } from "wagmi";
+import { MiniPayAutoConnect } from "@/components/minipay-auto-connect";
 import { wagmiConfig } from "@/lib/wagmi";
 import "@rainbow-me/rainbowkit/styles.css";
 
@@ -13,6 +14,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider theme={darkTheme()} modalSize="compact">
+          <MiniPayAutoConnect />
           {children}
         </RainbowKitProvider>
       </QueryClientProvider>
