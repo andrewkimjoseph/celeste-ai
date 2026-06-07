@@ -11,6 +11,9 @@ import { formatFlowSummary, formatWalletError } from "@/lib/wallet-error";
 import { formatTransactionStep } from "@/lib/transaction-display";
 import { useState } from "react";
 import { useAccount, usePublicClient, useSendTransaction } from "wagmi";
+import { trackEvent } from "@/lib/analytics/amplitude-browser";
+import { categorizeWalletError } from "@/lib/analytics/events";
+import { inferFlowCategory } from "@/lib/analytics/flow-category";
 
 type CardStatus = "idle" | "signing" | "done" | "error";
 
@@ -132,6 +135,7 @@ export function TxConfirmCard({
   const insufficientGas =
     !supportsFeeAbstraction && !isSendFlow && celoBalance <= 0;
   const invalidCarbonBudget = carbonDetails?.budgetValid === false;
+  const flowCategory = inferFlowCategory(summary, { carbonDetails });
   const preflightBlocked =
     isSendFlow &&
     preflight.status === "ready" &&
@@ -188,6 +192,10 @@ export function TxConfirmCard({
     setSigningStepIndex(0);
     setErrorDisplay(null);
     setShowTechnicalDetails(false);
+    trackEvent("tx_confirm_clicked", {
+      step_count: steps.length,
+      flow_category: flowCategory,
+    });
     const hashes: string[] = [];
 
     try {
@@ -204,10 +212,20 @@ export function TxConfirmCard({
       }
 
       setStatus("done");
+      trackEvent("tx_confirmed", {
+        step_count: steps.length,
+        hash_count: hashes.length,
+        flow_category: flowCategory,
+      });
       onComplete(hashes);
     } catch (err) {
       setStatus("error");
-      setErrorDisplay(formatWalletError(err));
+      const walletError = formatWalletError(err);
+      setErrorDisplay(walletError);
+      trackEvent("tx_failed", {
+        flow_category: flowCategory,
+        error_category: categorizeWalletError(walletError.title),
+      });
     }
   }
 
