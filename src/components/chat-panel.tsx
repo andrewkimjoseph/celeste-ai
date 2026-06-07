@@ -5,10 +5,18 @@
  */
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { useMemo, useState, useEffect, useCallback } from "react";
+import { useMemo, useState, useEffect, useCallback, useRef } from "react";
 import { ChatComposer } from "@/components/chat/chat-composer";
 import { ChatMessageList } from "@/components/chat/chat-message-list";
 import { formatChatError } from "@/components/chat/chat-utils";
+import { trackEvent } from "@/lib/analytics/amplitude-browser";
+import {
+  analyzeAssistantResponse,
+  categorizeChatError,
+  charLengthBucket,
+  type PromptGroup,
+} from "@/lib/analytics/events";
+import { inferFlowCategory } from "@/lib/analytics/flow-category";
 import {
   buildPreparedFlowClientContext,
   getActivePreparedFlowWithMeta,
@@ -43,6 +51,8 @@ export function ChatPanel({
   /** After dismiss, hide confirm cards until the user sends a new message. */
   const [txCardBlockedUntilUserMessage, setTxCardBlockedUntilUserMessage] =
     useState(false);
+  const chatSendStartedAtRef = useRef<number | null>(null);
+  const lastTrackedErrorRef = useRef<string | null>(null);
 
   const transport = useMemo(
     () => new DefaultChatTransport({ api: "/api/chat" }),
@@ -51,6 +61,21 @@ export function ChatPanel({
 
   const { messages, sendMessage, setMessages, status, error } = useChat({
     transport,
+    onFinish: ({ message, isError }) => {
+      if (isError) {
+        return;
+      }
+
+      const startedAt = chatSendStartedAtRef.current;
+      chatSendStartedAtRef.current = null;
+      const responseMeta = analyzeAssistantResponse(message);
+
+      trackEvent("chat_response_finished", {
+        duration_ms: startedAt ? Math.max(0, Date.now() - startedAt) : 0,
+        had_tool_calls: responseMeta.had_tool_calls,
+        had_prepare_flow: responseMeta.had_prepare_flow,
+      });
+    },
   });
 
   const flowMeta = getActivePreparedFlowWithMeta(messages);
@@ -71,6 +96,19 @@ export function ChatPanel({
     return clientContext ? { ...base, clientContext } : base;
   }
 
+  function trackChatMessageSent(
+    text: string,
+    source: "composer" | "suggestion",
+    promptGroup?: PromptGroup,
+  ) {
+    chatSendStartedAtRef.current = Date.now();
+    trackEvent("chat_message_sent", {
+      source,
+      char_length_bucket: charLengthBucket(text.length),
+      ...(promptGroup ? { prompt_group: promptGroup } : {}),
+    });
+  }
+
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     const text = input.trim();
@@ -80,16 +118,18 @@ export function ChatPanel({
 
     clearTxCardBlock();
     setInput("");
+    trackChatMessageSent(text, "composer");
     await sendMessage({ text }, { body: buildChatRequestBody() });
   }
 
-  async function handlePromptSelect(prompt: string) {
+  async function handlePromptSelect(prompt: string, promptGroup?: PromptGroup) {
     if (!canChat || !address) {
       setInput(prompt);
       return;
     }
 
     clearTxCardBlock();
+    trackChatMessageSent(prompt, "suggestion", promptGroup);
     await sendMessage({ text: prompt }, { body: buildChatRequestBody() });
   }
 
@@ -98,11 +138,29 @@ export function ChatPanel({
     setDismissedFlowKey(null);
     setTxCardBlockedUntilUserMessage(false);
     setInput("");
+    trackEvent("new_chat_started", {});
   }, [setMessages]);
 
   useEffect(() => {
     onNavStateChange?.(messages.length > 0, handleNewChat);
   }, [messages.length, onNavStateChange, handleNewChat]);
+
+  useEffect(() => {
+    if (!error) {
+      lastTrackedErrorRef.current = null;
+      return;
+    }
+
+    const formatted = formatChatError(error.message);
+    if (lastTrackedErrorRef.current === formatted) {
+      return;
+    }
+
+    lastTrackedErrorRef.current = formatted;
+    trackEvent("chat_error", {
+      error_category: categorizeChatError(formatted),
+    });
+  }, [error]);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -114,7 +172,10 @@ export function ChatPanel({
           errorMessage={error ? formatChatError(error.message) : null}
           showTxCard={showTxCard}
           latestFlow={flowMeta?.flow}
-          onPromptSelect={(prompt) => void handlePromptSelect(prompt)}
+          txCardFlowKey={flowKey}
+          onPromptSelect={(prompt, promptGroup) =>
+            void handlePromptSelect(prompt, promptGroup)
+          }
           onTxComplete={(hashes) => {
             if (flowKey) {
               setDismissedFlowKey(flowKey);
@@ -142,6 +203,14 @@ export function ChatPanel({
               setDismissedFlowKey(flowKey);
             }
             setTxCardBlockedUntilUserMessage(true);
+
+            if (flowMeta?.flow) {
+              trackEvent("tx_dismissed", {
+                flow_category: inferFlowCategory(flowMeta.flow.summary, {
+                  carbonDetails: flowMeta.flow.carbonDetails,
+                }),
+              });
+            }
 
             const summary = flowMeta?.flow.summary;
             const actionLabel = summary
