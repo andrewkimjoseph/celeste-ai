@@ -4,6 +4,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { CelesteLogoAvatar } from "@/components/celeste-logo";
 import { useMounted } from "@/hooks/use-mounted";
 import { useTransactions } from "@/hooks/use-transactions";
+import { trackEvent } from "@/lib/analytics/amplitude-browser";
 
 interface HeaderProps {
   showNewChat?: boolean;
@@ -67,10 +68,17 @@ function TransactionsButton({
     return null;
   }
 
+  function handleOpenDrawer() {
+    trackEvent("transactions_drawer_opened", {
+      transaction_count: transactions.length,
+    });
+    openDrawer();
+  }
+
   return (
     <button
       type="button"
-      onClick={openDrawer}
+      onClick={handleOpenDrawer}
       aria-label="View transactions"
       className="relative flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-zinc-400 transition-colors hover:border-zinc-600 hover:text-white sm:h-auto sm:w-auto sm:rounded-lg sm:px-3 sm:py-1.5"
     >
