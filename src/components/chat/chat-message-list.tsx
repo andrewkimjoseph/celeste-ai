@@ -14,6 +14,9 @@ import type { PreparedFlowWithExtras } from "@/lib/prepared-flow";
 import { CelesteLogoMark } from "@/components/celeste-logo";
 import { TxConfirmCard } from "@/components/tx-confirm-card";
 import { useWalletCapabilities } from "@/hooks/use-wallet-capabilities";
+import { trackEvent } from "@/lib/analytics/amplitude-browser";
+import type { PromptGroup } from "@/lib/analytics/events";
+import { inferFlowCategory } from "@/lib/analytics/flow-category";
 
 const SUGGESTED_PROMPT_GROUPS = [
   {
@@ -58,7 +61,8 @@ interface ChatMessageListProps {
   errorMessage: string | null;
   showTxCard: boolean;
   latestFlow: PreparedFlowWithExtras | undefined;
-  onPromptSelect: (prompt: string) => void;
+  txCardFlowKey: string | null;
+  onPromptSelect: (prompt: string, promptGroup?: PromptGroup) => void;
   onTxComplete: (hashes: string[]) => void;
   onTxReject: () => void;
 }
@@ -71,6 +75,7 @@ export function ChatMessageList({
   errorMessage,
   showTxCard,
   latestFlow,
+  txCardFlowKey,
   onPromptSelect,
   onTxComplete,
   onTxReject,
@@ -78,6 +83,7 @@ export function ChatMessageList({
   const { blocksCeloSend } = useWalletCapabilities();
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const trackedTxCardKeyRef = useRef<string | null>(null);
   const showLoading = shouldShowAssistantLoading(status, messages);
   const isStreaming = status === "streaming";
 
@@ -101,6 +107,24 @@ export function ChatMessageList({
       behavior: isStreaming ? "auto" : "smooth",
     });
   }, [messages, status, showTxCard, showLoading, isStreaming]);
+
+  useEffect(() => {
+    if (!showTxCard || !latestFlow || !txCardFlowKey) {
+      return;
+    }
+
+    if (trackedTxCardKeyRef.current === txCardFlowKey) {
+      return;
+    }
+
+    trackedTxCardKeyRef.current = txCardFlowKey;
+    trackEvent("tx_card_shown", {
+      step_count: latestFlow.steps.length,
+      flow_category: inferFlowCategory(latestFlow.summary, {
+        carbonDetails: latestFlow.carbonDetails,
+      }),
+    });
+  }, [latestFlow, showTxCard, txCardFlowKey]);
 
   useEffect(() => {
     const viewport = window.visualViewport;
@@ -186,7 +210,7 @@ export function ChatMessageList({
                     <button
                       key={prompt}
                       type="button"
-                      onClick={() => onPromptSelect(prompt)}
+                      onClick={() => onPromptSelect(prompt, group.label)}
                       className="rounded-full border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-1.5 text-xs text-zinc-300 transition-colors hover:border-[var(--accent)]/40 hover:text-white"
                     >
                       {prompt}
