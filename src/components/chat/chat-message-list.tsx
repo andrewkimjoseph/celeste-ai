@@ -51,6 +51,14 @@ const SUGGESTED_PROMPT_GROUPS = [
       "Withdraw my entire Aave savings",
     ],
   },
+  {
+    label: "GoodDollar",
+    prompts: [
+      "Can I claim GoodDollar UBI today?",
+      "Check my GoodDollar status",
+      "Claim my GoodDollar UBI",
+    ],
+  },
 ] as const;
 
 interface ChatMessageListProps {
@@ -189,8 +197,8 @@ export function ChatMessageList({
             What can Celeste AI do?
           </h2>
           <p className="mt-1 text-center text-sm text-zinc-400">
-            Ask in plain English — send, swap, FX, and earn on Aave, all on
-            Celo.
+            Ask in plain English — send, swap, FX, earn on Aave, and claim
+            GoodDollar UBI, all on Celo.
           </p>
           <CelesteLogoMark className="my-6 sm:my-8" />
           <div className="space-y-3">

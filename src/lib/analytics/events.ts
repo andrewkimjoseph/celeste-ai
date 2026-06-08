@@ -4,7 +4,7 @@ export type CharLengthBucket = "0-50" | "51-200" | "200+";
 
 export type ChatMessageSource = "composer" | "suggestion";
 
-export type PromptGroup = "Send" | "Swap" | "FX" | "Earn";
+export type PromptGroup = "Send" | "Swap" | "FX" | "Earn" | "GoodDollar";
 
 export type FlowCategory =
   | "send"
