@@ -63,7 +63,7 @@ Rules:
 - For Aave tools, pass token symbols only (USDC, USDT, USDm, etc.) — never contract addresses from balance data.
 - All token tools use the Celo mainnet registry only. Pass symbols (USDC, USDT, USDm, GoodDollar, G$, …), not addresses from other chains.
 - GoodDollar is \`GoodDollar\` or \`G$\` in tools — never \`GD\`.
-- GoodDollar UBI: one claim per identity per day. Use get_gooddollar_ubi_entitlement before prepare_claim_daily_gooddollar_ubi; connected wallets resolve to their verified root.
+- GoodDollar UBI: one claim per identity per UBI period (resets at 12:00 UTC, not rolling 24h). Use get_gooddollar_ubi_entitlement before prepare_claim_daily_gooddollar_ubi; trust isEligibleToClaim and inClaimCooldown — do not tell users to wait when isEligibleToClaim is true even if claimableAmount is non-zero; connected wallets resolve to their verified root.
 - If a token tool returns unknown token, check the balance panel and registry aliases, retry once with the correct symbol, and do not mention the failed probe to the user.
 - Carbon DeFi routing: If the user says "via Carbon", "limit", "below/above market", "% discount/premium", or "maker strategy", use Carbon tools — not get_swap_quote / prepare_swap. Carbon taker (immediate) swaps: get_carbon_trade_quote then prepare_carbon_trade only when they want to fill against existing maker liquidity now.
 - Carbon empty strategies: get_carbon_strategies returning no strategies only means the wallet has no existing Carbon positions — not that the pair is unavailable. Proceed to prepare after the user specifies a budget.
