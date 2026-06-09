@@ -1,6 +1,7 @@
 import { isAddress } from "viem";
 import { checkSendPreflight, parseSendSummary } from "@/lib/send-preflight";
 import { scheduleAmplitudeFlush } from "@/lib/amplitude-flush";
+import { runWithAnalyticsWallet } from "@andrewkimjoseph/celina-sdk";
 import { getCelinaClient } from "@/lib/celina";
 
 export async function POST(req: Request) {
@@ -36,13 +37,20 @@ export async function POST(req: Request) {
   }
 
   const celina = getCelinaClient();
-  const result = await checkSendPreflight(
-    celina,
-    address as `0x${string}`,
-    parsed.token,
-    parsed.amount,
-    { supportsFeeAbstraction: supportsFeeAbstraction === true, blocksCeloSend: blocksCeloSend === true },
-  );
+  const wallet = address as `0x${string}`;
 
-  return Response.json(result);
+  return runWithAnalyticsWallet(wallet, async () => {
+    const result = await checkSendPreflight(
+      celina,
+      wallet,
+      parsed.token,
+      parsed.amount,
+      {
+        supportsFeeAbstraction: supportsFeeAbstraction === true,
+        blocksCeloSend: blocksCeloSend === true,
+      },
+    );
+
+    return Response.json(result);
+  });
 }

@@ -7,6 +7,7 @@ import { isAddress } from "viem";
 import { assertChatApiKeyConfigured, getChatModel } from "@/lib/chat-model";
 import { createChatTools, SYSTEM_PROMPT } from "@/lib/chat-tools";
 import { scheduleAmplitudeFlush } from "@/lib/amplitude-flush";
+import { runWithAnalyticsWallet } from "@andrewkimjoseph/celina-sdk";
 import { getCelinaClient } from "@/lib/celina";
 
 export const maxDuration = 60;
@@ -55,20 +56,24 @@ export async function POST(req: Request) {
     system += `\n\nClient context for this turn:\n${clientContext.trim()}`;
   }
 
-  const result = streamText({
-    model: getChatModel(),
-    system,
-    messages: await convertToModelMessages(messages),
-    tools: createChatTools(celina, walletAddress, {
-      supportsFeeAbstraction: supportsFeeAbstraction === true,
-      blocksCeloSend: blocksCeloSend === true,
-    }),
-    stopWhen: stepCountIs(6),
-    experimental_transform: smoothStream({
-      delayInMs: 52,
-      chunking: "word",
-    }),
-  });
+  const modelMessages = await convertToModelMessages(messages);
 
-  return result.toUIMessageStreamResponse({ originalMessages: messages });
+  return runWithAnalyticsWallet(walletAddress, () => {
+    const result = streamText({
+      model: getChatModel(),
+      system,
+      messages: modelMessages,
+      tools: createChatTools(celina, walletAddress, {
+        supportsFeeAbstraction: supportsFeeAbstraction === true,
+        blocksCeloSend: blocksCeloSend === true,
+      }),
+      stopWhen: stepCountIs(6),
+      experimental_transform: smoothStream({
+        delayInMs: 52,
+        chunking: "word",
+      }),
+    });
+
+    return result.toUIMessageStreamResponse({ originalMessages: messages });
+  });
 }

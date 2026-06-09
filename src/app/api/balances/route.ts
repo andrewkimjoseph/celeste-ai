@@ -2,6 +2,7 @@ import { formatUnits } from "viem";
 import { isAddress } from "viem";
 import { buildWalletBalancesResponse } from "@/lib/balances";
 import { scheduleAmplitudeFlush } from "@/lib/amplitude-flush";
+import { runWithAnalyticsWallet } from "@andrewkimjoseph/celina-sdk";
 import { getCelinaClient } from "@/lib/celina";
 
 export async function GET(req: Request) {
@@ -17,20 +18,22 @@ export async function GET(req: Request) {
   const address = addressParam as `0x${string}`;
   const celina = getCelinaClient();
 
-  const [account, stablecoinResult] = await Promise.all([
-    celina.account.getAccount(address),
-    celina.token.getStablecoinBalances(address, { includeZero }),
-  ]);
+  return runWithAnalyticsWallet(address, async () => {
+    const [account, stablecoinResult] = await Promise.all([
+      celina.account.getAccount(address),
+      celina.token.getStablecoinBalances(address, { includeZero }),
+    ]);
 
-  const celoFormatted = formatUnits(BigInt(account.balanceWei), 18);
+    const celoFormatted = formatUnits(BigInt(account.balanceWei), 18);
 
-  const response = buildWalletBalancesResponse(
-    address,
-    account.balanceWei,
-    celoFormatted,
-    stablecoinResult.stablecoins,
-    stablecoinResult.totalChecked,
-  );
+    const response = buildWalletBalancesResponse(
+      address,
+      account.balanceWei,
+      celoFormatted,
+      stablecoinResult.stablecoins,
+      stablecoinResult.totalChecked,
+    );
 
-  return Response.json(response);
+    return Response.json(response);
+  });
 }
