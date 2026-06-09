@@ -54,6 +54,26 @@ function formatSwapQuote(output: unknown): string | null {
   );
 }
 
+function formatEstimateSendNotice(output: unknown): string | null {
+  if (typeof output !== "object" || output === null) {
+    return null;
+  }
+
+  const result = output as {
+    insufficientBalance?: boolean;
+    message?: string;
+  };
+
+  if (result.insufficientBalance !== true) {
+    return null;
+  }
+
+  return (
+    result.message?.trim() ||
+    "Insufficient balance — gas cannot be estimated without sufficient tokens."
+  );
+}
+
 function formatGovernanceSummary(output: unknown): string | null {
   if (typeof output !== "object" || output === null || !("proposals" in output)) {
     return null;
@@ -144,6 +164,17 @@ export function ToolStatus({
       toolName === "get_governance_proposals"
         ? formatGovernanceSummary(part.output)
         : null;
+
+    const estimateSendNotice =
+      toolName === "estimate_send"
+        ? formatEstimateSendNotice(part.output)
+        : null;
+
+    if (estimateSendNotice) {
+      return (
+        <p className={TOOL_ERROR_TONE_CLASS.notice}>{estimateSendNotice}</p>
+      );
+    }
 
     return (
       <div className="space-y-2">
