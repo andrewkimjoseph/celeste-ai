@@ -206,9 +206,7 @@ export function ChatPanel({
 
             if (flowMeta?.flow) {
               trackEvent("tx_dismissed", {
-                flow_category: inferFlowCategory(flowMeta.flow.summary, {
-                  carbonDetails: flowMeta.flow.carbonDetails,
-                }),
+                flow_category: inferFlowCategory(flowMeta.flow.summary),
               });
             }
 

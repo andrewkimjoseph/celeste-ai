@@ -5,14 +5,6 @@ import {
   filterToolDefinitions,
   type ToolRuntime,
 } from "@andrewkimjoseph/celina-sdk/tools";
-import { validateCarbonPrepareBody } from "@/lib/carbon-prepare-validation";
-import {
-  prepareCarbonConcentratedWithLimitFallback,
-  prepareCarbonWithMarketFallback,
-} from "@/lib/carbon-market-price";
-import type { CarbonPrepareFn } from "@/lib/carbon-prepare";
-import { enrichCarbonPrepareFlow } from "@/lib/carbon-prepare-enrich";
-import { finalizeCarbonPrepare } from "@andrewkimjoseph/celina-sdk";
 import { checkSendPreflight } from "@/lib/send-preflight";
 
 type CelinaClient = ReturnType<typeof createCelinaClient>;
@@ -49,44 +41,6 @@ function createCelesteRuntime(
           );
         }
       },
-      carbon: {
-        validateBody: validateCarbonPrepareBody,
-        prepare: async (toolName, sender, prepareFn, body, opts) => {
-          if (opts?.concentrated) {
-            const flow = await prepareCarbonConcentratedWithLimitFallback(
-              celina,
-              sender,
-              body,
-            );
-            return enrichCarbonPrepareFlow(flow, body, {
-              fallbackNote: flow.carbonFallbackNote,
-              orderType: flow.carbonFallbackNote
-                ? "Limit buy (fallback)"
-                : "Discount strategy",
-            });
-          }
-          if (opts?.marketPriceFallback) {
-            const flow = await prepareCarbonWithMarketFallback(
-              celina,
-              sender,
-              prepareFn as CarbonPrepareFn,
-              body,
-            );
-            return enrichCarbonPrepareFlow(flow, body, {
-              fallbackNote: flow.carbonFallbackNote,
-              orderType: flow.carbonFallbackNote ? "Limit buy (fallback)" : undefined,
-            });
-          }
-          const prepared = await prepareFn(body);
-          const preparedFlow = await finalizeCarbonPrepare(
-            celina.carbon,
-            sender,
-            prepared as Parameters<typeof finalizeCarbonPrepare>[2],
-            body,
-          );
-          return enrichCarbonPrepareFlow(preparedFlow, body);
-        },
-      },
     },
   };
 }
@@ -99,8 +53,6 @@ export function createChatToolsFromSdk(
   const runtime = createCelesteRuntime(celina, connectedAddress, options);
   const definitions = filterToolDefinitions(ALL_TOOL_DEFINITIONS, {
     surface: "browser",
-    carbonPrepareEnabled: true,
-    carbonExecuteEnabled: false,
   });
 
   const tools: ToolSet = {};

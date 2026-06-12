@@ -13,7 +13,7 @@ npm install
 npm run dev
 ```
 
-Installs `@andrewkimjoseph/celina-sdk` **`^0.7.2`** from npm (not a monorepo file link — required for Vercel deploys).
+Installs `@andrewkimjoseph/celina-sdk` **`^0.8.0`** from npm (not a monorepo file link — required for Vercel deploys).
 
 ## Stack
 
@@ -38,22 +38,6 @@ Swaps use **composite routing** in [`src/lib/swap-routing.ts`](src/lib/swap-rout
 
 Example: *"Swap 100 G$ to USDm"* → `get_swap_quote` selects **`gooddollar_reserve`** via MentoBroker — not Uniswap → user confirms → `prepare_swap` (or `prepare_gooddollar_reserve_swap`) → `TxConfirmCard` (optional approve + broker swap).
 
-## Carbon DeFi
-
-Carbon on Celo uses **maker strategies** (limit, recurring, concentrated) and **taker swaps** against maker liquidity. Celeste exposes 12 read tools and 13 `prepare_carbon_*` tools via celina-sdk (REST-primary; no `execute_carbon_*` — you sign in the wallet).
-
-| Intent | Tools |
-|--------|--------|
-| Buy/sell at a limit or % vs market | `prepare_carbon_limit_order`, `prepare_carbon_recurring_strategy`, `prepare_carbon_concentrated_strategy`, … |
-| Immediate swap on Carbon | `get_carbon_trade_quote` → `prepare_carbon_trade` |
-| Instant Mento/reserve/Uniswap swap | `get_swap_quote` → `prepare_swap` (when user does **not** ask for Carbon) |
-
-Market price is **auto-fetched** on prepare when omitted — if Carbon lacks pair data, Celeste **retries with a Uniswap v4 reference price** (pricing only, not an instant swap). Do not use `get_carbon_price_history` for spot price before orders (historical OHLC only; often 400 on some pairs). An empty `get_carbon_strategies` result only means the wallet has no existing strategies.
-
-Example: *"Buy CELO with 50 USDT at 10% below market via Carbon"* → ask budget if missing → `prepare_carbon_concentrated_strategy` (base CELO, quote USDT, `spread_percentage: 10`, `buy_budget`) → `TxConfirmCard` (warnings + Carbon deep link when returned). Use `get_carbon_price_history` only when the user asks for charts/history.
-
-See [Carbon guide](../celina-sdk/docs/guides/carbon.md).
-
 ## GoodDollar
 
 Wallet-signed UBI claims and **G$ ↔ USDm reserve swaps** via celina-sdk:
@@ -70,7 +54,7 @@ Example (UBI): *"Claim my GoodDollar UBI"* → `get_gooddollar_ubi_entitlement` 
 
 Example (reserve): *"Swap 100 G$ to USDm"* → `get_swap_quote` (or `get_gooddollar_reserve_quote`) → user confirms → `prepare_swap` → sign in wallet.
 
-Requires `@andrewkimjoseph/celina-sdk` **^0.7.2**. Reserve **execute** (`execute_gooddollar_reserve_swap`) is MCP stdio only — Celeste uses `prepare_swap` + wallet signing. See [GoodDollar guide](../celina-sdk/docs/guides/gooddollar.md).
+Requires `@andrewkimjoseph/celina-sdk` **^0.8.0**. Reserve **execute** (`execute_gooddollar_reserve_swap`) is MCP stdio only — Celeste uses `prepare_swap` + wallet signing. See [GoodDollar guide](../celina-sdk/docs/guides/gooddollar.md).
 
 Uniswap v4 CELO swaps route through WCELO — the connected wallet needs WCELO balance. Dismissing the confirm card does not re-prepare until the user sends a new message.
 
@@ -86,7 +70,7 @@ Uniswap v4 CELO swaps route through WCELO — the connected wallet needs WCELO b
 6. `ChatPanel` detects the flow in message parts and renders `TxConfirmCard`.
 7. User confirms — `TxConfirmCard` signs each step sequentially via wagmi.
 
-Chat tools mirror **celina-sdk** reads and `prepare_*` wallet flows (naming is similar to celina-mcp for familiarity, but Celeste does not call MCP). Server-key writes (`send_token`, `execute_mento_fx`, `execute_uniswap_swap`, `execute_carbon_*`) and **Self Agent ID** registration flows are only in [celina-mcp](../celina-mcp) or [`@selfxyz/agent-sdk`](https://www.npmjs.com/package/@selfxyz/agent-sdk).
+Chat tools mirror **celina-sdk** reads and `prepare_*` wallet flows (naming is similar to celina-mcp for familiarity, but Celeste does not call MCP). Server-key writes (`send_token`, `execute_mento_fx`, `execute_uniswap_swap`) and **Self Agent ID** registration flows are only in [celina-mcp](../celina-mcp) or [`@selfxyz/agent-sdk`](https://www.npmjs.com/package/@selfxyz/agent-sdk).
 
 ### Directory map
 
@@ -135,6 +119,6 @@ Dev script uses `--webpack` for compatibility; adjust if Turbopack-only dev is p
 ### Adding a chat tool
 
 1. Add a `ToolDefinition` in **celina-sdk** — see [LLM tool catalog](../celina-sdk/docs/guides/tool-catalog.md) (`src/tools/domains/`, `surfaces: ["browser"]` or both).
-2. Celeste wires tools through [`src/lib/chat-tools/sdk-adapter.ts`](src/lib/chat-tools/sdk-adapter.ts); add `ToolRuntime.hooks` there if the tool needs host-specific behavior (e.g. send preflight, Carbon enrich). Use **`dynamicTool`** when wrapping the catalog (documented in the SDK guide).
+2. Celeste wires tools through [`src/lib/chat-tools/sdk-adapter.ts`](src/lib/chat-tools/sdk-adapter.ts); add `ToolRuntime.hooks` there if the tool needs host-specific behavior (e.g. send preflight). Use **`dynamicTool`** when wrapping the catalog (documented in the SDK guide).
 3. Update `SYSTEM_PROMPT` in [`src/lib/chat-tools/index.ts`](src/lib/chat-tools/index.ts) if the LLM needs new rules.
-4. Requires `@andrewkimjoseph/celina-sdk` **^0.7.2** with the `./tools` export.
+4. Requires `@andrewkimjoseph/celina-sdk` **^0.8.0** with the `./tools` export.

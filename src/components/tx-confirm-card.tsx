@@ -4,8 +4,6 @@ import { useTxPreflight } from "@/hooks/use-tx-preflight";
 import { useWalletBalances } from "@/hooks/use-wallet-balances";
 import { useWalletCapabilities } from "@/hooks/use-wallet-capabilities";
 import type { PreparedTx } from "@/lib/prepared-flow";
-import type { CarbonOrderDisplay } from "@/lib/carbon-order-display";
-import { CarbonOrderSummary } from "@/components/carbon-order-summary";
 import { parseSendSummary } from "@/lib/send-preflight";
 import { formatFlowSummary, formatWalletError } from "@/lib/wallet-error";
 import { formatTransactionStep } from "@/lib/transaction-display";
@@ -23,7 +21,6 @@ interface TxConfirmCardProps {
   recipientLabel?: string;
   warnings?: string[];
   deepLink?: string;
-  carbonDetails?: CarbonOrderDisplay;
   onComplete: (hashes: string[]) => void;
   onDismiss: () => void;
 }
@@ -114,7 +111,6 @@ export function TxConfirmCard({
   recipientLabel,
   warnings,
   deepLink,
-  carbonDetails,
   onComplete,
   onDismiss,
 }: TxConfirmCardProps) {
@@ -134,8 +130,7 @@ export function TxConfirmCard({
   const celoBalance = Number(walletBalances?.celo?.formatted ?? 0);
   const insufficientGas =
     !supportsFeeAbstraction && !isSendFlow && celoBalance <= 0;
-  const invalidCarbonBudget = carbonDetails?.budgetValid === false;
-  const flowCategory = inferFlowCategory(summary, { carbonDetails });
+  const flowCategory = inferFlowCategory(summary);
   const preflightBlocked =
     isSendFlow &&
     preflight.status === "ready" &&
@@ -152,13 +147,10 @@ export function TxConfirmCard({
     isBusy ||
     preflightBlocked ||
     insufficientGas ||
-    invalidCarbonBudget ||
     (isSendFlow && preflight.status === "loading");
 
   const cardTitle =
-    invalidCarbonBudget
-      ? "Invalid order amount"
-      : insufficientGas
+    insufficientGas
         ? "Insufficient CELO for gas"
         : celoSendBlocked
           ? "CELO sends not supported"
@@ -245,7 +237,6 @@ export function TxConfirmCard({
           <p className="mt-1 text-sm leading-relaxed text-zinc-300">
             {displaySummary}
           </p>
-          {carbonDetails && <CarbonOrderSummary details={carbonDetails} />}
           <p className="mt-1.5 text-xs text-zinc-500">
             {status === "signing" && steps.length > 1
               ? `Step ${signingStepIndex + 1} of ${steps.length} — approve in your wallet.`
@@ -259,7 +250,7 @@ export function TxConfirmCard({
           className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2.5"
           role="status"
         >
-          <p className="text-xs font-medium text-amber-100">Carbon warnings</p>
+          <p className="text-xs font-medium text-amber-100">Warnings</p>
           <ul className="mt-1.5 list-inside list-disc space-y-1 text-xs text-amber-100/90">
             {warnings.map((warning) => (
               <li key={warning}>{warning}</li>
@@ -276,7 +267,7 @@ export function TxConfirmCard({
             rel="noopener noreferrer"
             className="text-sm font-medium text-amber-300 underline-offset-2 hover:text-amber-200 hover:underline"
           >
-            View on Carbon
+            View details
           </a>
         </p>
       )}
@@ -301,23 +292,12 @@ export function TxConfirmCard({
           </div>
         )}
 
-      {!isSendFlow && (insufficientGas || invalidCarbonBudget) && (
+      {!isSendFlow && insufficientGas && (
         <div className="mt-3 border-t border-[var(--warn)]/15 pt-3">
-          {insufficientGas && (
-            <p className="text-xs text-amber-200/90" role="alert">
-              You need a small CELO balance to pay network fees. Add CELO to your
-              wallet, then try again.
-            </p>
-          )}
-          {invalidCarbonBudget && (
-            <p
-              className={`text-xs text-amber-200/90${insufficientGas ? " mt-1.5" : ""}`}
-              role="alert"
-            >
-              This order has no spend amount. Ask Celeste to prepare again with
-              how much you want to use (e.g. 50 USDT).
-            </p>
-          )}
+          <p className="text-xs text-amber-200/90" role="alert">
+            You need a small CELO balance to pay network fees. Add CELO to your
+            wallet, then try again.
+          </p>
         </div>
       )}
 
@@ -328,7 +308,7 @@ export function TxConfirmCard({
             className="flex gap-2 text-sm text-zinc-400"
           >
             <span className="font-medium text-zinc-500">{index + 1}.</span>
-            <span>{formatTransactionStep(step.description, { carbonDetails, summary })}</span>
+            <span>{formatTransactionStep(step.description, { summary })}</span>
           </li>
         ))}
       </ol>

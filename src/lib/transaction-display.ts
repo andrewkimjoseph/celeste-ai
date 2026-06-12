@@ -1,5 +1,4 @@
 import { formatHumanFlowText } from "@/lib/format-human-flow-text";
-import type { CarbonOrderDisplay } from "@/lib/carbon-order-display";
 
 /** Known Celo mainnet token addresses → registry symbols for step label cleanup. */
 const TOKEN_ADDRESS_SYMBOLS: Record<string, string> = {
@@ -13,87 +12,47 @@ const TOKEN_ADDRESS_SYMBOLS: Record<string, string> = {
 };
 
 const HEX_ADDRESS = /\b0x[a-fA-F0-9]{40}\b/g;
-const GENERIC_CARBON_STEP = /^Carbon transaction step \d+$/;
 
-export type FormatTransactionStepOptions = {
-  carbonDetails?: CarbonOrderDisplay;
+type FormatStepOptions = {
   summary?: string;
 };
 
-function carbonStepFallback(
-  step: string,
-  carbonDetails: CarbonOrderDisplay,
-): string {
-  const direction = carbonDetails.direction === "sell" ? "sell" : "buy";
-  const orderType = carbonDetails.orderType.toLowerCase();
-
-  if (orderType.includes("limit")) {
-    return carbonDetails.budget
-      ? `Create limit ${direction} — ${carbonDetails.budget} on ${carbonDetails.pairLabel}`
-      : `Create limit ${direction} on ${carbonDetails.pairLabel}`;
-  }
-
-  if (orderType.includes("recurring")) {
-    return carbonDetails.budget
-      ? `Create recurring strategy — ${carbonDetails.budget} on ${carbonDetails.pairLabel}`
-      : `Create recurring strategy — ${carbonDetails.pairLabel}`;
-  }
-
-  if (orderType.includes("discount") || orderType.includes("concentrated")) {
-    return carbonDetails.budget
-      ? `Create concentrated strategy — ${carbonDetails.budget} on ${carbonDetails.pairLabel}`
-      : `Create concentrated strategy — ${carbonDetails.pairLabel}`;
-  }
-
-  return carbonDetails.budget
-    ? `Create Carbon ${direction} — ${carbonDetails.budget} on ${carbonDetails.pairLabel}`
-    : `Create Carbon ${direction} on ${carbonDetails.pairLabel}`;
-}
-
-function carbonSummaryFallback(step: string, summary: string): string | null {
-  if (!GENERIC_CARBON_STEP.test(step) || !/^Carbon /i.test(summary)) {
-    return null;
-  }
-
-  const normalized = summary.toLowerCase();
-  if (normalized.includes("deposit budget")) return "Deposit to Carbon strategy";
-  if (normalized.includes("withdraw budget")) return "Withdraw from Carbon strategy";
-  if (normalized.includes("reprice strategy")) return "Reprice Carbon strategy";
-  if (normalized.includes("edit strategy")) return "Edit Carbon strategy";
-  if (normalized.includes("pause strategy")) return "Pause Carbon strategy";
-  if (normalized.includes("resume strategy")) return "Resume Carbon strategy";
-  if (normalized.includes("delete strategy")) return "Close Carbon strategy";
-  if (normalized.includes("taker swap")) return "Swap via Carbon DeFi";
-  if (normalized.includes("limit order")) return "Create Carbon limit order";
-  if (normalized.includes("recurring strategy")) return "Create Carbon recurring strategy";
-  return "Create Carbon strategy";
-}
-
 export function formatTransactionStep(
   step: string,
-  options: FormatTransactionStepOptions = {},
+  _options?: FormatStepOptions,
 ): string {
-  if (GENERIC_CARBON_STEP.test(step)) {
-    if (options.carbonDetails) {
-      return carbonStepFallback(step, options.carbonDetails);
-    }
-    const fromSummary = options.summary
-      ? carbonSummaryFallback(step, options.summary)
-      : null;
-    if (fromSummary) {
-      return fromSummary;
-    }
-  }
-
   const withSymbols = step.replace(HEX_ADDRESS, (address) => {
     return TOKEN_ADDRESS_SYMBOLS[address.toLowerCase()] ?? address;
   });
   return formatHumanFlowText(withSymbols);
 }
 
-export function getTransactionProtocolLabel(
-  summary: string,
-): string | null {
+export function formatProtocolLabel(summary: string): string {
+  const lower = summary.toLowerCase();
+
+  if (lower.includes("aave")) {
+    return "Aave";
+  }
+  if (lower.includes("gooddollar") || /\bg\$/.test(lower)) {
+    return "GoodDollar";
+  }
+  if (lower.includes("mento") || lower.includes("eurm")) {
+    return "Mento FX";
+  }
+  if (lower.includes("uniswap")) {
+    return "Uniswap";
+  }
+  if (lower.startsWith("send ")) {
+    return "Send";
+  }
+  if (lower.includes("swap") || lower.includes("quote")) {
+    return "Swap";
+  }
+
+  return "Transaction";
+}
+
+export function getTransactionProtocolLabel(summary: string): string | null {
   if (/uniswap v4/i.test(summary)) {
     return "Uniswap v4";
   }
@@ -103,8 +62,8 @@ export function getTransactionProtocolLabel(
   if (/aave/i.test(summary)) {
     return "Aave";
   }
-  if (/^carbon /i.test(summary)) {
-    return "Carbon";
+  if (/gooddollar/i.test(summary) || /\bg\$/i.test(summary)) {
+    return "GoodDollar";
   }
   if (/^send /i.test(summary)) {
     return "Send";

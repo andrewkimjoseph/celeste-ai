@@ -1,17 +1,12 @@
 import type { SerializedPreparedFlow, PreparedTx } from "@andrewkimjoseph/celina-sdk";
-import type { CarbonOrderDisplay } from "@/lib/carbon-order-display";
 import { isTextUIPart, isToolUIPart, type UIMessage } from "ai";
 
 const PREPARE_TOOL_PREFIX = "prepare_";
 
-/** Prepared flow with optional Carbon REST extras from finalizeCarbonPrepare. */
+/** Prepared flow with optional extras from prepare tool outputs. */
 export type PreparedFlowWithExtras = SerializedPreparedFlow & {
   deep_link?: string;
   warnings?: string[];
-  strategyPreview?: unknown;
-  market_price?: number;
-  market_price_source?: "uniswap_v4";
-  carbonDetails?: CarbonOrderDisplay;
 };
 
 /** Type guard for `SerializedPreparedFlow` objects from prepare_* tool outputs. */

@@ -11,7 +11,6 @@ export type FlowCategory =
   | "swap"
   | "mento_fx"
   | "aave"
-  | "carbon"
   | "gooddollar"
   | "other";
 

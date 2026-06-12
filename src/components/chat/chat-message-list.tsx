@@ -128,9 +128,7 @@ export function ChatMessageList({
     trackedTxCardKeyRef.current = txCardFlowKey;
     trackEvent("tx_card_shown", {
       step_count: latestFlow.steps.length,
-      flow_category: inferFlowCategory(latestFlow.summary, {
-        carbonDetails: latestFlow.carbonDetails,
-      }),
+      flow_category: inferFlowCategory(latestFlow.summary),
     });
   }, [latestFlow, showTxCard, txCardFlowKey]);
 
@@ -256,7 +254,6 @@ export function ChatMessageList({
               recipientLabel={recipientLabel}
               warnings={latestFlow.warnings}
               deepLink={latestFlow.deep_link}
-              carbonDetails={latestFlow.carbonDetails}
               onComplete={onTxComplete}
               onDismiss={onTxReject}
             />

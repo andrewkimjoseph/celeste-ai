@@ -2,7 +2,6 @@ import type { FlowCategory } from "@/lib/analytics/events";
 import { parseSendSummary } from "@/lib/send-preflight";
 
 type InferFlowCategoryOptions = {
-  carbonDetails?: unknown;
   toolName?: string;
 };
 
@@ -12,9 +11,6 @@ export function inferFlowCategory(
 ): FlowCategory {
   const toolName = options?.toolName?.toLowerCase() ?? "";
 
-  if (toolName.startsWith("prepare_carbon_") || options?.carbonDetails) {
-    return "carbon";
-  }
   if (toolName.startsWith("prepare_aave_")) {
     return "aave";
   }
@@ -38,9 +34,6 @@ export function inferFlowCategory(
 
   if (lower.includes("aave")) {
     return "aave";
-  }
-  if (lower.includes("carbon")) {
-    return "carbon";
   }
   if (lower.includes("gooddollar") || /\bg\$/.test(lower)) {
     return "gooddollar";
