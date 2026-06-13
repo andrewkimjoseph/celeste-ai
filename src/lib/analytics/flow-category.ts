@@ -11,7 +11,7 @@ export function inferFlowCategory(
 ): FlowCategory {
   const toolName = options?.toolName?.toLowerCase() ?? "";
 
-  if (toolName.startsWith("prepare_aave_")) {
+  if (toolName === "get_aave_balances" || toolName.startsWith("prepare_aave_")) {
     return "aave";
   }
   if (

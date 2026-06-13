@@ -13,7 +13,7 @@ npm install
 npm run dev
 ```
 
-Installs `@andrewkimjoseph/celina-sdk` **`^0.8.0`** from npm (not a monorepo file link — required for Vercel deploys).
+Installs `@andrewkimjoseph/celina-sdk` **`^0.8.3`** from npm (not a monorepo file link — required for Vercel deploys).
 
 ## Stack
 
@@ -54,9 +54,21 @@ Example (UBI): *"Claim my GoodDollar UBI"* → `get_gooddollar_ubi_entitlement` 
 
 Example (reserve): *"Swap 100 G$ to USDm"* → `get_swap_quote` (or `get_gooddollar_reserve_quote`) → user confirms → `prepare_swap` → sign in wallet.
 
-Requires `@andrewkimjoseph/celina-sdk` **^0.8.0**. Reserve **execute** (`execute_gooddollar_reserve_swap`) is MCP stdio only — Celeste uses `prepare_swap` + wallet signing. See [GoodDollar guide](../celina-sdk/docs/guides/gooddollar.md).
+Requires `@andrewkimjoseph/celina-sdk` **^0.8.3**. Reserve **execute** (`execute_gooddollar_reserve_swap`) is MCP stdio only — Celeste uses `prepare_swap` + wallet signing. See [GoodDollar guide](https://andrewkimjoseph.gitbook.io/celina-sdk/guides/gooddollar).
 
 Uniswap v4 CELO swaps route through WCELO — the connected wallet needs WCELO balance. Dismissing the confirm card does not re-prepare until the user sends a new message.
+
+## Aave V3
+
+Supplied balance reads and wallet-signed supply/withdraw via celina-sdk:
+
+| Tool | Purpose |
+|------|---------|
+| `get_aave_balances` | Supplied positions (aToken balances) in underlying units including interest |
+| `prepare_aave_supply` | Unsigned supply steps — user signs approve + supply in wallet |
+| `prepare_aave_withdraw` | Unsigned withdraw step — user signs in wallet |
+
+Example: *"What do I have on Aave?"* → `get_aave_balances` → concise summary. *"Withdraw all my USDT from Aave"* → `get_aave_balances` first, then `prepare_aave_withdraw` with `withdraw_max`. CELO supply requires wrapped CELO (ERC-20), not native CELO.
 
 ## For developers
 
@@ -121,4 +133,4 @@ Dev script uses `--webpack` for compatibility; adjust if Turbopack-only dev is p
 1. Add a `ToolDefinition` in **celina-sdk** — see [LLM tool catalog](../celina-sdk/docs/guides/tool-catalog.md) (`src/tools/domains/`, `surfaces: ["browser"]` or both).
 2. Celeste wires tools through [`src/lib/chat-tools/sdk-adapter.ts`](src/lib/chat-tools/sdk-adapter.ts); add `ToolRuntime.hooks` there if the tool needs host-specific behavior (e.g. send preflight). Use **`dynamicTool`** when wrapping the catalog (documented in the SDK guide).
 3. Update `SYSTEM_PROMPT` in [`src/lib/chat-tools/index.ts`](src/lib/chat-tools/index.ts) if the LLM needs new rules.
-4. Requires `@andrewkimjoseph/celina-sdk` **^0.8.0** with the `./tools` export.
+4. Requires `@andrewkimjoseph/celina-sdk` **^0.8.3** with the `./tools` export.

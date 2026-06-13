@@ -143,6 +143,10 @@ const TOOL_LABELS: Record<string, { inProgress: string; done: string }> = {
     inProgress: "Preparing transaction…",
     done: "Transaction prepared",
   },
+  get_aave_balances: {
+    inProgress: "Checking Aave supplied balances…",
+    done: "Aave balances loaded",
+  },
   prepare_aave_supply: {
     inProgress: "Preparing transaction…",
     done: "Transaction prepared",
