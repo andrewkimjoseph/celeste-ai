@@ -18,6 +18,14 @@ export function formatBalanceShort(
   });
 }
 
+/** Compact wallet address for UI and chat (0x1234…abcd). */
+export function formatAddressShort(address: string): string {
+  if (address.length <= 13) {
+    return address;
+  }
+  return `${address.slice(0, 6)}…${address.slice(-4)}`;
+}
+
 /** Compact tx hash for chat bubbles on mobile. */
 export function formatTxHash(hash: string): string {
   if (hash.length <= 18) {

@@ -169,6 +169,7 @@ export function ChatPanel({
           status={status}
           mounted={mounted}
           isConnected={isConnected}
+          address={address}
           errorMessage={error ? formatChatError(error.message) : null}
           showTxCard={showTxCard}
           latestFlow={flowMeta?.flow}

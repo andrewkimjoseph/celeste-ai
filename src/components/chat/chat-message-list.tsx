@@ -17,6 +17,7 @@ import { useWalletCapabilities } from "@/hooks/use-wallet-capabilities";
 import { trackEvent } from "@/lib/analytics/amplitude-browser";
 import type { PromptGroup } from "@/lib/analytics/events";
 import { inferFlowCategory } from "@/lib/analytics/flow-category";
+import { formatAddressShort } from "@/lib/format-balance";
 
 const SUGGESTED_PROMPT_GROUPS = [
   {
@@ -61,6 +62,7 @@ interface ChatMessageListProps {
   status: ChatStatus;
   mounted: boolean;
   isConnected: boolean;
+  address?: `0x${string}`;
   errorMessage: string | null;
   showTxCard: boolean;
   latestFlow: PreparedFlowWithExtras | undefined;
@@ -75,6 +77,7 @@ export function ChatMessageList({
   status,
   mounted,
   isConnected,
+  address,
   errorMessage,
   showTxCard,
   latestFlow,
@@ -193,6 +196,14 @@ export function ChatMessageList({
             Ask in plain English — send, swap, FX, earn on Aave, and claim
             GoodDollar UBI, all on Celo.
           </p>
+          {address ? (
+            <p className="mt-2 text-center text-xs text-zinc-500">
+              Connected as{" "}
+              <span className="font-mono text-zinc-400">
+                {formatAddressShort(address)}
+              </span>
+            </p>
+          ) : null}
           <CelesteLogoMark className="my-6 sm:my-8" />
           <div className="space-y-3">
             {SUGGESTED_PROMPT_GROUPS.map((group) => {
