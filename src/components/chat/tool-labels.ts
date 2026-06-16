@@ -51,6 +51,10 @@ const TOOL_LABELS: Record<string, { inProgress: string; done: string }> = {
     inProgress: "Estimating transaction gas…",
     done: "Estimate ready",
   },
+  get_gooddollar_identity_link: {
+    inProgress: "Checking GoodDollar identity link…",
+    done: "Identity link loaded",
+  },
   get_gooddollar_whitelisting_info: {
     inProgress: "Checking GoodDollar status…",
     done: "GoodDollar status loaded",
