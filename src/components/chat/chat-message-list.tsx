@@ -23,7 +23,6 @@ const SUGGESTED_PROMPT_GROUPS = [
     label: "Send",
     prompts: [
       "Send 1 USDC to ",
-      "Send 0.1 CELO to ",
       "Send 5 USDm to andrewkimjoseph.celo.eth",
     ],
   },
@@ -32,15 +31,12 @@ const SUGGESTED_PROMPT_GROUPS = [
     prompts: [
       "Swap 10 USDm to CELO",
       "Get a quote to swap CELO to USDC",
-      "Swap 100 G$ to USDm",
-      "What's the best swap rate for 50 USDT to CELO?",
     ],
   },
   {
     label: "FX",
     prompts: [
       "Convert 50 USDm to EURm",
-      "What's the Mento rate for USDm to EURm?",
       "Convert 20 EURm to USDC",
     ],
   },
@@ -54,9 +50,8 @@ const SUGGESTED_PROMPT_GROUPS = [
   {
     label: "GoodDollar",
     prompts: [
-      "Can I claim GoodDollar UBI today?",
-      "Check my GoodDollar status",
       "Claim my GoodDollar UBI",
+      "Check my GoodDollar status",
     ],
   },
 ] as const;
