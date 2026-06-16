@@ -52,8 +52,8 @@ const TOOL_LABELS: Record<string, { inProgress: string; done: string }> = {
     done: "Estimate ready",
   },
   get_gooddollar_identity_link: {
-    inProgress: "Checking GoodDollar identity link…",
-    done: "Identity link loaded",
+    inProgress: "Checking verified identity for this wallet…",
+    done: "Identity checked",
   },
   get_gooddollar_whitelisting_info: {
     inProgress: "Checking GoodDollar status…",
