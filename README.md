@@ -2,6 +2,8 @@
 
 DeFAI chat UI for Celo — applied Celina. Connect a wallet, ask about balances, and prepare sends, swaps (Mento FX + GoodDollar reserve + Uniswap v4), and Aave actions — you sign in your wallet.
 
+**Live:** [celeste.usecelina.xyz](https://celeste.usecelina.xyz)
+
 **Celeste is independent of Celina MCP.** It does not run `@andrewkimjoseph/celina-mcp`, does not use `CELO_PRIVATE_KEY` or `get_wallet_address`, and is not the same product as [usecelina.xyz](https://usecelina.xyz). It is a Next.js app that calls **`@andrewkimjoseph/celina-sdk`** with the connected wallet address from wagmi (same pattern as any custom SDK + wagmi frontend).
 
 ## Setup
