@@ -67,9 +67,10 @@ export function buildWalletBalancesResponse(
     readError?: boolean;
   }>,
   totalChecked: number,
+  extraTokens: TokenBalanceRow[] = [],
 ): WalletBalancesResponse {
-  const tokens = sortTokenRows(
-    stablecoins.map((coin) => ({
+  const tokens = sortTokenRows([
+    ...stablecoins.map((coin) => ({
       symbol: coin.symbol,
       formatted: coin.formatted,
       raw: coin.raw,
@@ -78,7 +79,8 @@ export function buildWalletBalancesResponse(
       useCase: coin.useCase,
       readError: coin.readError,
     })),
-  );
+    ...extraTokens,
+  ]);
 
   const totalNonZero = tokens.filter((token) => !isZeroBalance(token.raw)).length;
 
@@ -88,8 +90,24 @@ export function buildWalletBalancesResponse(
     celo: { formatted: celoFormatted, raw: celoRaw },
     tokens,
     totalNonZero,
-    totalChecked,
+    totalChecked: totalChecked + extraTokens.length,
     fetchedAt: new Date().toISOString(),
+  };
+}
+
+/** GoodDollar balance row for wallet panels (G$ is excluded from stablecoin scans). */
+export function goodDollarBalanceRow(balance: {
+  tokenAddress: `0x${string}`;
+  raw: string;
+  formatted: string;
+}): TokenBalanceRow {
+  return {
+    symbol: "G$",
+    formatted: balance.formatted,
+    raw: balance.raw,
+    address: balance.tokenAddress,
+    issuer: "GoodDollar",
+    useCase: "UBI-focused token for financial inclusion",
   };
 }
 
