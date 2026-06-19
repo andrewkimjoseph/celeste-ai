@@ -26,7 +26,9 @@ import { formatTxHashes } from "@/lib/format-balance";
 import { formatFlowSummary } from "@/lib/wallet-error";
 import { useMounted } from "@/hooks/use-mounted";
 import { useTransactions } from "@/hooks/use-transactions";
+import { useWalletBalances } from "@/hooks/use-wallet-balances";
 import { useWalletCapabilities } from "@/hooks/use-wallet-capabilities";
+import { formatWalletBalanceSnapshot } from "@/lib/chat-tools/system-prompt";
 
 interface ChatPanelProps {
   address?: `0x${string}`;
@@ -47,6 +49,7 @@ export function ChatPanel({
   const canChat = mounted && isConnected && Boolean(address);
   const { addTransaction } = useTransactions();
   const { supportsFeeAbstraction, blocksCeloSend } = useWalletCapabilities();
+  const { data: walletBalances } = useWalletBalances(address);
   const {
     activeChatId,
     activeChat,
@@ -130,9 +133,27 @@ export function ChatPanel({
   }
 
   function buildChatRequestBody() {
-    const clientContext = buildPreparedFlowClientContext(messages);
-    const base = { address, supportsFeeAbstraction, blocksCeloSend };
-    return clientContext ? { ...base, clientContext } : base;
+    const contextParts: string[] = [];
+    const flowContext = buildPreparedFlowClientContext(messages);
+    if (flowContext) {
+      contextParts.push(flowContext);
+    }
+    if (showTxCard && flowMeta?.flow.summary) {
+      contextParts.push(
+        `Pending wallet confirm card visible: "${flowMeta.flow.summary}". User must tap Confirm below.`,
+      );
+    }
+
+    const balanceSnapshot = formatWalletBalanceSnapshot(walletBalances);
+    return {
+      address,
+      supportsFeeAbstraction,
+      blocksCeloSend,
+      ...(balanceSnapshot ? { balanceSnapshot } : {}),
+      ...(contextParts.length > 0
+        ? { clientContext: contextParts.join("\n") }
+        : {}),
+    };
   }
 
   function trackChatMessageSent(
@@ -247,7 +268,7 @@ export function ChatPanel({
               {
                 text: `Transaction confirmed. Hash${hashes.length > 1 ? "es" : ""}: ${formatTxHashes(hashes)}`,
               },
-              { body: { address, supportsFeeAbstraction, blocksCeloSend } },
+              { body: buildChatRequestBody() },
             );
           }}
           onTxReject={() => {
@@ -277,7 +298,7 @@ export function ChatPanel({
                   ? `Cancelled signing — was: ${actionLabel}`
                   : "Cancelled signing on the confirmation card.",
               },
-              { body: { address, supportsFeeAbstraction, blocksCeloSend } },
+              { body: buildChatRequestBody() },
             );
           }}
         />

@@ -5,7 +5,7 @@
 import { convertToModelMessages, smoothStream, stepCountIs, streamText, UIMessage } from "ai";
 import { isAddress } from "viem";
 import { assertChatApiKeyConfigured, getChatModel } from "@/lib/chat-model";
-import { createChatTools, SYSTEM_PROMPT } from "@/lib/chat-tools";
+import { buildSystemPrompt, createChatTools } from "@/lib/chat-tools";
 import { scheduleAmplitudeFlush } from "@/lib/amplitude-flush";
 import { runWithAnalyticsWallet } from "@andrewkimjoseph/celina-sdk";
 import { getCelinaClient } from "@/lib/celina";
@@ -18,12 +18,19 @@ export async function POST(req: Request) {
     messages: UIMessage[];
     address?: string;
     clientContext?: string;
+    balanceSnapshot?: string;
     supportsFeeAbstraction?: boolean;
     blocksCeloSend?: boolean;
   };
 
-  const { messages, address, clientContext, supportsFeeAbstraction, blocksCeloSend } =
-    body;
+  const {
+    messages,
+    address,
+    clientContext,
+    balanceSnapshot,
+    supportsFeeAbstraction,
+    blocksCeloSend,
+  } = body;
 
   if (!address || !isAddress(address)) {
     return new Response(
@@ -43,18 +50,13 @@ export async function POST(req: Request) {
   const celina = getCelinaClient();
   const walletAddress = address as `0x${string}`;
 
-  let system = SYSTEM_PROMPT.replace("{address}", walletAddress);
-  if (supportsFeeAbstraction === true) {
-    system +=
-      "\n\nConnected via MiniPay — gas can be paid from USDC, USDT, USDm, or CELO; zero CELO is OK if stablecoin balances cover fees.";
-  }
-  if (blocksCeloSend === true) {
-    system +=
-      "\n\nMiniPay does not allow sending CELO or WCELO to other wallets. Never call prepare_send with token CELO or WCELO. Offer stablecoin sends (USDC, USDT, USDm, etc.) instead.";
-  }
-  if (clientContext?.trim()) {
-    system += `\n\nClient context for this turn:\n${clientContext.trim()}`;
-  }
+  const system = buildSystemPrompt({
+    address: walletAddress,
+    supportsFeeAbstraction: supportsFeeAbstraction === true,
+    blocksCeloSend: blocksCeloSend === true,
+    balanceSnapshot,
+    clientContext,
+  });
 
   const modelMessages = await convertToModelMessages(messages);
 

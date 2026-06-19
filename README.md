@@ -143,5 +143,5 @@ Dev script uses `--webpack` for compatibility; adjust if Turbopack-only dev is p
 
 1. Add a `ToolDefinition` in **celina-sdk** — see [LLM tool catalog](../celina-sdk/docs/guides/tool-catalog.md) (`src/tools/domains/`, `surfaces: ["browser"]` or both).
 2. Celeste wires tools through [`src/lib/chat-tools/sdk-adapter.ts`](src/lib/chat-tools/sdk-adapter.ts); add `ToolRuntime.hooks` there if the tool needs host-specific behavior (e.g. send preflight). Use **`dynamicTool`** when wrapping the catalog (documented in the SDK guide).
-3. Update `SYSTEM_PROMPT` in [`src/lib/chat-tools/index.ts`](src/lib/chat-tools/index.ts) if the LLM needs new rules.
+3. Update `buildSystemPrompt` in [`src/lib/chat-tools/system-prompt.ts`](src/lib/chat-tools/system-prompt.ts) if the LLM needs new rules.
 4. Requires `@andrewkimjoseph/celina-sdk` **0.9.0** with the `./tools` export.
