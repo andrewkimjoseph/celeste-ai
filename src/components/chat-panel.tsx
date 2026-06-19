@@ -20,8 +20,7 @@ import {
 import { inferFlowCategory } from "@/lib/analytics/flow-category";
 import {
   buildPreparedFlowClientContext,
-  getActivePreparedFlowMetas,
-  type PreparedFlowMeta,
+  getActivePreparedFlowWithMeta,
 } from "@/lib/prepared-flow";
 import { formatTxHashes } from "@/lib/format-balance";
 import { formatFlowSummary } from "@/lib/wallet-error";
@@ -56,9 +55,6 @@ export function ChatPanel({
     saveActiveChat,
   } = useChats();
   const [input, setInput] = useState("");
-  const [handledFlowKeys, setHandledFlowKeys] = useState<Set<string>>(
-    () => new Set(),
-  );
   const [dismissedFlowKey, setDismissedFlowKey] = useState<string | null>(null);
   /** After dismiss, hide confirm cards until the user sends a new message. */
   const [txCardBlockedUntilUserMessage, setTxCardBlockedUntilUserMessage] =
@@ -121,40 +117,13 @@ export function ChatPanel({
     },
   });
 
-  const activePrepareMessageIdRef = useRef<string | null>(null);
-
-  const activeFlowMetas = getActivePreparedFlowMetas(messages);
-
-  useEffect(() => {
-    const messageId = activeFlowMetas[0]?.messageId ?? null;
-    if (messageId !== activePrepareMessageIdRef.current) {
-      activePrepareMessageIdRef.current = messageId;
-      setHandledFlowKeys(new Set());
-    }
-  }, [activeFlowMetas]);
-
-  const pendingFlowMetas = activeFlowMetas.filter(
-    (meta) => !handledFlowKeys.has(meta.flowKey),
-  );
-  const flowMeta: PreparedFlowMeta | undefined = pendingFlowMetas[0];
+  const flowMeta = getActivePreparedFlowWithMeta(messages);
   const flowKey = flowMeta?.flowKey ?? null;
   const showTxCard = Boolean(
     flowMeta &&
       flowKey !== dismissedFlowKey &&
       !txCardBlockedUntilUserMessage,
   );
-
-  const queueLabel =
-    activeFlowMetas.length > 1 && flowMeta
-      ? `Transaction ${
-          activeFlowMetas.findIndex((meta) => meta.flowKey === flowMeta.flowKey) +
-          1
-        } of ${activeFlowMetas.length}`
-      : undefined;
-
-  function markFlowHandled(key: string) {
-    setHandledFlowKeys((prev) => new Set(prev).add(key));
-  }
 
   function clearTxCardBlock() {
     setTxCardBlockedUntilUserMessage(false);
@@ -251,22 +220,17 @@ export function ChatPanel({
           errorMessage={error ? formatChatError(error.message) : null}
           showTxCard={showTxCard}
           latestFlow={flowMeta?.flow}
-          queueLabel={queueLabel}
           txCardFlowKey={flowKey}
           onPromptSelect={(prompt, promptGroup) =>
             void handlePromptSelect(prompt, promptGroup)
           }
           onTxComplete={(hashes) => {
             if (flowKey) {
-              markFlowHandled(flowKey);
-              const remaining = pendingFlowMetas.length - 1;
-              if (remaining === 0) {
-                uiStateRef.current = {
-                  ...uiStateRef.current,
-                  dismissedFlowKey: flowKey,
-                };
-                setDismissedFlowKey(flowKey);
-              }
+              uiStateRef.current = {
+                ...uiStateRef.current,
+                dismissedFlowKey: flowKey,
+              };
+              setDismissedFlowKey(flowKey);
             }
 
             if (address && flowMeta?.flow) {
@@ -288,18 +252,14 @@ export function ChatPanel({
           }}
           onTxReject={() => {
             if (flowKey) {
-              markFlowHandled(flowKey);
-              const remaining = pendingFlowMetas.length - 1;
-              if (remaining === 0) {
-                uiStateRef.current = {
-                  ...uiStateRef.current,
-                  dismissedFlowKey: flowKey,
-                  txCardBlockedUntilUserMessage: true,
-                };
-                setDismissedFlowKey(flowKey);
-                setTxCardBlockedUntilUserMessage(true);
-              }
+              uiStateRef.current = {
+                ...uiStateRef.current,
+                dismissedFlowKey: flowKey,
+                txCardBlockedUntilUserMessage: true,
+              };
+              setDismissedFlowKey(flowKey);
             }
+            setTxCardBlockedUntilUserMessage(true);
 
             if (flowMeta?.flow) {
               trackEvent("tx_dismissed", {

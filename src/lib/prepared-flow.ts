@@ -24,7 +24,7 @@ function isPrepareToolName(toolName: string): boolean {
   return toolName.startsWith(PREPARE_TOOL_PREFIX);
 }
 
-export type PreparedFlowMeta = {
+type PreparedFlowMeta = {
   flow: PreparedFlowWithExtras;
   flowKey: string;
   messageId: string;
@@ -90,33 +90,6 @@ export function getLatestPreparedFlowWithMeta(
   return extractPreparedFlowMetas(messages).at(-1);
 }
 
-/** Collect all prepared flows from the active assistant turn (no user follow-up yet). */
-export function getActivePreparedFlowMetas(
-  messages: UIMessage[],
-): PreparedFlowMeta[] {
-  const meta = getLatestPreparedFlowWithMeta(messages);
-  if (!meta) {
-    return [];
-  }
-
-  const preparedIndex = messages.findIndex((message) => message.id === meta.messageId);
-  if (preparedIndex === -1) {
-    return extractPreparedFlowMetas(messages).filter(
-      (entry) => entry.messageId === meta.messageId,
-    );
-  }
-
-  for (let i = preparedIndex + 1; i < messages.length; i++) {
-    if (messages[i].role === "user") {
-      return [];
-    }
-  }
-
-  return extractPreparedFlowMetas(messages).filter(
-    (entry) => entry.messageId === meta.messageId,
-  );
-}
-
 /**
  * Prepared flow to show in `TxConfirmCard` — only while the user has not sent a
  * follow-up message after it was prepared (clarifications, corrections, etc.).
@@ -124,7 +97,23 @@ export function getActivePreparedFlowMetas(
 export function getActivePreparedFlowWithMeta(
   messages: UIMessage[],
 ): PreparedFlowMeta | undefined {
-  return getActivePreparedFlowMetas(messages).at(-1);
+  const meta = getLatestPreparedFlowWithMeta(messages);
+  if (!meta) {
+    return undefined;
+  }
+
+  const preparedIndex = messages.findIndex((message) => message.id === meta.messageId);
+  if (preparedIndex === -1) {
+    return meta;
+  }
+
+  for (let i = preparedIndex + 1; i < messages.length; i++) {
+    if (messages[i].role === "user") {
+      return undefined;
+    }
+  }
+
+  return meta;
 }
 
 const CONFIRMED_TX_PREFIX = "Transaction confirmed";
