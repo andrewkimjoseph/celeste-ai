@@ -3,6 +3,7 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { CelesteLogoAvatar } from "@/components/celeste-logo";
 import { useMounted } from "@/hooks/use-mounted";
+import { useChats } from "@/hooks/use-chats";
 import { useTransactions } from "@/hooks/use-transactions";
 import { trackEvent } from "@/lib/analytics/amplitude-browser";
 
@@ -54,6 +55,54 @@ function NewChatButton({
         New chat
       </button>
     </>
+  );
+}
+
+function HistoryButton({
+  isConnected,
+}: {
+  isConnected: boolean;
+}) {
+  const { chats, openHistory } = useChats();
+
+  if (!isConnected) {
+    return null;
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={openHistory}
+      aria-label="View chat history"
+      className="relative flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-zinc-400 transition-colors hover:border-zinc-600 hover:text-white sm:h-auto sm:w-auto sm:rounded-lg sm:px-3 sm:py-1.5 lg:hidden"
+    >
+      <svg
+        className="size-4 sm:mr-1.5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={1.75}
+        aria-hidden
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
+        />
+      </svg>
+      <span className="hidden sm:inline text-xs">History</span>
+      {chats.length > 0 && (
+        <span
+          className={`absolute -right-1 -top-1 inline-flex shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[10px] font-semibold tabular-nums leading-none text-[var(--accent-foreground)] sm:static sm:ml-1.5 ${
+            chats.length > 9
+              ? "h-4 min-w-[1.125rem] px-1 sm:h-5 sm:min-w-[1.375rem]"
+              : "size-4 sm:size-5"
+          }`}
+        >
+          {chats.length > 9 ? "9+" : chats.length}
+        </span>
+      )}
+    </button>
   );
 }
 
@@ -146,6 +195,7 @@ export function Header({
         </div>
 
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <HistoryButton isConnected={isConnected} />
           <TransactionsButton isConnected={isConnected} />
           <NewChatButton showNewChat={showNewChat} onNewChat={onNewChat} />
           {mounted ? (

@@ -9,6 +9,7 @@ import { useMemo, useState, useEffect, useCallback, useRef } from "react";
 import { ChatComposer } from "@/components/chat/chat-composer";
 import { ChatMessageList } from "@/components/chat/chat-message-list";
 import { formatChatError } from "@/components/chat/chat-utils";
+import { useChats } from "@/hooks/use-chats";
 import { trackEvent } from "@/lib/analytics/amplitude-browser";
 import {
   analyzeAssistantResponse,
@@ -46,6 +47,13 @@ export function ChatPanel({
   const canChat = mounted && isConnected && Boolean(address);
   const { addTransaction } = useTransactions();
   const { supportsFeeAbstraction, blocksCeloSend } = useWalletCapabilities();
+  const {
+    activeChatId,
+    activeChat,
+    isLoading: isChatLoading,
+    createChat,
+    saveActiveChat,
+  } = useChats();
   const [input, setInput] = useState("");
   const [dismissedFlowKey, setDismissedFlowKey] = useState<string | null>(null);
   /** After dismiss, hide confirm cards until the user sends a new message. */
@@ -53,15 +61,44 @@ export function ChatPanel({
     useState(false);
   const chatSendStartedAtRef = useRef<number | null>(null);
   const lastTrackedErrorRef = useRef<string | null>(null);
+  const hydratedChatIdRef = useRef<string | null>(null);
+  const uiStateRef = useRef({
+    dismissedFlowKey: null as string | null,
+    txCardBlockedUntilUserMessage: false,
+  });
+
+  useEffect(() => {
+    if (!activeChatId || !activeChat) {
+      return;
+    }
+
+    if (hydratedChatIdRef.current === activeChatId) {
+      return;
+    }
+
+    hydratedChatIdRef.current = activeChatId;
+    setDismissedFlowKey(activeChat.dismissedFlowKey);
+    setTxCardBlockedUntilUserMessage(activeChat.txCardBlockedUntilUserMessage);
+    setInput("");
+  }, [activeChatId, activeChat]);
+
+  useEffect(() => {
+    uiStateRef.current = {
+      dismissedFlowKey,
+      txCardBlockedUntilUserMessage,
+    };
+  }, [dismissedFlowKey, txCardBlockedUntilUserMessage]);
 
   const transport = useMemo(
     () => new DefaultChatTransport({ api: "/api/chat" }),
     [],
   );
 
-  const { messages, sendMessage, setMessages, status, error } = useChat({
+  const { messages, sendMessage, status, error } = useChat({
+    id: activeChatId ?? undefined,
+    messages: activeChat?.messages,
     transport,
-    onFinish: ({ message, isError }) => {
+    onFinish: ({ message, messages: finishedMessages, isError }) => {
       if (isError) {
         return;
       }
@@ -75,6 +112,8 @@ export function ChatPanel({
         had_tool_calls: responseMeta.had_tool_calls,
         had_prepare_flow: responseMeta.had_prepare_flow,
       });
+
+      void saveActiveChat(finishedMessages, uiStateRef.current);
     },
   });
 
@@ -134,12 +173,8 @@ export function ChatPanel({
   }
 
   const handleNewChat = useCallback(() => {
-    setMessages([]);
-    setDismissedFlowKey(null);
-    setTxCardBlockedUntilUserMessage(false);
-    setInput("");
-    trackEvent("new_chat_started", {});
-  }, [setMessages]);
+    void createChat();
+  }, [createChat]);
 
   useEffect(() => {
     onNavStateChange?.(messages.length > 0, handleNewChat);
@@ -162,6 +197,18 @@ export function ChatPanel({
     });
   }, [error]);
 
+  if (isConnected && (isChatLoading || !activeChatId || !activeChat)) {
+    return (
+      <div className="flex min-h-0 flex-1 items-center justify-center">
+        <span
+          className="inline-block size-5 animate-spin rounded-full border-2 border-zinc-600 border-t-[var(--accent-hover)]"
+          aria-hidden
+        />
+        <span className="sr-only">Loading chat</span>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <ChatMessageList
@@ -179,6 +226,10 @@ export function ChatPanel({
           }
           onTxComplete={(hashes) => {
             if (flowKey) {
+              uiStateRef.current = {
+                ...uiStateRef.current,
+                dismissedFlowKey: flowKey,
+              };
               setDismissedFlowKey(flowKey);
             }
 
@@ -201,6 +252,11 @@ export function ChatPanel({
           }}
           onTxReject={() => {
             if (flowKey) {
+              uiStateRef.current = {
+                ...uiStateRef.current,
+                dismissedFlowKey: flowKey,
+                txCardBlockedUntilUserMessage: true,
+              };
               setDismissedFlowKey(flowKey);
             }
             setTxCardBlockedUntilUserMessage(true);

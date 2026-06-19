@@ -73,6 +73,10 @@ Supplied balance reads and wallet-signed supply/withdraw via celina-sdk:
 
 Example: *"What do I have on Aave?"* → `get_aave_balances` → concise summary. *"Withdraw all my USDT from Aave"* → `get_aave_balances` first, then `prepare_aave_withdraw` with `withdraw_max`. CELO supply requires wrapped CELO (ERC-20), not native CELO.
 
+## Chat history
+
+Chats are saved **locally in your browser** (IndexedDB via Dexie), scoped to the connected wallet address. Up to **50 threads** per wallet are kept; older threads are trimmed automatically. History survives page refresh but stays on this device — there is no server sync. Delete individual threads from the sidebar (desktop) or History drawer (mobile), or clear all site data in your browser.
+
 ## For developers
 
 ### Request flow
@@ -97,6 +101,10 @@ Chat tools mirror **celina-sdk** reads and `prepare_*` wallet flows (naming is s
 | `src/lib/chat-model.ts` | OpenRouter / OpenAI model selection |
 | `src/lib/celina.ts` | Server-side SDK singleton |
 | `src/lib/prepared-flow.ts` | Extract `SerializedPreparedFlow` from chat messages |
+| `src/lib/chats.ts` | Chat thread types, title helper, tx-card UI state on load |
+| `src/lib/chat-db.ts` | IndexedDB CRUD for persisted chat threads |
+| `src/components/chat/chat-context.tsx` | Wallet-scoped chat state + persistence |
+| `src/components/chat/chat-sidebar.tsx` | Desktop thread list + wallet balances |
 | `src/components/chat-panel.tsx` | Chat UI, address transport, tx card trigger |
 | `src/components/tx-confirm-card.tsx` | Sequential wagmi signing loop |
 | `next.config.ts` | Monorepo + bundler workarounds |

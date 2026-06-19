@@ -220,6 +220,34 @@ function MobileBalanceAccordion({
   );
 }
 
+export function WalletBalanceSection({
+  address,
+  isConnected,
+}: {
+  address: `0x${string}` | undefined;
+  isConnected: boolean;
+}) {
+  const [includeZero, setIncludeZero] = useState(false);
+
+  if (!isConnected || !address) {
+    return (
+      <p className="text-xs text-zinc-500">
+        Connect your wallet to view balances.
+      </p>
+    );
+  }
+
+  return (
+    <div className="max-h-[40vh] overflow-y-auto">
+      <PanelBody
+        address={address}
+        includeZero={includeZero}
+        onIncludeZeroChange={setIncludeZero}
+      />
+    </div>
+  );
+}
+
 export function WalletBalancePanel({
   address,
   isConnected,

@@ -1,22 +1,29 @@
 import Dexie, { type Table } from "dexie";
+import type { StoredChat } from "@/lib/chats";
 import {
   MAX_TRANSACTIONS_PER_WALLET,
   type NewSessionTransaction,
   type SessionTransaction,
 } from "@/lib/transactions";
 
-class TransactionDatabase extends Dexie {
+class CelesteDatabase extends Dexie {
   transactions!: Table<SessionTransaction, string>;
+  chats!: Table<StoredChat, string>;
 
   constructor() {
     super("celeste-ai");
     this.version(1).stores({
       transactions: "id, address, timestamp",
     });
+    this.version(2).stores({
+      transactions: "id, address, timestamp",
+      chats: "id, address, updatedAt",
+    });
   }
 }
 
-export const txDb = new TransactionDatabase();
+export const celesteDb = new CelesteDatabase();
+export const txDb = celesteDb;
 
 function normalizeAddress(address: string): string {
   return address.toLowerCase();

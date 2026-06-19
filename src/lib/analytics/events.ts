@@ -40,6 +40,9 @@ export type AnalyticsEventMap = {
   tx_failed: { flow_category: FlowCategory; error_category: string };
   tx_dismissed: { flow_category: FlowCategory };
   transactions_drawer_opened: { transaction_count: number };
+  chat_thread_selected: { message_count: number };
+  chat_thread_deleted: Record<string, never>;
+  chat_history_drawer_opened: { thread_count: number };
 };
 
 export type AnalyticsEventName = keyof AnalyticsEventMap;
