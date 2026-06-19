@@ -4,6 +4,7 @@ import { useTxPreflight } from "@/hooks/use-tx-preflight";
 import { useWalletBalances } from "@/hooks/use-wallet-balances";
 import { useWalletCapabilities } from "@/hooks/use-wallet-capabilities";
 import type { PreparedTx } from "@/lib/prepared-flow";
+import { simulatePreparedFlowSteps } from "@/lib/prepared-flow-preflight";
 import { parseSendSummary } from "@/lib/send-preflight";
 import { formatFlowSummary, formatWalletError } from "@/lib/wallet-error";
 import { formatTransactionStep } from "@/lib/transaction-display";
@@ -21,6 +22,8 @@ interface TxConfirmCardProps {
   recipientLabel?: string;
   warnings?: string[];
   deepLink?: string;
+  /** e.g. "Transaction 1 of 2" when multiple prepares are queued */
+  queueLabel?: string;
   onComplete: (hashes: string[]) => void;
   onDismiss: () => void;
 }
@@ -111,6 +114,7 @@ export function TxConfirmCard({
   recipientLabel,
   warnings,
   deepLink,
+  queueLabel,
   onComplete,
   onDismiss,
 }: TxConfirmCardProps) {
@@ -171,7 +175,7 @@ export function TxConfirmCard({
       : "border-amber-500/30";
 
   async function handleConfirm() {
-    if (!publicClient) {
+    if (!publicClient || !address) {
       setErrorDisplay({
         title: "Wallet unavailable",
         message: "Reconnect your wallet, then tap Confirm below.",
@@ -188,6 +192,22 @@ export function TxConfirmCard({
       step_count: steps.length,
       flow_category: flowCategory,
     });
+
+    const preflight = await simulatePreparedFlowSteps(publicClient, address, steps);
+    if (!preflight.ok) {
+      setStatus("error");
+      setErrorDisplay({
+        title: "Transaction failed",
+        message: preflight.message,
+        technicalDetails: preflight.technicalDetails,
+      });
+      trackEvent("tx_failed", {
+        flow_category: flowCategory,
+        error_category: categorizeWalletError("Transaction failed"),
+      });
+      return;
+    }
+
     const hashes: string[] = [];
 
     try {
@@ -233,6 +253,11 @@ export function TxConfirmCard({
           <CardIcon variant={copy.icon} />
         </div>
         <div className="min-w-0 flex-1">
+          {queueLabel && (
+            <p className="text-xs font-medium uppercase tracking-wide text-amber-400/90">
+              {queueLabel}
+            </p>
+          )}
           <p className="text-sm font-semibold text-amber-50">{cardTitle}</p>
           <p className="mt-1 text-sm leading-relaxed text-zinc-300">
             {displaySummary}

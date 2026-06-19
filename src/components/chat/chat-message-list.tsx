@@ -66,6 +66,7 @@ interface ChatMessageListProps {
   errorMessage: string | null;
   showTxCard: boolean;
   latestFlow: PreparedFlowWithExtras | undefined;
+  queueLabel?: string;
   txCardFlowKey: string | null;
   onPromptSelect: (prompt: string, promptGroup?: PromptGroup) => void;
   onTxComplete: (hashes: string[]) => void;
@@ -81,6 +82,7 @@ export function ChatMessageList({
   errorMessage,
   showTxCard,
   latestFlow,
+  queueLabel,
   txCardFlowKey,
   onPromptSelect,
   onTxComplete,
@@ -257,6 +259,7 @@ export function ChatMessageList({
             <TxConfirmCard
               summary={latestFlow.summary}
               steps={latestFlow.steps}
+              queueLabel={queueLabel}
               recipientLabel={recipientLabel}
               warnings={latestFlow.warnings}
               deepLink={latestFlow.deep_link}
