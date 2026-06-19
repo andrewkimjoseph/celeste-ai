@@ -9,6 +9,16 @@ export type PreparedStepSimulationOptions = {
   feeCurrency?: `0x${string}`;
 };
 
+export type PreparedStepSimulationFailure = {
+  ok: false;
+  rawMessage: string;
+};
+
+export type PreparedStepSimulationSuccess = {
+  ok: true;
+  feeCurrency?: `0x${string}`;
+};
+
 /**
  * Simulate one prepared step immediately before wallet broadcast.
  * Resolves MiniPay feeCurrency in Celeste; SDK stays wallet-product agnostic.
@@ -18,7 +28,7 @@ export async function simulatePreparedStepBeforeSend(
   from: `0x${string}`,
   step: PreparedTx,
   options?: PreparedStepSimulationOptions,
-): Promise<{ ok: true; feeCurrency?: `0x${string}` } | { ok: false; message: string; technicalDetails?: string }> {
+): Promise<PreparedStepSimulationSuccess | PreparedStepSimulationFailure> {
   let feeCurrency = options?.feeCurrency;
 
   if (options?.supportsFeeAbstraction && !feeCurrency) {
@@ -30,8 +40,7 @@ export async function simulatePreparedStepBeforeSend(
       const formatted = formatWalletError(error);
       return {
         ok: false,
-        message: formatted.message,
-        technicalDetails: formatted.technicalDetails,
+        rawMessage: formatted.technicalDetails ?? formatted.message,
       };
     }
   }
@@ -43,11 +52,9 @@ export async function simulatePreparedStepBeforeSend(
       feeCurrency ? { feeCurrency } : undefined,
     );
   } catch (error) {
-    const formatted = formatWalletError(error);
     return {
       ok: false,
-      message: formatted.message,
-      technicalDetails: formatted.technicalDetails,
+      rawMessage: error instanceof Error ? error.message : String(error),
     };
   }
 

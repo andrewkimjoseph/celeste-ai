@@ -6,6 +6,11 @@ import { useWalletCapabilities } from "@/hooks/use-wallet-capabilities";
 import type { PreparedTx } from "@/lib/prepared-flow";
 import { simulatePreparedStepBeforeSend } from "@/lib/prepared-step-simulation";
 import { parseSendSummary } from "@/lib/send-preflight";
+import {
+  categorizeSimulationError,
+  formatSimulationError,
+  type SimulationErrorDisplay,
+} from "@/lib/simulation-error";
 import { formatFlowSummary, formatWalletError } from "@/lib/wallet-error";
 import { formatTransactionStep } from "@/lib/transaction-display";
 import { useState } from "react";
@@ -117,9 +122,10 @@ export function TxConfirmCard({
 }: TxConfirmCardProps) {
   const [status, setStatus] = useState<CardStatus>("idle");
   const [signingStepIndex, setSigningStepIndex] = useState(0);
-  const [errorDisplay, setErrorDisplay] = useState<ReturnType<
-    typeof formatWalletError
-  > | null>(null);
+  const [completedHashes, setCompletedHashes] = useState<string[]>([]);
+  const [errorDisplay, setErrorDisplay] = useState<SimulationErrorDisplay | null>(
+    null,
+  );
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
   const { address } = useAccount();
   const { sendTransactionAsync } = useSendTransaction();
@@ -152,12 +158,30 @@ export function TxConfirmCard({
 
   const cardTitle =
     insufficientGas
-        ? "Insufficient CELO for gas"
-        : celoSendBlocked
-          ? "CELO sends not supported"
-          : preflightBlocked && preflight.status === "ready"
-            ? "Insufficient balance"
-            : copy.title;
+      ? "Insufficient CELO for gas"
+      : celoSendBlocked
+        ? "CELO sends not supported"
+        : preflightBlocked && preflight.status === "ready"
+          ? "Insufficient balance"
+          : status === "error" && completedHashes.length > 0
+            ? "Step incomplete"
+            : status === "error" && errorDisplay
+              ? errorDisplay.title
+              : copy.title;
+
+  const cardHint =
+    status === "signing" && steps.length > 1
+      ? `Step ${signingStepIndex + 1} of ${steps.length} — approve in your wallet.`
+      : status === "error" && completedHashes.length > 0
+        ? `Step ${completedHashes.length} of ${steps.length} is done. The next step didn't go through yet.`
+        : copy.hint;
+
+  const confirmLabel =
+    status === "signing"
+      ? "Waiting for wallet…"
+      : status === "error" && errorDisplay?.retryable
+        ? "Try again"
+        : "Confirm";
 
   const iconStyles =
     status === "error"
@@ -171,29 +195,39 @@ export function TxConfirmCard({
       ? "border-red-500/25"
       : "border-amber-500/30";
 
+  function handleDismiss() {
+    setCompletedHashes([]);
+    setErrorDisplay(null);
+    setStatus("idle");
+    onDismiss();
+  }
+
   async function handleConfirm() {
     if (!publicClient || !address) {
       setErrorDisplay({
         title: "Wallet unavailable",
         message: "Reconnect your wallet, then tap Confirm below.",
+        retryable: true,
       });
       setStatus("error");
       return;
     }
 
     setStatus("signing");
-    setSigningStepIndex(0);
     setErrorDisplay(null);
     setShowTechnicalDetails(false);
     trackEvent("tx_confirm_clicked", {
       step_count: steps.length,
       flow_category: flowCategory,
     });
-    const hashes: string[] = [];
+
+    const startIndex = completedHashes.length;
+    setSigningStepIndex(startIndex);
+    const sessionHashes = [...completedHashes];
     let feeCurrency: `0x${string}` | undefined;
 
     try {
-      for (let index = 0; index < steps.length; index++) {
+      for (let index = startIndex; index < steps.length; index++) {
         setSigningStepIndex(index);
         const step = steps[index]!;
 
@@ -207,15 +241,20 @@ export function TxConfirmCard({
           },
         );
         if (!simulation.ok) {
-          setStatus("error");
-          setErrorDisplay({
-            title: "Transaction would fail",
-            message: simulation.message,
-            technicalDetails: simulation.technicalDetails,
+          const friendly = formatSimulationError(simulation.rawMessage, {
+            stepIndex: index,
+            stepCount: steps.length,
+            completedStepCount: sessionHashes.length,
           });
+          setStatus("error");
+          setErrorDisplay(friendly);
           trackEvent("tx_failed", {
             flow_category: flowCategory,
-            error_category: categorizeWalletError("Transaction would fail"),
+            error_category: categorizeSimulationError(
+              friendly.title,
+              friendly.retryable,
+            ),
+            simulation_retryable: friendly.retryable,
           });
           return;
         }
@@ -229,7 +268,8 @@ export function TxConfirmCard({
             ? ({ feeCurrency } as Record<string, `0x${string}`>)
             : {}),
         });
-        hashes.push(hash);
+        sessionHashes.push(hash);
+        setCompletedHashes([...sessionHashes]);
 
         const receipt = await publicClient.waitForTransactionReceipt({ hash });
         if (receipt.status === "reverted") {
@@ -240,10 +280,10 @@ export function TxConfirmCard({
       setStatus("done");
       trackEvent("tx_confirmed", {
         step_count: steps.length,
-        hash_count: hashes.length,
+        hash_count: sessionHashes.length,
         flow_category: flowCategory,
       });
-      onComplete(hashes);
+      onComplete(sessionHashes);
     } catch (err) {
       setStatus("error");
       const walletError = formatWalletError(err);
@@ -271,11 +311,7 @@ export function TxConfirmCard({
           <p className="mt-1 text-sm leading-relaxed text-zinc-300">
             {displaySummary}
           </p>
-          <p className="mt-1.5 text-xs text-zinc-500">
-            {status === "signing" && steps.length > 1
-              ? `Step ${signingStepIndex + 1} of ${steps.length} — approve in your wallet.`
-              : copy.hint}
-          </p>
+          <p className="mt-1.5 text-xs text-zinc-500">{cardHint}</p>
         </div>
       </div>
 
@@ -380,12 +416,12 @@ export function TxConfirmCard({
           onClick={() => void handleConfirm()}
           className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-amber-400 disabled:opacity-50"
         >
-          {status === "signing" ? "Waiting for wallet…" : "Confirm"}
+          {confirmLabel}
         </button>
         <button
           type="button"
           disabled={status === "signing"}
-          onClick={onDismiss}
+          onClick={handleDismiss}
           className="rounded-lg border border-zinc-600 px-4 py-2 text-sm text-zinc-300 transition-colors hover:border-zinc-500 hover:text-white disabled:opacity-50"
         >
           Dismiss

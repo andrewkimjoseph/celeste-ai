@@ -37,7 +37,11 @@ export type AnalyticsEventMap = {
     hash_count: number;
     flow_category: FlowCategory;
   };
-  tx_failed: { flow_category: FlowCategory; error_category: string };
+  tx_failed: {
+    flow_category: FlowCategory;
+    error_category: string;
+    simulation_retryable?: boolean;
+  };
   tx_dismissed: { flow_category: FlowCategory };
   transactions_drawer_opened: { transaction_count: number };
   chat_thread_selected: { message_count: number };

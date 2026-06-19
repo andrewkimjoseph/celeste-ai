@@ -4,6 +4,7 @@ export type WalletErrorDisplay = {
   title: string;
   message: string;
   technicalDetails?: string;
+  retryable?: boolean;
 };
 
 function truncateForDisplay(text: string, max = 280): string {
