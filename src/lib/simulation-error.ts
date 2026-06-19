@@ -51,12 +51,17 @@ export function formatSimulationError(
 
   if (
     lower.includes("insufficient balance") ||
-    lower.includes("exceeds balance")
+    lower.includes("exceeds balance") ||
+    lower.includes("network fees")
   ) {
+    const supplyMatch = raw.match(/Supply\s+[\d.]+\s+(\S+)/i);
+    const token = supplyMatch?.[1];
+
     return {
       title: "Insufficient balance",
-      message:
-        "Your wallet doesn't have enough for this transaction. Try a smaller amount.",
+      message: token
+        ? `You're supplying almost all your ${token}. Leave a little for network fees, or try a slightly smaller amount.`
+        : "Your wallet doesn't have enough for this transaction. Try a smaller amount.",
       technicalDetails: raw,
       retryable: false,
     };

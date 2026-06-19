@@ -54,13 +54,24 @@ export function formatWalletError(error: unknown): WalletErrorDisplay {
     };
   }
 
+  if (lower.includes("transaction reverted")) {
+    return {
+      title: "Transaction failed",
+      message:
+        "This transaction didn't complete. You may still have paid network fees.",
+      technicalDetails: raw,
+      retryable: false,
+    };
+  }
+
   const firstLine = raw.split("\n").find((line) => line.trim().length > 0)?.trim();
   const shortMessage = firstLine?.replace(/^details:\s*/i, "") ?? "Transaction failed.";
 
   return {
     title: "Transaction failed",
     message: truncateForDisplay(shortMessage, 120),
-    technicalDetails: raw.length > shortMessage.length ? truncateForDisplay(raw) : undefined,
+    technicalDetails: raw,
+    retryable: false,
   };
 }
 

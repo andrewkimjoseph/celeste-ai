@@ -157,9 +157,12 @@ Before each wagmi send, Celeste dry-runs the prepared step so reverts surface in
 | SDK | `@andrewkimjoseph/celina-sdk/simulation` | Generic `simulatePreparedStep` — `publicClient.call` (or `estimateGas` when `feeCurrency` is set) |
 | Celeste | `src/lib/prepared-step-simulation.ts` | Host wrapper around the SDK helper |
 | Celeste | `src/lib/minipay-fee-currency.ts` | Resolves MiniPay stablecoin gas (`feeCurrency`) for simulation + send |
-| Celeste | `src/lib/simulation-error.ts` | Friendly simulation failure copy (retry hints, allowance lag) |
+| Celeste | `src/lib/minipay-spend-buffer.ts` | MiniPay gas buffer when fee token equals spend token |
+| `src/lib/flow-preflight.ts` | Aave supply balance + gas buffer checks |
+| `src/lib/simulation-error.ts` | Friendly simulation failure copy (retry hints, allowance lag) |
+| `src/lib/revert-error.ts` | Friendly on-chain revert copy (hash in technical details) |
 | Celeste | `tx-confirm-card.tsx` | Send preflight (balance checks) for send flows only; simulate → send → `receipt.status`; resumes multi-step flows on retry |
 
-Simulation failures show user-friendly messages (e.g. “Almost there” after a mined approve when the network preview lags) with a **Try again** action. Completed steps are remembered so retry continues from the next step instead of re-signing approve.
+Simulation failures show user-friendly messages (e.g. “Almost there” after a mined approve when the network preview lags) with a **Try again** action. Completed steps are remembered so retry continues from the next step instead of re-signing approve. On MiniPay, when network fees are paid from the same stablecoin being supplied or sent, Celeste reserves a small gas buffer so “supply all” flows fail at preflight/simulation instead of on-chain. Reverted transactions are not counted as completed steps.
 
 Full guide: [Prepared-step simulation](https://andrewkimjoseph.gitbook.io/celina-sdk/guides/prepared-step-simulation) (SDK GitBook).

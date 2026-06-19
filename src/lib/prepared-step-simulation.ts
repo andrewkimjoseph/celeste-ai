@@ -1,7 +1,12 @@
 import { simulatePreparedStep } from "@andrewkimjoseph/celina-sdk/simulation";
-import type { PublicClient } from "viem";
+import { erc20Abi, parseUnits, type PublicClient } from "viem";
 import type { PreparedTx } from "@/lib/prepared-flow";
+import { parseSupplyStepDescription } from "@/lib/flow-preflight";
 import { resolveMiniPayFeeCurrency } from "@/lib/minipay-fee-currency";
+import {
+  checkMiniPaySpendBuffer,
+  minipayEntryForSymbol,
+} from "@/lib/minipay-spend-buffer";
 import { formatWalletError } from "@/lib/wallet-error";
 
 export type PreparedStepSimulationOptions = {
@@ -18,6 +23,62 @@ export type PreparedStepSimulationSuccess = {
   ok: true;
   feeCurrency?: `0x${string}`;
 };
+
+const TOKEN_DECIMALS: Record<string, number> = {
+  USDT: 6,
+  USDC: 6,
+  USDm: 18,
+};
+
+async function checkStepMiniPaySpendBuffer(
+  publicClient: PublicClient,
+  from: `0x${string}`,
+  step: PreparedTx,
+  feeCurrency: `0x${string}`,
+): Promise<PreparedStepSimulationFailure | null> {
+  const supply = parseSupplyStepDescription(step.description);
+  if (!supply) {
+    return null;
+  }
+
+  const entry = minipayEntryForSymbol(supply.token);
+  if (!entry) {
+    return null;
+  }
+
+  let spendAmountWei: bigint;
+  try {
+    spendAmountWei = parseUnits(
+      supply.amount,
+      TOKEN_DECIMALS[entry.symbol] ?? 18,
+    );
+  } catch {
+    return null;
+  }
+
+  const balance = await publicClient.readContract({
+    address: entry.token,
+    abi: erc20Abi,
+    functionName: "balanceOf",
+    args: [from],
+  });
+
+  const bufferCheck = checkMiniPaySpendBuffer({
+    balance,
+    spendAmountWei,
+    feeCurrency,
+    spendTokenAddress: entry.token,
+  });
+
+  if (!bufferCheck.ok) {
+    return {
+      ok: false,
+      rawMessage: `Simulation failed for "${step.description}": ${bufferCheck.message ?? "insufficient balance after network fees."}`,
+    };
+  }
+
+  return null;
+}
 
 /**
  * Simulate one prepared step immediately before wallet broadcast.
@@ -42,6 +103,18 @@ export async function simulatePreparedStepBeforeSend(
         ok: false,
         rawMessage: formatted.technicalDetails ?? formatted.message,
       };
+    }
+  }
+
+  if (options?.supportsFeeAbstraction && feeCurrency) {
+    const bufferFailure = await checkStepMiniPaySpendBuffer(
+      publicClient,
+      from,
+      step,
+      feeCurrency,
+    );
+    if (bufferFailure) {
+      return bufferFailure;
     }
   }
 

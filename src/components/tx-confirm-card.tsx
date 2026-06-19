@@ -1,10 +1,13 @@
 "use client";
 
+import { useFlowPreflight } from "@/hooks/use-flow-preflight";
 import { useTxPreflight } from "@/hooks/use-tx-preflight";
 import { useWalletBalances } from "@/hooks/use-wallet-balances";
 import { useWalletCapabilities } from "@/hooks/use-wallet-capabilities";
+import { parseSupplySummary } from "@/lib/flow-preflight";
 import type { PreparedTx } from "@/lib/prepared-flow";
 import { simulatePreparedStepBeforeSend } from "@/lib/prepared-step-simulation";
+import { formatRevertedStepError } from "@/lib/revert-error";
 import { parseSendSummary } from "@/lib/send-preflight";
 import {
   categorizeSimulationError,
@@ -123,6 +126,7 @@ export function TxConfirmCard({
   const [status, setStatus] = useState<CardStatus>("idle");
   const [signingStepIndex, setSigningStepIndex] = useState(0);
   const [completedHashes, setCompletedHashes] = useState<string[]>([]);
+  const [revertedOnChain, setRevertedOnChain] = useState(false);
   const [errorDisplay, setErrorDisplay] = useState<SimulationErrorDisplay | null>(
     null,
   );
@@ -131,9 +135,11 @@ export function TxConfirmCard({
   const { sendTransactionAsync } = useSendTransaction();
   const publicClient = usePublicClient();
   const preflight = useTxPreflight(address, summary);
+  const flowPreflight = useFlowPreflight(address, summary);
   const { data: walletBalances } = useWalletBalances(address);
   const { supportsFeeAbstraction } = useWalletCapabilities();
   const isSendFlow = parseSendSummary(summary) !== null;
+  const isSupplyFlow = parseSupplySummary(summary) !== null;
   const celoBalance = Number(walletBalances?.celo?.formatted ?? 0);
   const insufficientGas =
     !supportsFeeAbstraction && !isSendFlow && celoBalance <= 0;
@@ -142,6 +148,10 @@ export function TxConfirmCard({
     isSendFlow &&
     preflight.status === "ready" &&
     !preflight.data.ok;
+  const flowPreflightBlocked =
+    isSupplyFlow &&
+    flowPreflight.status === "ready" &&
+    !flowPreflight.data.ok;
   const celoSendBlocked =
     preflightBlocked &&
     preflight.status === "ready" &&
@@ -150,11 +160,20 @@ export function TxConfirmCard({
   const copy = CARD_COPY[status];
   const displaySummary = formatFlowSummary(summary, recipientLabel);
   const isBusy = status === "signing" || status === "done";
+  const preflightLoading =
+    (isSendFlow && preflight.status === "loading") ||
+    (isSupplyFlow && flowPreflight.status === "loading");
   const confirmDisabled =
     isBusy ||
     preflightBlocked ||
+    flowPreflightBlocked ||
     insufficientGas ||
-    (isSendFlow && preflight.status === "loading");
+    preflightLoading;
+
+  const partialMultiStepError =
+    status === "error" &&
+    completedHashes.length > 0 &&
+    steps.length > 1;
 
   const cardTitle =
     insufficientGas
@@ -163,18 +182,22 @@ export function TxConfirmCard({
         ? "CELO sends not supported"
         : preflightBlocked && preflight.status === "ready"
           ? "Insufficient balance"
-          : status === "error" && completedHashes.length > 0
-            ? "Step incomplete"
-            : status === "error" && errorDisplay
-              ? errorDisplay.title
-              : copy.title;
+          : flowPreflightBlocked && flowPreflight.status === "ready"
+            ? "Insufficient balance"
+            : partialMultiStepError
+              ? "Step incomplete"
+              : status === "error" && errorDisplay
+                ? errorDisplay.title
+                : copy.title;
 
   const cardHint =
     status === "signing" && steps.length > 1
       ? `Step ${signingStepIndex + 1} of ${steps.length} — approve in your wallet.`
-      : status === "error" && completedHashes.length > 0
+      : partialMultiStepError
         ? `Step ${completedHashes.length} of ${steps.length} is done. The next step didn't go through yet.`
-        : copy.hint;
+        : status === "error" && revertedOnChain && completedHashes.length === 0
+          ? "This didn't complete. You may still have paid network fees."
+          : copy.hint;
 
   const confirmLabel =
     status === "signing"
@@ -197,6 +220,7 @@ export function TxConfirmCard({
 
   function handleDismiss() {
     setCompletedHashes([]);
+    setRevertedOnChain(false);
     setErrorDisplay(null);
     setStatus("idle");
     onDismiss();
@@ -214,6 +238,7 @@ export function TxConfirmCard({
     }
 
     setStatus("signing");
+    setRevertedOnChain(false);
     setErrorDisplay(null);
     setShowTechnicalDetails(false);
     trackEvent("tx_confirm_clicked", {
@@ -268,13 +293,22 @@ export function TxConfirmCard({
             ? ({ feeCurrency } as Record<string, `0x${string}`>)
             : {}),
         });
-        sessionHashes.push(hash);
-        setCompletedHashes([...sessionHashes]);
 
         const receipt = await publicClient.waitForTransactionReceipt({ hash });
         if (receipt.status === "reverted") {
-          throw new Error(`Transaction reverted: ${hash} (${step.description})`);
+          setRevertedOnChain(true);
+          const revertedError = formatRevertedStepError(step, hash);
+          setStatus("error");
+          setErrorDisplay(revertedError);
+          trackEvent("tx_failed", {
+            flow_category: flowCategory,
+            error_category: categorizeWalletError(revertedError.title),
+          });
+          return;
         }
+
+        sessionHashes.push(hash);
+        setCompletedHashes([...sessionHashes]);
       }
 
       setStatus("done");
@@ -308,7 +342,7 @@ export function TxConfirmCard({
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-amber-50">{cardTitle}</p>
-          <p className="mt-1 text-sm leading-relaxed text-zinc-300">
+          <p className="mt-1 break-words text-sm leading-relaxed text-zinc-300">
             {displaySummary}
           </p>
           <p className="mt-1.5 text-xs text-zinc-500">{cardHint}</p>
@@ -342,10 +376,10 @@ export function TxConfirmCard({
         </p>
       )}
 
-      {isSendFlow &&
-        (preflight.status === "loading" || preflightBlocked) && (
+      {(isSendFlow || isSupplyFlow) &&
+        (preflightLoading || preflightBlocked || flowPreflightBlocked) && (
           <div className="mt-3 border-t border-[var(--warn)]/15 pt-3">
-            {preflight.status === "loading" && (
+            {preflightLoading && (
               <p className="flex items-center gap-2 text-xs text-zinc-400">
                 <span
                   className="inline-block size-3 shrink-0 animate-spin rounded-full border-2 border-zinc-500 border-t-[var(--accent-hover)]"
@@ -355,8 +389,13 @@ export function TxConfirmCard({
               </p>
             )}
             {preflightBlocked && preflight.status === "ready" && (
-              <p className="text-xs text-amber-200/90" role="alert">
+              <p className="break-words text-xs text-amber-200/90" role="alert">
                 {preflight.data.message}
+              </p>
+            )}
+            {flowPreflightBlocked && flowPreflight.status === "ready" && (
+              <p className="break-words text-xs text-amber-200/90" role="alert">
+                {flowPreflight.data.message}
               </p>
             )}
           </div>
@@ -378,7 +417,9 @@ export function TxConfirmCard({
             className="flex gap-2 text-sm text-zinc-400"
           >
             <span className="font-medium text-zinc-500">{index + 1}.</span>
-            <span>{formatTransactionStep(step.description, { summary })}</span>
+            <span className="min-w-0 break-words">
+              {formatTransactionStep(step.description, { summary })}
+            </span>
           </li>
         ))}
       </ol>
@@ -388,8 +429,12 @@ export function TxConfirmCard({
           className="mt-3 rounded-lg border border-red-500/25 bg-red-500/10 px-3 py-2.5"
           role="alert"
         >
-          <p className="text-sm font-medium text-red-200">{errorDisplay.title}</p>
-          <p className="mt-0.5 text-sm text-red-100/90">{errorDisplay.message}</p>
+          <p className="break-words text-sm font-medium text-red-200">
+            {errorDisplay.title}
+          </p>
+          <p className="mt-0.5 break-words text-sm text-red-100/90">
+            {errorDisplay.message}
+          </p>
           {errorDisplay.technicalDetails && (
             <div className="mt-2">
               <button

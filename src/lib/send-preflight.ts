@@ -1,6 +1,11 @@
 import type { createCelinaClient } from "@andrewkimjoseph/celina-sdk";
 import { parseUnits } from "viem";
 import { normalizeRegistryTokenInput } from "@/lib/registry-token";
+import {
+  minipayFeeSymbolFromBalances,
+  minipayGasBufferWei,
+  minipaySpendBufferMessage,
+} from "@/lib/minipay-spend-buffer";
 
 type CelinaClient = ReturnType<typeof createCelinaClient>;
 
@@ -133,6 +138,26 @@ export async function checkSendPreflight(
       supportsFeeAbstraction,
       message: `Insufficient ${resolved.symbol}. You have ${tokenBalance} but tried to send ${amount}.`,
     };
+  }
+
+  if (supportsFeeAbstraction) {
+    const feeSymbol = minipayFeeSymbolFromBalances(
+      balances.map((b) => ({ symbol: b.token, raw: BigInt(b.raw) })),
+    );
+    if (feeSymbol === resolved.symbol) {
+      const buffer = minipayGasBufferWei(resolved.symbol);
+      if (tokenRaw < amountWei + buffer) {
+        return {
+          ok: false,
+          token: resolved.symbol,
+          amount,
+          tokenBalance,
+          celoBalance,
+          supportsFeeAbstraction,
+          message: minipaySpendBufferMessage(resolved.symbol),
+        };
+      }
+    }
   }
 
   if (!supportsFeeAbstraction && celoRaw < MIN_CELO_FOR_GAS) {
