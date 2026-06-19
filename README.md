@@ -15,7 +15,7 @@ npm install
 npm run dev
 ```
 
-Installs `@andrewkimjoseph/celina-sdk` **`0.9.0`** from npm (not a monorepo file link — required for Vercel deploys).
+Installs `@andrewkimjoseph/celina-sdk` **`0.9.6`** from npm (not a monorepo file link — required for Vercel deploys).
 
 ## Stack
 
@@ -57,7 +57,7 @@ Example (UBI): *"Claim my GoodDollar UBI"* → `get_gooddollar_ubi_entitlement` 
 
 Example (reserve): *"Swap 100 G$ to USDm"* → `get_swap_quote` (or `get_gooddollar_reserve_quote`) → user confirms → `prepare_swap` → sign in wallet.
 
-Requires `@andrewkimjoseph/celina-sdk` **0.9.0**. Reserve **execute** (`execute_gooddollar_reserve_swap`) is MCP stdio only — Celeste uses `prepare_swap` + wallet signing. See [GoodDollar guide](https://andrewkimjoseph.gitbook.io/celina-sdk/guides/gooddollar).
+Requires `@andrewkimjoseph/celina-sdk` **0.9.6**. Reserve **execute** (`execute_gooddollar_reserve_swap`) is MCP stdio only — Celeste uses `prepare_swap` + wallet signing. See [GoodDollar guide](https://andrewkimjoseph.gitbook.io/celina-sdk/guides/gooddollar).
 
 Uniswap v4 CELO swaps route through WCELO — the connected wallet needs WCELO balance. Dismissing the confirm card does not re-prepare until the user sends a new message.
 
@@ -87,7 +87,7 @@ Chats are saved **locally in your browser** (IndexedDB via Dexie), scoped to the
 4. LLM calls tools from `src/lib/chat-tools/` (reads via SDK, writes via `prepare_*`).
 5. `prepare_*` tools return `SerializedPreparedFlow` from celina-sdk.
 6. `ChatPanel` detects the flow in message parts and renders `TxConfirmCard`.
-7. User confirms — `TxConfirmCard` signs each step sequentially via wagmi.
+7. User confirms — `TxConfirmCard` simulates each step via SDK + Celeste MiniPay wrapper, then signs sequentially via wagmi; checks `receipt.status` after each mine.
 
 Chat tools mirror **celina-sdk** reads and `prepare_*` wallet flows (naming is similar to celina-mcp for familiarity, but Celeste does not call MCP). Server-key writes (`send_token`, `execute_mento_fx`, `execute_uniswap_swap`) and **Self Agent ID** registration flows are only in [celina-mcp](../celina-mcp) or [`@selfxyz/agent-sdk`](https://www.npmjs.com/package/@selfxyz/agent-sdk).
 
@@ -101,12 +101,14 @@ Chat tools mirror **celina-sdk** reads and `prepare_*` wallet flows (naming is s
 | `src/lib/chat-model.ts` | OpenRouter / OpenAI model selection |
 | `src/lib/celina.ts` | Server-side SDK singleton |
 | `src/lib/prepared-flow.ts` | Extract `SerializedPreparedFlow` from chat messages |
+| `src/lib/minipay-fee-currency.ts` | MiniPay CIP-64 `feeCurrency` resolution (Celeste-only) |
+| `src/lib/prepared-step-simulation.ts` | Wraps SDK `simulatePreparedStep` + send preflight for sends |
 | `src/lib/chats.ts` | Chat thread types, title helper, tx-card UI state on load |
 | `src/lib/chat-db.ts` | IndexedDB CRUD for persisted chat threads |
 | `src/components/chat/chat-context.tsx` | Wallet-scoped chat state + persistence |
 | `src/components/chat/chat-sidebar.tsx` | Desktop thread list + wallet balances |
 | `src/components/chat-panel.tsx` | Chat UI, address transport, tx card trigger |
-| `src/components/tx-confirm-card.tsx` | Sequential wagmi signing loop |
+| `src/components/tx-confirm-card.tsx` | Per-step simulate → send → receipt check; MiniPay `feeCurrency` on send when applicable |
 | `next.config.ts` | Monorepo + bundler workarounds |
 
 ### Environment variables
@@ -144,4 +146,17 @@ Dev script uses `--webpack` for compatibility; adjust if Turbopack-only dev is p
 1. Add a `ToolDefinition` in **celina-sdk** — see [LLM tool catalog](../celina-sdk/docs/guides/tool-catalog.md) (`src/tools/domains/`, `surfaces: ["browser"]` or both).
 2. Celeste wires tools through [`src/lib/chat-tools/sdk-adapter.ts`](src/lib/chat-tools/sdk-adapter.ts); add `ToolRuntime.hooks` there if the tool needs host-specific behavior (e.g. send preflight). Use **`dynamicTool`** when wrapping the catalog (documented in the SDK guide).
 3. Update `buildSystemPrompt` in [`src/lib/chat-tools/system-prompt.ts`](src/lib/chat-tools/system-prompt.ts) if the LLM needs new rules.
-4. Requires `@andrewkimjoseph/celina-sdk` **0.9.0** with the `./tools` export.
+4. Requires `@andrewkimjoseph/celina-sdk` **0.9.6** with the `./tools` export.
+
+### Transaction simulation
+
+Before each wagmi send, Celeste dry-runs the prepared step so reverts surface in the confirm card instead of on-chain:
+
+| Layer | Module | Role |
+|-------|--------|------|
+| SDK | `@andrewkimjoseph/celina-sdk/simulation` | Generic `simulatePreparedStep` — `publicClient.call` (or `estimateGas` when `feeCurrency` is set) |
+| Celeste | `src/lib/prepared-step-simulation.ts` | Host wrapper around the SDK helper |
+| Celeste | `src/lib/minipay-fee-currency.ts` | Resolves MiniPay stablecoin gas (`feeCurrency`) for simulation + send |
+| Celeste | `tx-confirm-card.tsx` | Send preflight (balance checks) for send flows only; then simulate → send → `receipt.status` |
+
+Full guide: [Prepared-step simulation](https://andrewkimjoseph.gitbook.io/celina-sdk/guides/prepared-step-simulation) (SDK GitBook).
