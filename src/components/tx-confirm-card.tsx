@@ -4,6 +4,7 @@ import { useTxPreflight } from "@/hooks/use-tx-preflight";
 import { useWalletBalances } from "@/hooks/use-wallet-balances";
 import { useWalletCapabilities } from "@/hooks/use-wallet-capabilities";
 import type { PreparedTx } from "@/lib/prepared-flow";
+import { simulatePreparedStepBeforeSend } from "@/lib/prepared-step-simulation";
 import { parseSendSummary } from "@/lib/send-preflight";
 import { formatFlowSummary, formatWalletError } from "@/lib/wallet-error";
 import { formatTransactionStep } from "@/lib/transaction-display";
@@ -171,7 +172,7 @@ export function TxConfirmCard({
       : "border-amber-500/30";
 
   async function handleConfirm() {
-    if (!publicClient) {
+    if (!publicClient || !address) {
       setErrorDisplay({
         title: "Wallet unavailable",
         message: "Reconnect your wallet, then tap Confirm below.",
@@ -189,18 +190,51 @@ export function TxConfirmCard({
       flow_category: flowCategory,
     });
     const hashes: string[] = [];
+    let feeCurrency: `0x${string}` | undefined;
 
     try {
       for (let index = 0; index < steps.length; index++) {
         setSigningStepIndex(index);
         const step = steps[index]!;
+
+        const simulation = await simulatePreparedStepBeforeSend(
+          publicClient,
+          address,
+          step,
+          {
+            supportsFeeAbstraction,
+            feeCurrency,
+          },
+        );
+        if (!simulation.ok) {
+          setStatus("error");
+          setErrorDisplay({
+            title: "Transaction would fail",
+            message: simulation.message,
+            technicalDetails: simulation.technicalDetails,
+          });
+          trackEvent("tx_failed", {
+            flow_category: flowCategory,
+            error_category: categorizeWalletError("Transaction would fail"),
+          });
+          return;
+        }
+        feeCurrency = simulation.feeCurrency ?? feeCurrency;
+
         const hash = await sendTransactionAsync({
           to: step.to,
           data: step.data,
           value: step.value ? BigInt(step.value) : undefined,
+          ...(feeCurrency
+            ? ({ feeCurrency } as Record<string, `0x${string}`>)
+            : {}),
         });
         hashes.push(hash);
-        await publicClient.waitForTransactionReceipt({ hash });
+
+        const receipt = await publicClient.waitForTransactionReceipt({ hash });
+        if (receipt.status === "reverted") {
+          throw new Error(`Transaction reverted: ${hash} (${step.description})`);
+        }
       }
 
       setStatus("done");
