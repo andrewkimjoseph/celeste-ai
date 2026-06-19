@@ -72,7 +72,7 @@ export function ChatThreadRow({
           onDelete(id);
         }}
         aria-label={`Delete chat: ${displayTitle}`}
-        className="mr-1.5 flex size-8 shrink-0 items-center justify-center self-center rounded-md text-zinc-500 opacity-0 transition-opacity hover:bg-white/[0.06] hover:text-red-400 group-hover:opacity-100 focus:opacity-100"
+        className="mr-1.5 flex size-8 shrink-0 items-center justify-center self-center rounded-md text-zinc-500 opacity-100 transition-opacity hover:bg-white/[0.06] hover:text-red-400 lg:opacity-0 lg:group-hover:opacity-100 lg:focus:opacity-100"
       >
         <svg
           className="size-3.5"
