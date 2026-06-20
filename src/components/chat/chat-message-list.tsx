@@ -11,8 +11,13 @@ import {
   shouldShowAssistantLoading,
 } from "@/components/chat/chat-utils";
 import type { PreparedFlowWithExtras } from "@/lib/prepared-flow";
+import {
+  getPreparedFlowMetasForMessage,
+  getSignedPreparedFlowMetas,
+} from "@/lib/prepared-flow";
 import { CelesteLogoMark } from "@/components/celeste-logo";
 import { TxConfirmCard } from "@/components/tx-confirm-card";
+import { TxConfirmCardSnapshot } from "@/components/tx-confirm-card-snapshot";
 import { useWalletCapabilities } from "@/hooks/use-wallet-capabilities";
 import { trackEvent } from "@/lib/analytics/amplitude-browser";
 import type { PromptGroup } from "@/lib/analytics/events";
@@ -65,10 +70,9 @@ interface ChatMessageListProps {
   address?: `0x${string}`;
   errorMessage: string | null;
   showTxCard: boolean;
-  latestFlow: PreparedFlowWithExtras | undefined;
+  confirmedFlowHashes: Record<string, string[]>;
+  pendingFlow: PreparedFlowWithExtras | undefined;
   txCardFlowKey: string | null;
-  txCardCompleted?: boolean;
-  txCardCompletedHashes?: string[];
   onPromptSelect: (prompt: string, promptGroup?: PromptGroup) => void;
   onTxComplete: (hashes: string[]) => void;
   onTxReject: () => void;
@@ -82,10 +86,9 @@ export function ChatMessageList({
   address,
   errorMessage,
   showTxCard,
-  latestFlow,
+  confirmedFlowHashes,
+  pendingFlow,
   txCardFlowKey,
-  txCardCompleted = false,
-  txCardCompletedHashes = [],
   onPromptSelect,
   onTxComplete,
   onTxReject,
@@ -96,6 +99,8 @@ export function ChatMessageList({
   const trackedTxCardKeyRef = useRef<string | null>(null);
   const showLoading = shouldShowAssistantLoading(status, messages);
   const isStreaming = status === "streaming";
+  const signedFlowMetas = getSignedPreparedFlowMetas(messages, confirmedFlowHashes);
+  const recipientLabel = extractRecipientLabel(messages);
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -119,7 +124,7 @@ export function ChatMessageList({
   }, [messages, status, showTxCard, showLoading, isStreaming]);
 
   useEffect(() => {
-    if (!showTxCard || !latestFlow || !txCardFlowKey) {
+    if (!showTxCard || !pendingFlow || !txCardFlowKey) {
       return;
     }
 
@@ -129,10 +134,10 @@ export function ChatMessageList({
 
     trackedTxCardKeyRef.current = txCardFlowKey;
     trackEvent("tx_card_shown", {
-      step_count: latestFlow.steps.length,
-      flow_category: inferFlowCategory(latestFlow.summary),
+      step_count: pendingFlow.steps.length,
+      flow_category: inferFlowCategory(pendingFlow.summary),
     });
-  }, [latestFlow, showTxCard, txCardFlowKey]);
+  }, [pendingFlow, showTxCard, txCardFlowKey]);
 
   useEffect(() => {
     const viewport = window.visualViewport;
@@ -161,7 +166,6 @@ export function ChatMessageList({
   const showConnectPrompt = mounted && !isConnected && messages.length === 0;
   const isLandingView =
     (showEmptyState || showConnectPrompt) && !showLoading && !showTxCard;
-  const recipientLabel = extractRecipientLabel(messages);
   const turns = groupMessagesIntoTurns(messages);
   const pendingTurnIndex =
     showLoading && turns.at(-1)?.user && !turns.at(-1)?.assistant
@@ -240,14 +244,33 @@ export function ChatMessageList({
         </div>
       )}
 
-      {turns.map((turn, index) => (
-        <ChatTurnRow
-          key={turn.id}
-          turn={turn}
-          hidePrepareToolDone={showTxCard}
-          showLoading={index === pendingTurnIndex}
-        />
-      ))}
+      {turns.map((turn, index) => {
+        const archivedFlows = turn.assistant
+          ? getPreparedFlowMetasForMessage(turn.assistant.id, signedFlowMetas)
+          : [];
+
+        return (
+          <div key={turn.id} className="flex flex-col gap-4 sm:gap-5">
+            <ChatTurnRow
+              turn={turn}
+              hidePrepareToolDone={showTxCard}
+              showLoading={index === pendingTurnIndex}
+            />
+            {archivedFlows.map((meta) => (
+              <AssistantColumn key={`${meta.flowKey}-snapshot`}>
+                <AssistantMessageSlot showAvatar={false} showLabel={false}>
+                  <TxConfirmCardSnapshot
+                    summary={meta.flow.summary}
+                    steps={meta.flow.steps}
+                    recipientLabel={recipientLabel}
+                    hashes={confirmedFlowHashes[meta.flowKey] ?? []}
+                  />
+                </AssistantMessageSlot>
+              </AssistantColumn>
+            ))}
+          </div>
+        );
+      })}
 
       {showLoading && pendingTurnIndex === -1 && (
         <div className="md:w-1/2 md:pr-4 lg:pr-6">
@@ -255,18 +278,16 @@ export function ChatMessageList({
         </div>
       )}
 
-      {showTxCard && latestFlow && (
+      {showTxCard && pendingFlow && (
         <AssistantColumn>
           <AssistantMessageSlot showAvatar={false} showLabel={false}>
             <TxConfirmCard
               key={txCardFlowKey ?? undefined}
-              summary={latestFlow.summary}
-              steps={latestFlow.steps}
+              summary={pendingFlow.summary}
+              steps={pendingFlow.steps}
               recipientLabel={recipientLabel}
-              warnings={latestFlow.warnings}
-              deepLink={latestFlow.deep_link}
-              initialCompleted={txCardCompleted}
-              initialCompletedHashes={txCardCompletedHashes}
+              warnings={pendingFlow.warnings}
+              deepLink={pendingFlow.deep_link}
               onComplete={onTxComplete}
               onDismiss={onTxReject}
             />

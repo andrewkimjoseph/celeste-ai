@@ -31,6 +31,8 @@ type PreparedFlowMeta = {
   toolCallId: string;
 };
 
+export type { PreparedFlowMeta };
+
 /** Collect prepared flows with stable keys from assistant tool-result parts. */
 export function extractPreparedFlowMetas(messages: UIMessage[]): PreparedFlowMeta[] {
   const metas: PreparedFlowMeta[] = [];
@@ -181,6 +183,35 @@ export function isHiddenChatUserMessage(message: UIMessage): boolean {
     return false;
   }
   return isAutoPreparedFlowUserMessage(getMessageText(message));
+}
+
+/** Whether a prepared flow was signed (messages or persisted hashes). */
+export function isPreparedFlowSigned(
+  messages: UIMessage[],
+  meta: PreparedFlowMeta,
+  confirmedFlowHashes: Record<string, string[]>,
+): boolean {
+  return (
+    isPreparedFlowConfirmed(messages, meta) ||
+    (confirmedFlowHashes[meta.flowKey]?.length ?? 0) > 0
+  );
+}
+
+/** All prepared flows that completed on-chain — shown as green cards in chat history. */
+export function getSignedPreparedFlowMetas(
+  messages: UIMessage[],
+  confirmedFlowHashes: Record<string, string[]>,
+): PreparedFlowMeta[] {
+  return extractPreparedFlowMetas(messages).filter((meta) =>
+    isPreparedFlowSigned(messages, meta, confirmedFlowHashes),
+  );
+}
+
+export function getPreparedFlowMetasForMessage(
+  messageId: string,
+  metas: PreparedFlowMeta[],
+): PreparedFlowMeta[] {
+  return metas.filter((meta) => meta.messageId === messageId);
 }
 
 function getUserFollowUpsAfterPrepare(

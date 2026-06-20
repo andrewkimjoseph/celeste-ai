@@ -21,8 +21,7 @@ import { inferFlowCategory } from "@/lib/analytics/flow-category";
 import {
   buildPreparedFlowClientContext,
   getActivePreparedFlowWithMeta,
-  getLatestPreparedFlowWithMeta,
-  isPreparedFlowConfirmed,
+  isPreparedFlowSigned,
 } from "@/lib/prepared-flow";
 import { formatFlowSummary } from "@/lib/wallet-error";
 import { useMounted } from "@/hooks/use-mounted";
@@ -127,23 +126,19 @@ export function ChatPanel({
     },
   });
 
-  const flowMeta = getLatestPreparedFlowWithMeta(messages);
-  const flowKey = flowMeta?.flowKey ?? null;
-  const flowPending = Boolean(getActivePreparedFlowWithMeta(messages));
-  const flowConfirmed = Boolean(
-    flowMeta && isPreparedFlowConfirmed(messages, flowMeta),
+  const pendingFlowMeta = getActivePreparedFlowWithMeta(messages);
+  const flowKey = pendingFlowMeta?.flowKey ?? null;
+  const pendingSigned = Boolean(
+    pendingFlowMeta &&
+      isPreparedFlowSigned(messages, pendingFlowMeta, confirmedFlowHashes),
   );
   const showTxCard = Boolean(
-    flowMeta &&
+    pendingFlowMeta &&
       flowKey &&
       flowKey !== dismissedFlowKey &&
-      (flowPending || flowConfirmed) &&
-      (!txCardBlockedUntilUserMessage || flowConfirmed),
+      !pendingSigned &&
+      !txCardBlockedUntilUserMessage,
   );
-  const txCardCompletedHashes =
-    flowKey && confirmedFlowHashes[flowKey]
-      ? confirmedFlowHashes[flowKey]
-      : [];
 
   function clearTxCardBlock() {
     setTxCardBlockedUntilUserMessage(false);
@@ -155,9 +150,9 @@ export function ChatPanel({
     if (flowContext) {
       contextParts.push(flowContext);
     }
-    if (showTxCard && flowPending && flowMeta?.flow.summary) {
+    if (showTxCard && pendingFlowMeta?.flow.summary) {
       contextParts.push(
-        `Pending wallet confirm card visible: "${flowMeta.flow.summary}". User must tap Confirm below.`,
+        `Pending wallet confirm card visible: "${pendingFlowMeta.flow.summary}". User must tap Confirm below.`,
       );
     }
 
@@ -257,15 +252,14 @@ export function ChatPanel({
           address={address}
           errorMessage={error ? formatChatError(error.message) : null}
           showTxCard={showTxCard}
-          latestFlow={flowMeta?.flow}
+          confirmedFlowHashes={confirmedFlowHashes}
+          pendingFlow={pendingFlowMeta?.flow}
           txCardFlowKey={flowKey}
-          txCardCompleted={flowConfirmed}
-          txCardCompletedHashes={txCardCompletedHashes}
           onPromptSelect={(prompt, promptGroup) =>
             void handlePromptSelect(prompt, promptGroup)
           }
           onTxComplete={(hashes) => {
-            const summary = flowMeta?.flow.summary ?? "Transaction";
+            const summary = pendingFlowMeta?.flow.summary ?? "Transaction";
 
             if (flowKey) {
               const nextConfirmed = {
@@ -279,12 +273,12 @@ export function ChatPanel({
               setConfirmedFlowHashes(nextConfirmed);
             }
 
-            if (address && flowMeta?.flow) {
+            if (address && pendingFlowMeta?.flow) {
               void addTransaction({
                 address,
                 hashes,
-                summary: flowMeta.flow.summary,
-                steps: flowMeta.flow.steps.map((step) => step.description),
+                summary: pendingFlowMeta.flow.summary,
+                steps: pendingFlowMeta.flow.steps.map((step) => step.description),
                 status: "confirmed",
               });
             }
@@ -322,13 +316,13 @@ export function ChatPanel({
             }
             setTxCardBlockedUntilUserMessage(true);
 
-            if (flowMeta?.flow) {
+            if (pendingFlowMeta?.flow) {
               trackEvent("tx_dismissed", {
-                flow_category: inferFlowCategory(flowMeta.flow.summary),
+                flow_category: inferFlowCategory(pendingFlowMeta.flow.summary),
               });
             }
 
-            const summary = flowMeta?.flow.summary;
+            const summary = pendingFlowMeta?.flow.summary;
             const actionLabel = summary
               ? formatFlowSummary(summary)
               : null;
