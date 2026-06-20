@@ -67,6 +67,8 @@ interface ChatMessageListProps {
   showTxCard: boolean;
   latestFlow: PreparedFlowWithExtras | undefined;
   txCardFlowKey: string | null;
+  txCardCompleted?: boolean;
+  txCardCompletedHashes?: string[];
   onPromptSelect: (prompt: string, promptGroup?: PromptGroup) => void;
   onTxComplete: (hashes: string[]) => void;
   onTxReject: () => void;
@@ -82,6 +84,8 @@ export function ChatMessageList({
   showTxCard,
   latestFlow,
   txCardFlowKey,
+  txCardCompleted = false,
+  txCardCompletedHashes = [],
   onPromptSelect,
   onTxComplete,
   onTxReject,
@@ -255,11 +259,14 @@ export function ChatMessageList({
         <AssistantColumn>
           <AssistantMessageSlot showAvatar={false} showLabel={false}>
             <TxConfirmCard
+              key={txCardFlowKey ?? undefined}
               summary={latestFlow.summary}
               steps={latestFlow.steps}
               recipientLabel={recipientLabel}
               warnings={latestFlow.warnings}
               deepLink={latestFlow.deep_link}
+              initialCompleted={txCardCompleted}
+              initialCompletedHashes={txCardCompletedHashes}
               onComplete={onTxComplete}
               onDismiss={onTxReject}
             />

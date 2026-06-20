@@ -120,6 +120,34 @@ export function getActivePreparedFlowWithMeta(
   return meta;
 }
 
+/** True after the user signed the wallet confirm card for this prepared flow. */
+export function isPreparedFlowConfirmed(
+  messages: UIMessage[],
+  meta: PreparedFlowMeta,
+): boolean {
+  const preparedIndex = messages.findIndex((message) => message.id === meta.messageId);
+  if (preparedIndex === -1) {
+    return false;
+  }
+
+  for (let i = preparedIndex + 1; i < messages.length; i++) {
+    const message = messages[i];
+    if (message.role !== "user") {
+      continue;
+    }
+
+    const text = getMessageText(message);
+    if (text.startsWith(CONFIRMED_TX_PREFIX)) {
+      return true;
+    }
+    if (!isAutoPreparedFlowUserMessage(text)) {
+      return false;
+    }
+  }
+
+  return false;
+}
+
 const CONFIRMED_TX_PREFIX = "Transaction confirmed";
 const DISMISSED_TX_SNIPPETS = [
   "dismissed the transaction confirmation card",

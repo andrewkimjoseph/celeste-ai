@@ -32,6 +32,8 @@ interface TxConfirmCardProps {
   recipientLabel?: string;
   warnings?: string[];
   deepLink?: string;
+  initialCompleted?: boolean;
+  initialCompletedHashes?: string[];
   onComplete: (hashes: string[]) => void;
   onDismiss: () => void;
 }
@@ -122,12 +124,18 @@ export function TxConfirmCard({
   recipientLabel,
   warnings,
   deepLink,
+  initialCompleted = false,
+  initialCompletedHashes = [],
   onComplete,
   onDismiss,
 }: TxConfirmCardProps) {
-  const [status, setStatus] = useState<CardStatus>("idle");
+  const [status, setStatus] = useState<CardStatus>(
+    initialCompleted ? "done" : "idle",
+  );
   const [signingStepIndex, setSigningStepIndex] = useState(0);
-  const [completedHashes, setCompletedHashes] = useState<string[]>([]);
+  const [completedHashes, setCompletedHashes] = useState<string[]>(
+    initialCompletedHashes,
+  );
   const [revertedOnChain, setRevertedOnChain] = useState(false);
   const [errorDisplay, setErrorDisplay] = useState<SimulationErrorDisplay | null>(
     null,

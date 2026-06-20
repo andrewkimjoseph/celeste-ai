@@ -102,6 +102,7 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
           uiState: {
             dismissedFlowKey: chat.dismissedFlowKey,
             txCardBlockedUntilUserMessage: chat.txCardBlockedUntilUserMessage,
+            confirmedFlowHashes: chat.confirmedFlowHashes,
           },
         });
 
@@ -150,6 +151,7 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
           messages: stored.messages,
           dismissedFlowKey: uiState.dismissedFlowKey,
           txCardBlockedUntilUserMessage: uiState.txCardBlockedUntilUserMessage,
+          confirmedFlowHashes: uiState.confirmedFlowHashes,
         };
       } catch (error) {
         console.warn("Celeste chat load failed:", error);
@@ -187,6 +189,7 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
             dismissedFlowKey: uiState.dismissedFlowKey,
             txCardBlockedUntilUserMessage:
               uiState.txCardBlockedUntilUserMessage,
+            confirmedFlowHashes: uiState.confirmedFlowHashes,
           });
           return;
         }
@@ -225,6 +228,7 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
         messages,
         dismissedFlowKey: uiState.dismissedFlowKey,
         txCardBlockedUntilUserMessage: uiState.txCardBlockedUntilUserMessage,
+        confirmedFlowHashes: uiState.confirmedFlowHashes,
       };
 
       activeChatRef.current = next;
@@ -308,6 +312,7 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
           messages: latest.messages,
           dismissedFlowKey: uiState.dismissedFlowKey,
           txCardBlockedUntilUserMessage: uiState.txCardBlockedUntilUserMessage,
+          confirmedFlowHashes: uiState.confirmedFlowHashes,
         };
         activeChatRef.current = next;
         setActiveChat(next);

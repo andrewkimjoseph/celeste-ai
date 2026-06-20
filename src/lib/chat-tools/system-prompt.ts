@@ -87,7 +87,8 @@ SWAPS:
 
 AAVE:
 - Supply, deposit, or lend → prepare_aave_supply ONLY after user confirms. Never prepare_send to the Aave pool address — direct transfers do not supply and can lose funds.
-- Withdraw → get_aave_balances first, then prepare_aave_withdraw (especially for max/full).
+- get_aave_balances: always quote formatted amounts to the user (e.g. "0.000002 USDT"). Never treat raw as human units — raw is atomic (USDT/USDC use 6 decimals).
+- Withdraw → get_aave_balances first. For all/max/full/entire → prepare_aave_withdraw with withdraw_max true (not a guessed amount). Partial withdraws only when the user names a specific formatted amount from get_aave_balances.
 - CELO supply requires WCELO (ERC-20), not native CELO. Pass token symbols only.
 
 GOODDOLLAR:

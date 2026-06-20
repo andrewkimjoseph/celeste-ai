@@ -1,5 +1,5 @@
 import { isTextUIPart, type UIMessage } from "ai";
-import { getActivePreparedFlowWithMeta } from "@/lib/prepared-flow";
+import { getActivePreparedFlowWithMeta, isPreparedFlowConfirmed } from "@/lib/prepared-flow";
 
 export const MAX_CHATS_PER_WALLET = 50;
 
@@ -8,6 +8,7 @@ export const DEFAULT_CHAT_TITLE = "New chat";
 export type ChatUiState = {
   dismissedFlowKey: string | null;
   txCardBlockedUntilUserMessage: boolean;
+  confirmedFlowHashes: Record<string, string[]>;
 };
 
 export type StoredChat = {
@@ -17,6 +18,7 @@ export type StoredChat = {
   messages: UIMessage[];
   dismissedFlowKey: string | null;
   txCardBlockedUntilUserMessage: boolean;
+  confirmedFlowHashes?: Record<string, string[]>;
   createdAt: number;
   updatedAt: number;
 };
@@ -33,6 +35,7 @@ export type ActiveChatState = {
   messages: UIMessage[];
   dismissedFlowKey: string | null;
   txCardBlockedUntilUserMessage: boolean;
+  confirmedFlowHashes: Record<string, string[]>;
 };
 
 export function deriveChatTitle(messages: UIMessage[]): string {
@@ -68,7 +71,12 @@ export function toChatListItem(chat: StoredChat): ChatListItem {
 /** Restore tx-card UI state; block stale unsigned prepares after reload. */
 export function resolveChatUiState(
   messages: UIMessage[],
-  stored?: Partial<Pick<StoredChat, "dismissedFlowKey" | "txCardBlockedUntilUserMessage">>,
+  stored?: Partial<
+    Pick<
+      StoredChat,
+      "dismissedFlowKey" | "txCardBlockedUntilUserMessage" | "confirmedFlowHashes"
+    >
+  >,
 ): ChatUiState {
   const meta = getActivePreparedFlowWithMeta(messages);
   const flowKey = meta?.flowKey ?? null;
@@ -76,12 +84,18 @@ export function resolveChatUiState(
   const dismissedFlowKey = stored?.dismissedFlowKey ?? null;
   let txCardBlockedUntilUserMessage =
     stored?.txCardBlockedUntilUserMessage ?? false;
+  const confirmedFlowHashes = stored?.confirmedFlowHashes ?? {};
 
-  if (meta && flowKey !== dismissedFlowKey && !txCardBlockedUntilUserMessage) {
+  if (
+    meta &&
+    flowKey !== dismissedFlowKey &&
+    !txCardBlockedUntilUserMessage &&
+    !isPreparedFlowConfirmed(messages, meta)
+  ) {
     txCardBlockedUntilUserMessage = true;
   }
 
-  return { dismissedFlowKey, txCardBlockedUntilUserMessage };
+  return { dismissedFlowKey, txCardBlockedUntilUserMessage, confirmedFlowHashes };
 }
 
 export function createEmptyActiveChat(id: string): ActiveChatState {
@@ -90,5 +104,6 @@ export function createEmptyActiveChat(id: string): ActiveChatState {
     messages: [],
     dismissedFlowKey: null,
     txCardBlockedUntilUserMessage: false,
+    confirmedFlowHashes: {},
   };
 }

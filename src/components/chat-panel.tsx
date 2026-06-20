@@ -22,7 +22,7 @@ import {
   buildPreparedFlowClientContext,
   getActivePreparedFlowWithMeta,
   getLatestPreparedFlowWithMeta,
-  isHiddenChatUserMessage,
+  isPreparedFlowConfirmed,
 } from "@/lib/prepared-flow";
 import { formatFlowSummary } from "@/lib/wallet-error";
 import { useMounted } from "@/hooks/use-mounted";
@@ -63,12 +63,16 @@ export function ChatPanel({
   /** After dismiss, hide confirm cards until the user sends a new message. */
   const [txCardBlockedUntilUserMessage, setTxCardBlockedUntilUserMessage] =
     useState(false);
+  const [confirmedFlowHashes, setConfirmedFlowHashes] = useState<
+    Record<string, string[]>
+  >({});
   const chatSendStartedAtRef = useRef<number | null>(null);
   const lastTrackedErrorRef = useRef<string | null>(null);
   const hydratedChatIdRef = useRef<string | null>(null);
   const uiStateRef = useRef({
     dismissedFlowKey: null as string | null,
     txCardBlockedUntilUserMessage: false,
+    confirmedFlowHashes: {} as Record<string, string[]>,
   });
 
   useEffect(() => {
@@ -83,6 +87,7 @@ export function ChatPanel({
     hydratedChatIdRef.current = activeChatId;
     setDismissedFlowKey(activeChat.dismissedFlowKey);
     setTxCardBlockedUntilUserMessage(activeChat.txCardBlockedUntilUserMessage);
+    setConfirmedFlowHashes(activeChat.confirmedFlowHashes);
     setInput("");
   }, [activeChatId, activeChat]);
 
@@ -90,8 +95,9 @@ export function ChatPanel({
     uiStateRef.current = {
       dismissedFlowKey,
       txCardBlockedUntilUserMessage,
+      confirmedFlowHashes,
     };
-  }, [dismissedFlowKey, txCardBlockedUntilUserMessage]);
+  }, [dismissedFlowKey, txCardBlockedUntilUserMessage, confirmedFlowHashes]);
 
   const transport = useMemo(
     () => new DefaultChatTransport({ api: "/api/chat" }),
@@ -117,29 +123,27 @@ export function ChatPanel({
         had_prepare_flow: responseMeta.had_prepare_flow,
       });
 
-      const lastUser = [...finishedMessages].reverse().find((m) => m.role === "user");
-      if (lastUser && isHiddenChatUserMessage(lastUser)) {
-        const meta = getLatestPreparedFlowWithMeta(finishedMessages);
-        if (meta) {
-          uiStateRef.current = {
-            ...uiStateRef.current,
-            dismissedFlowKey: meta.flowKey,
-          };
-          setDismissedFlowKey(meta.flowKey);
-        }
-      }
-
       void saveActiveChat(finishedMessages, uiStateRef.current);
     },
   });
 
-  const flowMeta = getActivePreparedFlowWithMeta(messages);
+  const flowMeta = getLatestPreparedFlowWithMeta(messages);
   const flowKey = flowMeta?.flowKey ?? null;
+  const flowPending = Boolean(getActivePreparedFlowWithMeta(messages));
+  const flowConfirmed = Boolean(
+    flowMeta && isPreparedFlowConfirmed(messages, flowMeta),
+  );
   const showTxCard = Boolean(
     flowMeta &&
+      flowKey &&
       flowKey !== dismissedFlowKey &&
-      !txCardBlockedUntilUserMessage,
+      (flowPending || flowConfirmed) &&
+      (!txCardBlockedUntilUserMessage || flowConfirmed),
   );
+  const txCardCompletedHashes =
+    flowKey && confirmedFlowHashes[flowKey]
+      ? confirmedFlowHashes[flowKey]
+      : [];
 
   function clearTxCardBlock() {
     setTxCardBlockedUntilUserMessage(false);
@@ -151,7 +155,7 @@ export function ChatPanel({
     if (flowContext) {
       contextParts.push(flowContext);
     }
-    if (showTxCard && flowMeta?.flow.summary) {
+    if (showTxCard && flowPending && flowMeta?.flow.summary) {
       contextParts.push(
         `Pending wallet confirm card visible: "${flowMeta.flow.summary}". User must tap Confirm below.`,
       );
@@ -255,11 +259,25 @@ export function ChatPanel({
           showTxCard={showTxCard}
           latestFlow={flowMeta?.flow}
           txCardFlowKey={flowKey}
+          txCardCompleted={flowConfirmed}
+          txCardCompletedHashes={txCardCompletedHashes}
           onPromptSelect={(prompt, promptGroup) =>
             void handlePromptSelect(prompt, promptGroup)
           }
           onTxComplete={(hashes) => {
             const summary = flowMeta?.flow.summary ?? "Transaction";
+
+            if (flowKey) {
+              const nextConfirmed = {
+                ...uiStateRef.current.confirmedFlowHashes,
+                [flowKey]: hashes,
+              };
+              uiStateRef.current = {
+                ...uiStateRef.current,
+                confirmedFlowHashes: nextConfirmed,
+              };
+              setConfirmedFlowHashes(nextConfirmed);
+            }
 
             if (address && flowMeta?.flow) {
               void addTransaction({

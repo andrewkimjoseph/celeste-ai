@@ -66,6 +66,7 @@ export async function upsertChat(input: {
     messages: input.messages,
     dismissedFlowKey: input.uiState.dismissedFlowKey,
     txCardBlockedUntilUserMessage: input.uiState.txCardBlockedUntilUserMessage,
+    confirmedFlowHashes: input.uiState.confirmedFlowHashes,
     createdAt: existing?.createdAt ?? input.createdAt ?? now,
     updatedAt: now,
   };
