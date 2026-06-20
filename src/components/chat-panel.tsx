@@ -22,7 +22,6 @@ import {
   buildPreparedFlowClientContext,
   getActivePreparedFlowWithMeta,
 } from "@/lib/prepared-flow";
-import { formatTxHashes } from "@/lib/format-balance";
 import { formatFlowSummary } from "@/lib/wallet-error";
 import { useMounted } from "@/hooks/use-mounted";
 import { useTransactions } from "@/hooks/use-transactions";
@@ -254,6 +253,8 @@ export function ChatPanel({
               setDismissedFlowKey(flowKey);
             }
 
+            const summary = flowMeta?.flow.summary ?? "Transaction";
+
             if (address && flowMeta?.flow) {
               void addTransaction({
                 address,
@@ -264,11 +265,28 @@ export function ChatPanel({
               });
             }
 
+            const fullHashLine = hashes.join(", ");
+            const requestBody = buildChatRequestBody();
+            const confirmContext = [
+              requestBody.clientContext,
+              "The user signed the prepared wallet transaction successfully.",
+              `Action: ${summary}`,
+              `Full transaction hash(es): ${fullHashLine}`,
+              "Do NOT call get_transaction — confirmation is already complete. Reply with a brief success acknowledgement only.",
+            ]
+              .filter(Boolean)
+              .join("\n");
+
             void sendMessage(
               {
-                text: `Transaction confirmed. Hash${hashes.length > 1 ? "es" : ""}: ${formatTxHashes(hashes)}`,
+                text: `Transaction confirmed. Hash${hashes.length > 1 ? "es" : ""}: ${fullHashLine}`,
               },
-              { body: buildChatRequestBody() },
+              {
+                body: {
+                  ...requestBody,
+                  clientContext: confirmContext,
+                },
+              },
             );
           }}
           onTxReject={() => {

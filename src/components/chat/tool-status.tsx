@@ -129,7 +129,7 @@ export function ToolStatus({
     const tone = getToolErrorTone(rawError, toolName);
 
     return (
-      <p className={TOOL_ERROR_TONE_CLASS[tone]}>{errorText}</p>
+      <p className={`${TOOL_ERROR_TONE_CLASS[tone]} break-words`}>{errorText}</p>
     );
   }
 

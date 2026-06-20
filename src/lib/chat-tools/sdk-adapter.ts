@@ -6,6 +6,11 @@ import {
   type ToolRuntime,
 } from "@andrewkimjoseph/celina-sdk/tools";
 import { checkSendPreflight } from "@/lib/send-preflight";
+import {
+  parseTransactionHash,
+  TRUNCATED_TX_HASH_MESSAGE,
+} from "@/lib/transaction-hash";
+import { z } from "zod";
 
 type CelinaClient = ReturnType<typeof createCelinaClient>;
 
@@ -57,6 +62,26 @@ export function createChatToolsFromSdk(
 
   const tools: ToolSet = {};
   for (const def of definitions) {
+    if (def.name === "get_transaction") {
+      tools[def.name] = dynamicTool({
+        description: def.description,
+        inputSchema: z.object({
+          hash: z
+            .string()
+            .describe("Full Celo transaction hash — 0x followed by 64 hex characters"),
+        }),
+        execute: async (input) => {
+          const params = input as { hash?: string };
+          const hash = parseTransactionHash(String(params.hash ?? ""));
+          if (!hash) {
+            throw new Error(TRUNCATED_TX_HASH_MESSAGE);
+          }
+          return def.handler(runtime, { hash });
+        },
+      });
+      continue;
+    }
+
     tools[def.name] = dynamicTool({
       description: def.description,
       inputSchema: def.inputSchema as unknown as FlexibleSchema<
