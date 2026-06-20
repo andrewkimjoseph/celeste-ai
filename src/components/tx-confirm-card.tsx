@@ -21,6 +21,8 @@ import { useAccount, usePublicClient, useSendTransaction } from "wagmi";
 import { trackEvent } from "@/lib/analytics/amplitude-browser";
 import { categorizeWalletError } from "@/lib/analytics/events";
 import { inferFlowCategory } from "@/lib/analytics/flow-category";
+import { formatTxHash } from "@/lib/format-balance";
+import { celoscanTxUrl } from "@/lib/links";
 
 type CardStatus = "idle" | "signing" | "done" | "error";
 
@@ -49,8 +51,8 @@ const CARD_COPY: Record<
     icon: "wallet",
   },
   done: {
-    title: "Transaction sent",
-    hint: "Your transaction was submitted successfully.",
+    title: "Transaction confirmed",
+    hint: "Saved to your history. Tap a hash to view details.",
     icon: "ready",
   },
   error: {
@@ -213,16 +215,25 @@ export function TxConfirmCard({
         : "Confirm";
 
   const iconStyles =
-    status === "error"
-      ? "bg-red-500/15 text-red-300"
-      : status === "signing"
-        ? "bg-amber-500/25 text-amber-200"
-        : "bg-amber-500/20 text-amber-300";
+    status === "done"
+      ? "bg-emerald-500/20 text-emerald-300"
+      : status === "error"
+        ? "bg-red-500/15 text-red-300"
+        : status === "signing"
+          ? "bg-amber-500/25 text-amber-200"
+          : "bg-amber-500/20 text-amber-300";
 
   const borderStyles =
-    status === "error"
-      ? "border-red-500/25"
-      : "border-amber-500/30";
+    status === "done"
+      ? "border-emerald-500/30"
+      : status === "error"
+        ? "border-red-500/25"
+        : "border-amber-500/30";
+
+  const surfaceStyles =
+    status === "done"
+      ? "from-emerald-500/10"
+      : "from-[var(--warn)]/10";
 
   function handleDismiss() {
     setCompletedHashes([]);
@@ -337,7 +348,7 @@ export function TxConfirmCard({
 
   return (
     <div
-      className={`rounded-xl border bg-gradient-to-b from-[var(--warn)]/10 to-[var(--surface-1)] p-4 shadow-sm ${borderStyles}`}
+      className={`rounded-xl border bg-gradient-to-b ${surfaceStyles} to-[var(--surface-1)] p-4 shadow-sm ${borderStyles}`}
     >
       <div className="flex items-start gap-3">
         <div
@@ -347,7 +358,13 @@ export function TxConfirmCard({
           <CardIcon variant={copy.icon} />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-amber-50">{cardTitle}</p>
+          <p
+            className={`text-sm font-semibold ${
+              status === "done" ? "text-emerald-50" : "text-amber-50"
+            }`}
+          >
+            {cardTitle}
+          </p>
           <p className="mt-1 break-words text-sm leading-relaxed text-zinc-300">
             {displaySummary}
           </p>
@@ -430,6 +447,23 @@ export function TxConfirmCard({
         ))}
       </ol>
 
+      {status === "done" && completedHashes.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-2 border-t border-emerald-500/15 pt-3">
+          {completedHashes.map((hash) => (
+            <a
+              key={hash}
+              href={celoscanTxUrl(hash)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center rounded-md bg-emerald-500/10 px-2.5 py-1 font-mono text-xs text-emerald-100 ring-1 ring-emerald-500/25 transition-colors hover:bg-emerald-500/20"
+              title={hash}
+            >
+              {formatTxHash(hash)}
+            </a>
+          ))}
+        </div>
+      )}
+
       {errorDisplay && (
         <div
           className="mt-3 rounded-lg border border-red-500/25 bg-red-500/10 px-3 py-2.5"
@@ -460,24 +494,26 @@ export function TxConfirmCard({
         </div>
       )}
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        <button
-          type="button"
-          disabled={confirmDisabled}
-          onClick={() => void handleConfirm()}
-          className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-amber-400 disabled:opacity-50"
-        >
-          {confirmLabel}
-        </button>
-        <button
-          type="button"
-          disabled={status === "signing"}
-          onClick={handleDismiss}
-          className="rounded-lg border border-zinc-600 px-4 py-2 text-sm text-zinc-300 transition-colors hover:border-zinc-500 hover:text-white disabled:opacity-50"
-        >
-          Dismiss
-        </button>
-      </div>
+      {status !== "done" && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            disabled={confirmDisabled}
+            onClick={() => void handleConfirm()}
+            className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-amber-400 disabled:opacity-50"
+          >
+            {confirmLabel}
+          </button>
+          <button
+            type="button"
+            disabled={status === "signing"}
+            onClick={handleDismiss}
+            className="rounded-lg border border-zinc-600 px-4 py-2 text-sm text-zinc-300 transition-colors hover:border-zinc-500 hover:text-white disabled:opacity-50"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
     </div>
   );
 }

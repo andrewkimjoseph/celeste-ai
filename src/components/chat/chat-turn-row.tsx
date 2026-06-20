@@ -3,6 +3,7 @@
 import { AssistantLoading } from "@/components/chat/assistant-loading";
 import { ChatMessage } from "@/components/chat/chat-message";
 import type { ChatTurn } from "@/components/chat/chat-utils";
+import { isHiddenChatUserMessage } from "@/lib/prepared-flow";
 
 interface ChatTurnRowProps {
   turn: ChatTurn;
@@ -17,10 +18,11 @@ export function ChatTurnRow({
 }: ChatTurnRowProps) {
   const hasAssistant = Boolean(turn.assistant);
   const showAssistantSlot = hasAssistant || showLoading;
+  const hideUserBubble = turn.user ? isHiddenChatUserMessage(turn.user) : false;
 
   return (
     <div className="flex flex-col gap-4 sm:gap-5">
-      {turn.user ? (
+      {turn.user && !hideUserBubble ? (
         <div className="flex min-w-0 justify-end md:w-1/2 md:self-end md:pl-4 lg:pl-6">
           <ChatMessage
             message={turn.user}

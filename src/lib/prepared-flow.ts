@@ -109,6 +109,10 @@ export function getActivePreparedFlowWithMeta(
 
   for (let i = preparedIndex + 1; i < messages.length; i++) {
     if (messages[i].role === "user") {
+      const text = getMessageText(messages[i]);
+      if (isAutoPreparedFlowUserMessage(text)) {
+        continue;
+      }
       return undefined;
     }
   }
@@ -137,6 +141,18 @@ function isAutoPreparedFlowUserMessage(text: string): boolean {
     text.startsWith(CONFIRMED_TX_PREFIX) ||
     DISMISSED_TX_SNIPPETS.some((snippet) => text.includes(snippet))
   );
+}
+
+/** System-generated user messages after signing or dismissing the confirm card — hidden in chat UI. */
+export function isAutoPreparedFlowUserMessageText(text: string): boolean {
+  return isAutoPreparedFlowUserMessage(text);
+}
+
+export function isHiddenChatUserMessage(message: UIMessage): boolean {
+  if (message.role !== "user") {
+    return false;
+  }
+  return isAutoPreparedFlowUserMessage(getMessageText(message));
 }
 
 function getUserFollowUpsAfterPrepare(

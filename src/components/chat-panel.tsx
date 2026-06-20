@@ -21,6 +21,8 @@ import { inferFlowCategory } from "@/lib/analytics/flow-category";
 import {
   buildPreparedFlowClientContext,
   getActivePreparedFlowWithMeta,
+  getLatestPreparedFlowWithMeta,
+  isHiddenChatUserMessage,
 } from "@/lib/prepared-flow";
 import { formatFlowSummary } from "@/lib/wallet-error";
 import { useMounted } from "@/hooks/use-mounted";
@@ -114,6 +116,18 @@ export function ChatPanel({
         had_tool_calls: responseMeta.had_tool_calls,
         had_prepare_flow: responseMeta.had_prepare_flow,
       });
+
+      const lastUser = [...finishedMessages].reverse().find((m) => m.role === "user");
+      if (lastUser && isHiddenChatUserMessage(lastUser)) {
+        const meta = getLatestPreparedFlowWithMeta(finishedMessages);
+        if (meta) {
+          uiStateRef.current = {
+            ...uiStateRef.current,
+            dismissedFlowKey: meta.flowKey,
+          };
+          setDismissedFlowKey(meta.flowKey);
+        }
+      }
 
       void saveActiveChat(finishedMessages, uiStateRef.current);
     },
@@ -245,14 +259,6 @@ export function ChatPanel({
             void handlePromptSelect(prompt, promptGroup)
           }
           onTxComplete={(hashes) => {
-            if (flowKey) {
-              uiStateRef.current = {
-                ...uiStateRef.current,
-                dismissedFlowKey: flowKey,
-              };
-              setDismissedFlowKey(flowKey);
-            }
-
             const summary = flowMeta?.flow.summary ?? "Transaction";
 
             if (address && flowMeta?.flow) {
@@ -272,15 +278,13 @@ export function ChatPanel({
               "The user signed the prepared wallet transaction successfully.",
               `Action: ${summary}`,
               `Full transaction hash(es): ${fullHashLine}`,
-              "Do NOT call get_transaction — confirmation is already complete. Reply with a brief success acknowledgement only.",
+              "Do NOT call get_transaction — confirmation is already complete. Reply with a brief success acknowledgement only — no hash list, no repeating step details.",
             ]
               .filter(Boolean)
               .join("\n");
 
             void sendMessage(
-              {
-                text: `Transaction confirmed. Hash${hashes.length > 1 ? "es" : ""}: ${fullHashLine}`,
-              },
+              { text: "Transaction confirmed." },
               {
                 body: {
                   ...requestBody,
