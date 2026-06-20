@@ -156,6 +156,10 @@ export function TxConfirmCard({
     preflightBlocked &&
     preflight.status === "ready" &&
     preflight.data.blocksCeloSend === true;
+  const blockedRecipientSend =
+    preflightBlocked &&
+    preflight.status === "ready" &&
+    preflight.data.blockedRecipient === true;
 
   const copy = CARD_COPY[status];
   const displaySummary = formatFlowSummary(summary, recipientLabel);
@@ -180,15 +184,17 @@ export function TxConfirmCard({
       ? "Insufficient CELO for gas"
       : celoSendBlocked
         ? "CELO sends not supported"
-        : preflightBlocked && preflight.status === "ready"
-          ? "Insufficient balance"
-          : flowPreflightBlocked && flowPreflight.status === "ready"
+        : blockedRecipientSend
+          ? "Cannot send here"
+          : preflightBlocked && preflight.status === "ready"
             ? "Insufficient balance"
-            : partialMultiStepError
-              ? "Step incomplete"
-              : status === "error" && errorDisplay
-                ? errorDisplay.title
-                : copy.title;
+            : flowPreflightBlocked && flowPreflight.status === "ready"
+              ? "Insufficient balance"
+              : partialMultiStepError
+                ? "Step incomplete"
+                : status === "error" && errorDisplay
+                  ? errorDisplay.title
+                  : copy.title;
 
   const cardHint =
     status === "signing" && steps.length > 1

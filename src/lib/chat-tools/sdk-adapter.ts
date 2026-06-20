@@ -6,6 +6,7 @@ import {
   type ToolRuntime,
 } from "@andrewkimjoseph/celina-sdk/tools";
 import { checkSendPreflight } from "@/lib/send-preflight";
+import { checkBlockedSendRecipient } from "@/lib/blocked-send-recipients";
 import {
   parseTransactionHash,
   TRUNCATED_TX_HASH_MESSAGE,
@@ -62,6 +63,32 @@ export function createChatToolsFromSdk(
 
   const tools: ToolSet = {};
   for (const def of definitions) {
+    if (def.name === "prepare_send") {
+      tools[def.name] = dynamicTool({
+        description: def.description,
+        inputSchema: def.inputSchema as unknown as FlexibleSchema<
+          Record<string, unknown>
+        >,
+        execute: async (input) => {
+          const params = input as {
+            to?: string;
+            token?: string;
+            amount?: string;
+            from?: string;
+          };
+          const { address: recipient } = await celina.ens.resolveAddressOrEns(
+            String(params.to ?? ""),
+          );
+          const blocked = checkBlockedSendRecipient(recipient);
+          if (!blocked.ok) {
+            throw new Error(blocked.message);
+          }
+          return def.handler(runtime, input as Record<string, unknown>);
+        },
+      });
+      continue;
+    }
+
     if (def.name === "get_transaction") {
       tools[def.name] = dynamicTool({
         description: def.description,

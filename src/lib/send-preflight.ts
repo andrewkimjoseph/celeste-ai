@@ -1,6 +1,12 @@
 import type { createCelinaClient } from "@andrewkimjoseph/celina-sdk";
 import { parseUnits } from "viem";
 import { normalizeRegistryTokenInput } from "@/lib/registry-token";
+import { checkBlockedSendRecipient } from "@/lib/blocked-send-recipients";
+export {
+  checkBlockedSendRecipient,
+  findBlockedSendRecipient,
+  parseSendRecipient,
+} from "@/lib/blocked-send-recipients";
 import {
   minipayFeeSymbolFromBalances,
   minipayGasBufferWei,
@@ -25,6 +31,7 @@ export type SendPreflightResult = {
   celoBalance: string;
   supportsFeeAbstraction?: boolean;
   blocksCeloSend?: boolean;
+  blockedRecipient?: boolean;
   message?: string;
 };
 
@@ -39,13 +46,18 @@ function isCeloSendToken(resolved: { symbol: string }): boolean {
 export function parseSendSummary(summary: string): {
   amount: string;
   token: string;
+  to?: `0x${string}`;
 } | null {
-  const match = summary.match(/^Send\s+([\d.]+)\s+(\S+)\s+to\s/i);
+  const match = summary.match(/^Send\s+([\d.]+)\s+(\S+)\s+to\s+(0x[a-fA-F0-9]{40})/i);
   if (!match) {
     return null;
   }
 
-  return { amount: match[1], token: match[2] };
+  return {
+    amount: match[1],
+    token: match[2],
+    to: match[3] as `0x${string}`,
+  };
 }
 
 export async function checkSendPreflight(
@@ -53,11 +65,28 @@ export async function checkSendPreflight(
   address: `0x${string}`,
   token: string,
   amount: string,
-  options?: SendPreflightOptions,
+  options?: SendPreflightOptions & { to?: `0x${string}` | string },
 ): Promise<SendPreflightResult> {
   const supportsFeeAbstraction = options?.supportsFeeAbstraction === true;
   const blocksCeloSend = options?.blocksCeloSend === true;
   const resolved = celina.token.resolveToken(normalizeRegistryTokenInput(token));
+
+  if (options?.to) {
+    const blocked = checkBlockedSendRecipient(options.to);
+    if (!blocked.ok) {
+      return {
+        ok: false,
+        token: resolved.symbol,
+        amount,
+        tokenBalance: "0",
+        celoBalance: "0",
+        supportsFeeAbstraction,
+        blocksCeloSend,
+        blockedRecipient: true,
+        message: blocked.message,
+      };
+    }
+  }
 
   if (blocksCeloSend && isCeloSendToken(resolved)) {
     return {

@@ -70,6 +70,7 @@ BALANCES:
 - Quote tools are wallet-free — do not skip a quote because balance is zero.
 
 SENDS:
+- prepare_send is for payments to people or wallet addresses only — never to DeFi pool or router contracts.
 - Check balance (get_token_balance or get_stablecoin_balances), then prepare_send. prepare_send enforces balance via preflight.
 - Do not call estimate_send unless the user explicitly asks for gas estimates.
 - Use the connected wallet as from unless the user specifies another address or ENS (resolve_ens first).
@@ -85,8 +86,8 @@ SWAPS:
 8. Uniswap CELO swaps route through WCELO — the wallet needs WCELO balance.
 
 AAVE:
-- get_aave_balances for supplied positions before withdraw (especially max/full).
-- prepare_aave_supply or prepare_aave_withdraw after confirmation.
+- Supply, deposit, or lend → prepare_aave_supply ONLY after user confirms. Never prepare_send to the Aave pool address — direct transfers do not supply and can lose funds.
+- Withdraw → get_aave_balances first, then prepare_aave_withdraw (especially for max/full).
 - CELO supply requires WCELO (ERC-20), not native CELO. Pass token symbols only.
 
 GOODDOLLAR:

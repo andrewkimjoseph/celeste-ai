@@ -1,5 +1,5 @@
 import { isAddress } from "viem";
-import { checkSendPreflight, parseSendSummary } from "@/lib/send-preflight";
+import { checkSendPreflight, parseSendRecipient, parseSendSummary } from "@/lib/send-preflight";
 import { scheduleAmplitudeFlush } from "@/lib/amplitude-flush";
 import { runWithAnalyticsWallet } from "@andrewkimjoseph/celina-sdk";
 import { getCelinaClient } from "@/lib/celina";
@@ -40,6 +40,7 @@ export async function POST(req: Request) {
   const wallet = address as `0x${string}`;
 
   return runWithAnalyticsWallet(wallet, async () => {
+    const recipient = summary ? parseSendRecipient(summary) : undefined;
     const result = await checkSendPreflight(
       celina,
       wallet,
@@ -48,6 +49,7 @@ export async function POST(req: Request) {
       {
         supportsFeeAbstraction: supportsFeeAbstraction === true,
         blocksCeloSend: blocksCeloSend === true,
+        ...(recipient ? { to: recipient } : {}),
       },
     );
 
