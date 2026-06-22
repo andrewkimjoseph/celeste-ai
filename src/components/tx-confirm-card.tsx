@@ -356,7 +356,7 @@ export function TxConfirmCard({
 
   return (
     <div
-      className={`rounded-xl border bg-gradient-to-b ${surfaceStyles} to-[var(--surface-1)] p-4 shadow-sm ${borderStyles}`}
+      className={`w-full min-w-0 max-w-full rounded-xl border bg-gradient-to-b ${surfaceStyles} to-[var(--surface-1)] p-4 shadow-sm ${borderStyles}`}
     >
       <div className="flex items-start gap-3">
         <div

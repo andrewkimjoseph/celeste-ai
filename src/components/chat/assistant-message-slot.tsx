@@ -20,7 +20,7 @@ export function AssistantMessageSlot({
           className="mt-1 shadow-sm ring-2 ring-[var(--accent)]/15"
         />
       ) : (
-        <div className="mt-1 size-7 shrink-0 sm:size-8" aria-hidden />
+        <div className="mt-1 size-8 shrink-0" aria-hidden />
       )}
       <div className="min-w-0 flex-1">
         {showLabel && showAvatar ? (
@@ -36,6 +36,8 @@ export function AssistantMessageSlot({
 
 export function AssistantColumn({ children }: { children: ReactNode }) {
   return (
-    <div className="min-w-0 md:w-1/2 md:pr-4 lg:pr-6">{children}</div>
+    <div className="min-w-0 w-full self-start md:w-1/2 md:pr-4 lg:pr-6">
+      {children}
+    </div>
   );
 }

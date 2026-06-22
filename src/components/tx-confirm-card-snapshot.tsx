@@ -21,7 +21,7 @@ export function TxConfirmCardSnapshot({
   const displaySummary = formatFlowSummary(summary, recipientLabel);
 
   return (
-    <div className="rounded-xl border border-emerald-500/30 bg-gradient-to-b from-emerald-500/10 to-[var(--surface-1)] p-4 shadow-sm">
+    <div className="w-full min-w-0 max-w-full rounded-xl border border-emerald-500/30 bg-gradient-to-b from-emerald-500/10 to-[var(--surface-1)] p-4 shadow-sm">
       <div className="flex items-start gap-3">
         <div
           className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300"
