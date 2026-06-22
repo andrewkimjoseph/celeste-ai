@@ -5,7 +5,7 @@ import {
   type StoredChat,
 } from "@/lib/chats";
 import { celesteDb } from "@/lib/transaction-db";
-import type { UIMessage } from "ai";
+import type { CelesteUIMessage } from "@/lib/chat-message-metadata";
 
 function normalizeAddress(address: string): string {
   return address.toLowerCase();
@@ -46,7 +46,7 @@ export async function deleteChat(id: string): Promise<void> {
 export async function upsertChat(input: {
   id: string;
   address: string;
-  messages: UIMessage[];
+  messages: CelesteUIMessage[];
   uiState: ChatUiState;
   createdAt?: number;
 }): Promise<StoredChat | null> {
@@ -67,6 +67,7 @@ export async function upsertChat(input: {
     dismissedFlowKey: input.uiState.dismissedFlowKey,
     txCardBlockedUntilUserMessage: input.uiState.txCardBlockedUntilUserMessage,
     confirmedFlowHashes: input.uiState.confirmedFlowHashes,
+    confirmedFlowTimestamps: input.uiState.confirmedFlowTimestamps,
     createdAt: existing?.createdAt ?? input.createdAt ?? now,
     updatedAt: now,
   };

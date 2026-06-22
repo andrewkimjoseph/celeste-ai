@@ -1,11 +1,16 @@
 "use client";
 
-import type { UIMessage } from "ai";
+import type { CelesteUIMessage } from "@/lib/chat-message-metadata";
+import {
+  formatMessageTimestamp,
+  getMessageCreatedAt,
+  MESSAGE_TIMESTAMP_CLASS,
+} from "@/lib/chat-message-metadata";
 import { CelesteLogoAvatar } from "@/components/celeste-logo";
 import { MessagePart } from "@/components/chat/message-part";
 
 interface ChatMessageProps {
-  message: UIMessage;
+  message: CelesteUIMessage;
   hidePrepareToolDone?: boolean;
   align?: "start" | "end";
 }
@@ -17,6 +22,9 @@ export function ChatMessage({
 }: ChatMessageProps) {
   const isUser = message.role === "user";
   const messageAlign = align ?? (isUser ? "end" : "start");
+  const createdAt = getMessageCreatedAt(message);
+  const timestampLabel =
+    createdAt != null ? formatMessageTimestamp(createdAt) : null;
 
   return (
     <div
@@ -45,13 +53,37 @@ export function ChatMessage({
           messageAlign === "end" ? "w-fit max-w-full" : "min-w-0 flex-1"
         }`}
       >
-        <p
-          className={`mb-1.5 text-[11px] font-medium tracking-wide ${
-            isUser ? "sr-only" : "text-zinc-500"
-          }`}
-        >
-          {isUser ? "You" : "Celeste AI"}
-        </p>
+        {timestampLabel ? (
+          isUser ? (
+            <p
+              className={`mb-1.5 text-right ${MESSAGE_TIMESTAMP_CLASS}`}
+            >
+              <time dateTime={new Date(createdAt!).toISOString()}>
+                {timestampLabel}
+              </time>
+            </p>
+          ) : (
+            <div className="mb-1.5 flex items-baseline justify-between gap-2">
+              <p className="text-[11px] font-medium tracking-wide text-zinc-500">
+                Celeste AI
+              </p>
+              <time
+                dateTime={new Date(createdAt!).toISOString()}
+                className={MESSAGE_TIMESTAMP_CLASS}
+              >
+                {timestampLabel}
+              </time>
+            </div>
+          )
+        ) : (
+          <p
+            className={`mb-1.5 text-[11px] font-medium tracking-wide ${
+              isUser ? "sr-only" : "text-zinc-500"
+            }`}
+          >
+            {isUser ? "You" : "Celeste AI"}
+          </p>
+        )}
         <div
           className={`space-y-2 break-words rounded-2xl px-3.5 py-2.5 shadow-sm [overflow-wrap:anywhere] sm:px-4 sm:py-3 ${
             isUser

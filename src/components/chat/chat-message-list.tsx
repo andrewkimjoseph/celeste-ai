@@ -1,6 +1,6 @@
 "use client";
 
-import type { ChatStatus, UIMessage } from "ai";
+import type { ChatStatus } from "ai";
 import { useEffect, useRef } from "react";
 import { AssistantLoading } from "@/components/chat/assistant-loading";
 import { AssistantColumn, AssistantMessageSlot } from "@/components/chat/assistant-message-slot";
@@ -10,6 +10,7 @@ import {
   groupMessagesIntoTurns,
   shouldShowAssistantLoading,
 } from "@/components/chat/chat-utils";
+import type { CelesteUIMessage } from "@/lib/chat-message-metadata";
 import type { PreparedFlowWithExtras } from "@/lib/prepared-flow";
 import {
   getPreparedFlowMetasForMessage,
@@ -63,7 +64,7 @@ const SUGGESTED_PROMPT_GROUPS = [
 ] as const;
 
 interface ChatMessageListProps {
-  messages: UIMessage[];
+  messages: CelesteUIMessage[];
   status: ChatStatus;
   mounted: boolean;
   isConnected: boolean;
@@ -71,6 +72,7 @@ interface ChatMessageListProps {
   errorMessage: string | null;
   showTxCard: boolean;
   confirmedFlowHashes: Record<string, string[]>;
+  confirmedFlowTimestamps: Record<string, number>;
   pendingFlow: PreparedFlowWithExtras | undefined;
   txCardFlowKey: string | null;
   onPromptSelect: (prompt: string, promptGroup?: PromptGroup) => void;
@@ -87,6 +89,7 @@ export function ChatMessageList({
   errorMessage,
   showTxCard,
   confirmedFlowHashes,
+  confirmedFlowTimestamps,
   pendingFlow,
   txCardFlowKey,
   onPromptSelect,
@@ -264,6 +267,7 @@ export function ChatMessageList({
                     steps={meta.flow.steps}
                     recipientLabel={recipientLabel}
                     hashes={confirmedFlowHashes[meta.flowKey] ?? []}
+                    confirmedAt={confirmedFlowTimestamps[meta.flowKey]}
                   />
                 </AssistantMessageSlot>
               </AssistantColumn>
@@ -288,6 +292,11 @@ export function ChatMessageList({
               recipientLabel={recipientLabel}
               warnings={pendingFlow.warnings}
               deepLink={pendingFlow.deep_link}
+              confirmedAt={
+                txCardFlowKey
+                  ? confirmedFlowTimestamps[txCardFlowKey]
+                  : undefined
+              }
               onComplete={onTxComplete}
               onDismiss={onTxReject}
             />

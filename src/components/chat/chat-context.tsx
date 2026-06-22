@@ -15,7 +15,7 @@ import {
   upsertChat,
 } from "@/lib/chat-db";
 import { trackEvent } from "@/lib/analytics/amplitude-browser";
-import type { UIMessage } from "ai";
+import type { CelesteUIMessage } from "@/lib/chat-message-metadata";
 import {
   createContext,
   useCallback,
@@ -40,7 +40,7 @@ interface ChatContextValue {
   selectChat: (id: string) => Promise<void>;
   deleteChat: (id: string) => Promise<void>;
   saveActiveChat: (
-    messages: UIMessage[],
+    messages: CelesteUIMessage[],
     uiState: ChatUiState,
   ) => Promise<void>;
 }
@@ -103,6 +103,7 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
             dismissedFlowKey: chat.dismissedFlowKey,
             txCardBlockedUntilUserMessage: chat.txCardBlockedUntilUserMessage,
             confirmedFlowHashes: chat.confirmedFlowHashes,
+            confirmedFlowTimestamps: chat.confirmedFlowTimestamps,
           },
         });
 
@@ -152,6 +153,7 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
           dismissedFlowKey: uiState.dismissedFlowKey,
           txCardBlockedUntilUserMessage: uiState.txCardBlockedUntilUserMessage,
           confirmedFlowHashes: uiState.confirmedFlowHashes,
+          confirmedFlowTimestamps: uiState.confirmedFlowTimestamps,
         };
       } catch (error) {
         console.warn("Celeste chat load failed:", error);
@@ -190,6 +192,7 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
             txCardBlockedUntilUserMessage:
               uiState.txCardBlockedUntilUserMessage,
             confirmedFlowHashes: uiState.confirmedFlowHashes,
+            confirmedFlowTimestamps: uiState.confirmedFlowTimestamps,
           });
           return;
         }
@@ -217,7 +220,7 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
   }, [address, walletAddress]);
 
   const saveActiveChat = useCallback(
-    async (messages: UIMessage[], uiState: ChatUiState) => {
+    async (messages: CelesteUIMessage[], uiState: ChatUiState) => {
       const current = activeChatRef.current;
       if (!current || !address) {
         return;
@@ -229,6 +232,7 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
         dismissedFlowKey: uiState.dismissedFlowKey,
         txCardBlockedUntilUserMessage: uiState.txCardBlockedUntilUserMessage,
         confirmedFlowHashes: uiState.confirmedFlowHashes,
+        confirmedFlowTimestamps: uiState.confirmedFlowTimestamps,
       };
 
       activeChatRef.current = next;
@@ -313,6 +317,7 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
           dismissedFlowKey: uiState.dismissedFlowKey,
           txCardBlockedUntilUserMessage: uiState.txCardBlockedUntilUserMessage,
           confirmedFlowHashes: uiState.confirmedFlowHashes,
+          confirmedFlowTimestamps: uiState.confirmedFlowTimestamps,
         };
         activeChatRef.current = next;
         setActiveChat(next);

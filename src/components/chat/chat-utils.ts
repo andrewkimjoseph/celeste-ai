@@ -1,14 +1,15 @@
-import { isTextUIPart, isToolUIPart, type ChatStatus, type UIMessage } from "ai";
+import { isTextUIPart, isToolUIPart, type ChatStatus } from "ai";
+import type { CelesteUIMessage } from "@/lib/chat-message-metadata";
 
 export type ChatTurn = {
   id: string;
-  user?: UIMessage;
-  assistant?: UIMessage;
+  user?: CelesteUIMessage;
+  assistant?: CelesteUIMessage;
 };
 
-export function groupMessagesIntoTurns(messages: UIMessage[]): ChatTurn[] {
+export function groupMessagesIntoTurns(messages: CelesteUIMessage[]): ChatTurn[] {
   const turns: ChatTurn[] = [];
-  let pendingUser: UIMessage | undefined;
+  let pendingUser: CelesteUIMessage | undefined;
 
   for (const message of messages) {
     if (message.role === "user") {
@@ -48,7 +49,7 @@ export function formatChatError(message: string): string {
   return message;
 }
 
-function messageHasVisibleAssistantContent(message: UIMessage): boolean {
+function messageHasVisibleAssistantContent(message: CelesteUIMessage): boolean {
   if (!message.parts?.length) {
     return false;
   }
@@ -71,7 +72,7 @@ function messageHasVisibleAssistantContent(message: UIMessage): boolean {
 
 export function shouldShowAssistantLoading(
   status: ChatStatus,
-  messages: UIMessage[],
+  messages: CelesteUIMessage[],
 ): boolean {
   if (status === "submitted") {
     return true;
@@ -97,7 +98,7 @@ const ENS_RECIPIENT =
   /\b([a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*\.(?:celo\.)?eth)\b/i;
 
 /** Pull the most recent ENS recipient mentioned in chat (matches assistant copy). */
-export function extractRecipientLabel(messages: UIMessage[]): string | undefined {
+export function extractRecipientLabel(messages: CelesteUIMessage[]): string | undefined {
   for (let i = messages.length - 1; i >= 0; i--) {
     const message = messages[i];
     if (!message.parts?.length) {

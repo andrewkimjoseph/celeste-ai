@@ -1,4 +1,8 @@
 import type { PreparedTx } from "@/lib/prepared-flow";
+import {
+  formatMessageTimestamp,
+  MESSAGE_TIMESTAMP_CLASS,
+} from "@/lib/chat-message-metadata";
 import { formatFlowSummary } from "@/lib/wallet-error";
 import { formatTransactionStep } from "@/lib/transaction-display";
 import { formatTxHash } from "@/lib/format-balance";
@@ -9,6 +13,7 @@ interface TxConfirmCardSnapshotProps {
   steps: PreparedTx[];
   recipientLabel?: string;
   hashes: string[];
+  confirmedAt?: number;
 }
 
 /** Read-only green success card pinned in chat history after signing. */
@@ -17,8 +22,11 @@ export function TxConfirmCardSnapshot({
   steps,
   recipientLabel,
   hashes,
+  confirmedAt,
 }: TxConfirmCardSnapshotProps) {
   const displaySummary = formatFlowSummary(summary, recipientLabel);
+  const timestampLabel =
+    confirmedAt != null ? formatMessageTimestamp(confirmedAt) : null;
 
   return (
     <div className="w-full min-w-0 max-w-full rounded-xl border border-emerald-500/30 bg-gradient-to-b from-emerald-500/10 to-[var(--surface-1)] p-4 shadow-sm">
@@ -42,9 +50,19 @@ export function TxConfirmCardSnapshot({
           </svg>
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-emerald-50">
-            Transaction confirmed
-          </p>
+          <div className="flex items-baseline justify-between gap-2">
+            <p className="text-sm font-semibold text-emerald-50">
+              Transaction confirmed
+            </p>
+            {timestampLabel ? (
+              <time
+                dateTime={new Date(confirmedAt!).toISOString()}
+                className={MESSAGE_TIMESTAMP_CLASS}
+              >
+                {timestampLabel}
+              </time>
+            ) : null}
+          </div>
           <p className="mt-1 break-words text-sm leading-relaxed text-zinc-300">
             {displaySummary}
           </p>

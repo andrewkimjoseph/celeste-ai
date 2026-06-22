@@ -1,5 +1,6 @@
-import { isTextUIPart, type UIMessage } from "ai";
+import { isTextUIPart } from "ai";
 import { getActivePreparedFlowWithMeta, isPreparedFlowConfirmed } from "@/lib/prepared-flow";
+import type { CelesteUIMessage } from "@/lib/chat-message-metadata";
 
 export const MAX_CHATS_PER_WALLET = 50;
 
@@ -9,16 +10,18 @@ export type ChatUiState = {
   dismissedFlowKey: string | null;
   txCardBlockedUntilUserMessage: boolean;
   confirmedFlowHashes: Record<string, string[]>;
+  confirmedFlowTimestamps: Record<string, number>;
 };
 
 export type StoredChat = {
   id: string;
   address: string;
   title: string;
-  messages: UIMessage[];
+  messages: CelesteUIMessage[];
   dismissedFlowKey: string | null;
   txCardBlockedUntilUserMessage: boolean;
   confirmedFlowHashes?: Record<string, string[]>;
+  confirmedFlowTimestamps?: Record<string, number>;
   createdAt: number;
   updatedAt: number;
 };
@@ -32,13 +35,14 @@ export type ChatListItem = {
 
 export type ActiveChatState = {
   id: string;
-  messages: UIMessage[];
+  messages: CelesteUIMessage[];
   dismissedFlowKey: string | null;
   txCardBlockedUntilUserMessage: boolean;
   confirmedFlowHashes: Record<string, string[]>;
+  confirmedFlowTimestamps: Record<string, number>;
 };
 
-export function deriveChatTitle(messages: UIMessage[]): string {
+export function deriveChatTitle(messages: CelesteUIMessage[]): string {
   for (const message of messages) {
     if (message.role !== "user") {
       continue;
@@ -70,11 +74,11 @@ export function toChatListItem(chat: StoredChat): ChatListItem {
 
 /** Restore tx-card UI state; block stale unsigned prepares after reload. */
 export function resolveChatUiState(
-  messages: UIMessage[],
+  messages: CelesteUIMessage[],
   stored?: Partial<
     Pick<
       StoredChat,
-      "dismissedFlowKey" | "txCardBlockedUntilUserMessage" | "confirmedFlowHashes"
+      "dismissedFlowKey" | "txCardBlockedUntilUserMessage" | "confirmedFlowHashes" | "confirmedFlowTimestamps"
     >
   >,
 ): ChatUiState {
@@ -85,6 +89,7 @@ export function resolveChatUiState(
   let txCardBlockedUntilUserMessage =
     stored?.txCardBlockedUntilUserMessage ?? false;
   const confirmedFlowHashes = stored?.confirmedFlowHashes ?? {};
+  const confirmedFlowTimestamps = stored?.confirmedFlowTimestamps ?? {};
 
   if (
     meta &&
@@ -95,7 +100,12 @@ export function resolveChatUiState(
     txCardBlockedUntilUserMessage = true;
   }
 
-  return { dismissedFlowKey, txCardBlockedUntilUserMessage, confirmedFlowHashes };
+  return {
+    dismissedFlowKey,
+    txCardBlockedUntilUserMessage,
+    confirmedFlowHashes,
+    confirmedFlowTimestamps,
+  };
 }
 
 export function createEmptyActiveChat(id: string): ActiveChatState {
@@ -105,5 +115,6 @@ export function createEmptyActiveChat(id: string): ActiveChatState {
     dismissedFlowKey: null,
     txCardBlockedUntilUserMessage: false,
     confirmedFlowHashes: {},
+    confirmedFlowTimestamps: {},
   };
 }

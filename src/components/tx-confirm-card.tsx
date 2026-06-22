@@ -23,6 +23,10 @@ import { categorizeWalletError } from "@/lib/analytics/events";
 import { inferFlowCategory } from "@/lib/analytics/flow-category";
 import { formatTxHash } from "@/lib/format-balance";
 import { celoscanTxUrl } from "@/lib/links";
+import {
+  formatMessageTimestamp,
+  MESSAGE_TIMESTAMP_CLASS,
+} from "@/lib/chat-message-metadata";
 
 type CardStatus = "idle" | "signing" | "done" | "error";
 
@@ -32,6 +36,7 @@ interface TxConfirmCardProps {
   recipientLabel?: string;
   warnings?: string[];
   deepLink?: string;
+  confirmedAt?: number;
   initialCompleted?: boolean;
   initialCompletedHashes?: string[];
   onComplete: (hashes: string[]) => void;
@@ -124,6 +129,7 @@ export function TxConfirmCard({
   recipientLabel,
   warnings,
   deepLink,
+  confirmedAt: confirmedAtProp,
   initialCompleted = false,
   initialCompletedHashes = [],
   onComplete,
@@ -135,6 +141,9 @@ export function TxConfirmCard({
   const [signingStepIndex, setSigningStepIndex] = useState(0);
   const [completedHashes, setCompletedHashes] = useState<string[]>(
     initialCompletedHashes,
+  );
+  const [confirmedAt, setConfirmedAt] = useState<number | undefined>(
+    confirmedAtProp,
   );
   const [revertedOnChain, setRevertedOnChain] = useState(false);
   const [errorDisplay, setErrorDisplay] = useState<SimulationErrorDisplay | null>(
@@ -337,6 +346,8 @@ export function TxConfirmCard({
       }
 
       setStatus("done");
+      const nextConfirmedAt = Date.now();
+      setConfirmedAt(nextConfirmedAt);
       trackEvent("tx_confirmed", {
         step_count: steps.length,
         hash_count: sessionHashes.length,
@@ -354,6 +365,12 @@ export function TxConfirmCard({
     }
   }
 
+  const displayConfirmedAt = confirmedAtProp ?? confirmedAt;
+  const timestampLabel =
+    status === "done" && displayConfirmedAt != null
+      ? formatMessageTimestamp(displayConfirmedAt)
+      : null;
+
   return (
     <div
       className={`w-full min-w-0 max-w-full rounded-xl border bg-gradient-to-b ${surfaceStyles} to-[var(--surface-1)] p-4 shadow-sm ${borderStyles}`}
@@ -366,13 +383,23 @@ export function TxConfirmCard({
           <CardIcon variant={copy.icon} />
         </div>
         <div className="min-w-0 flex-1">
-          <p
-            className={`text-sm font-semibold ${
-              status === "done" ? "text-emerald-50" : "text-amber-50"
-            }`}
-          >
-            {cardTitle}
-          </p>
+          <div className="flex items-baseline justify-between gap-2">
+            <p
+              className={`text-sm font-semibold ${
+                status === "done" ? "text-emerald-50" : "text-amber-50"
+              }`}
+            >
+              {cardTitle}
+            </p>
+            {timestampLabel ? (
+              <time
+                dateTime={new Date(displayConfirmedAt!).toISOString()}
+                className={MESSAGE_TIMESTAMP_CLASS}
+              >
+                {timestampLabel}
+              </time>
+            ) : null}
+          </div>
           <p className="mt-1 break-words text-sm leading-relaxed text-zinc-300">
             {displaySummary}
           </p>

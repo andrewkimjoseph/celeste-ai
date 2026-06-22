@@ -29,6 +29,11 @@ import { useTransactions } from "@/hooks/use-transactions";
 import { useWalletBalances } from "@/hooks/use-wallet-balances";
 import { useWalletCapabilities } from "@/hooks/use-wallet-capabilities";
 import { formatWalletBalanceSnapshot } from "@/lib/chat-tools/system-prompt";
+import {
+  type CelesteUIMessage,
+  createMessageMetadata,
+  messageMetadataSchema,
+} from "@/lib/chat-message-metadata";
 
 interface ChatPanelProps {
   address?: `0x${string}`;
@@ -65,6 +70,9 @@ export function ChatPanel({
   const [confirmedFlowHashes, setConfirmedFlowHashes] = useState<
     Record<string, string[]>
   >({});
+  const [confirmedFlowTimestamps, setConfirmedFlowTimestamps] = useState<
+    Record<string, number>
+  >({});
   const chatSendStartedAtRef = useRef<number | null>(null);
   const lastTrackedErrorRef = useRef<string | null>(null);
   const hydratedChatIdRef = useRef<string | null>(null);
@@ -72,6 +80,7 @@ export function ChatPanel({
     dismissedFlowKey: null as string | null,
     txCardBlockedUntilUserMessage: false,
     confirmedFlowHashes: {} as Record<string, string[]>,
+    confirmedFlowTimestamps: {} as Record<string, number>,
   });
 
   useEffect(() => {
@@ -87,6 +96,7 @@ export function ChatPanel({
     setDismissedFlowKey(activeChat.dismissedFlowKey);
     setTxCardBlockedUntilUserMessage(activeChat.txCardBlockedUntilUserMessage);
     setConfirmedFlowHashes(activeChat.confirmedFlowHashes);
+    setConfirmedFlowTimestamps(activeChat.confirmedFlowTimestamps);
     setInput("");
   }, [activeChatId, activeChat]);
 
@@ -95,17 +105,19 @@ export function ChatPanel({
       dismissedFlowKey,
       txCardBlockedUntilUserMessage,
       confirmedFlowHashes,
+      confirmedFlowTimestamps,
     };
-  }, [dismissedFlowKey, txCardBlockedUntilUserMessage, confirmedFlowHashes]);
+  }, [dismissedFlowKey, txCardBlockedUntilUserMessage, confirmedFlowHashes, confirmedFlowTimestamps]);
 
   const transport = useMemo(
     () => new DefaultChatTransport({ api: "/api/chat" }),
     [],
   );
 
-  const { messages, sendMessage, status, error } = useChat({
+  const { messages, sendMessage, status, error } = useChat<CelesteUIMessage>({
     id: activeChatId ?? undefined,
     messages: activeChat?.messages,
+    messageMetadataSchema,
     transport,
     onFinish: ({ message, messages: finishedMessages, isError }) => {
       if (isError) {
@@ -191,7 +203,10 @@ export function ChatPanel({
     clearTxCardBlock();
     setInput("");
     trackChatMessageSent(text, "composer");
-    await sendMessage({ text }, { body: buildChatRequestBody() });
+    await sendMessage(
+      { text, metadata: createMessageMetadata() },
+      { body: buildChatRequestBody() },
+    );
   }
 
   async function handlePromptSelect(prompt: string, promptGroup?: PromptGroup) {
@@ -202,7 +217,10 @@ export function ChatPanel({
 
     clearTxCardBlock();
     trackChatMessageSent(prompt, "suggestion", promptGroup);
-    await sendMessage({ text: prompt }, { body: buildChatRequestBody() });
+    await sendMessage(
+      { text: prompt, metadata: createMessageMetadata() },
+      { body: buildChatRequestBody() },
+    );
   }
 
   const handleNewChat = useCallback(() => {
@@ -253,6 +271,7 @@ export function ChatPanel({
           errorMessage={error ? formatChatError(error.message) : null}
           showTxCard={showTxCard}
           confirmedFlowHashes={confirmedFlowHashes}
+          confirmedFlowTimestamps={confirmedFlowTimestamps}
           pendingFlow={pendingFlowMeta?.flow}
           txCardFlowKey={flowKey}
           onPromptSelect={(prompt, promptGroup) =>
@@ -262,15 +281,22 @@ export function ChatPanel({
             const summary = pendingFlowMeta?.flow.summary ?? "Transaction";
 
             if (flowKey) {
+              const confirmedAt = Date.now();
               const nextConfirmed = {
                 ...uiStateRef.current.confirmedFlowHashes,
                 [flowKey]: hashes,
               };
+              const nextTimestamps = {
+                ...uiStateRef.current.confirmedFlowTimestamps,
+                [flowKey]: confirmedAt,
+              };
               uiStateRef.current = {
                 ...uiStateRef.current,
                 confirmedFlowHashes: nextConfirmed,
+                confirmedFlowTimestamps: nextTimestamps,
               };
               setConfirmedFlowHashes(nextConfirmed);
+              setConfirmedFlowTimestamps(nextTimestamps);
             }
 
             if (address && pendingFlowMeta?.flow) {
@@ -296,7 +322,10 @@ export function ChatPanel({
               .join("\n");
 
             void sendMessage(
-              { text: "Transaction confirmed." },
+              {
+                text: "Transaction confirmed.",
+                metadata: createMessageMetadata(),
+              },
               {
                 body: {
                   ...requestBody,
@@ -331,6 +360,7 @@ export function ChatPanel({
                 text: actionLabel
                   ? `Cancelled signing — was: ${actionLabel}`
                   : "Cancelled signing on the confirmation card.",
+                metadata: createMessageMetadata(),
               },
               { body: buildChatRequestBody() },
             );
