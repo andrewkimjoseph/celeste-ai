@@ -21,6 +21,13 @@ const BALANCE_TOOLS = new Set([
   "get_account",
 ]);
 
+function formatQuoteToken(symbol: string): string {
+  if (symbol === "GoodDollar") {
+    return "G$";
+  }
+  return symbol;
+}
+
 function formatSwapQuote(output: unknown): string | null {
   if (typeof output !== "object" || output === null) {
     return null;
@@ -40,17 +47,18 @@ function formatSwapQuote(output: unknown): string | null {
     return null;
   }
 
+  const tokenIn = formatQuoteToken(quote.tokenIn);
+  const tokenOut = formatQuoteToken(quote.tokenOut);
+
   const via =
     quote.protocol === "uniswap_v4"
       ? " via Uniswap"
       : quote.protocol === "mento_fx"
         ? " via Mento"
-        : quote.protocol === "gooddollar_reserve"
-          ? " via GoodDollar reserve"
-          : "";
+        : "";
 
   return formatHumanFlowText(
-    `${quote.amountIn} ${quote.tokenIn} → ${amountOut} ${quote.tokenOut}${via}`,
+    `${quote.amountIn} ${tokenIn} → ${amountOut} ${tokenOut}${via}`,
   );
 }
 
@@ -170,6 +178,8 @@ export function ToolStatus({
         ? formatEstimateSendNotice(part.output)
         : null;
 
+    const detailSummary = swapQuoteSummary ?? governanceSummary;
+
     if (estimateSendNotice) {
       return (
         <p className={TOOL_ERROR_TONE_CLASS.notice}>{estimateSendNotice}</p>
@@ -178,17 +188,18 @@ export function ToolStatus({
 
     return (
       <div className="space-y-2">
-        <div className="inline-flex items-center gap-1.5 rounded-full border border-[var(--accent-soft-border)] bg-[var(--accent-soft)] px-2.5 py-1 text-[11px] font-medium text-[var(--accent-soft-text)]">
-          <span className="text-[var(--accent-hover)]" aria-hidden>
-            ✓
-          </span>
-          {labels.done}
-          {swapQuoteSummary && (
-            <span className="text-[var(--accent-soft-text)]/80">· {swapQuoteSummary}</span>
-          )}
-          {governanceSummary && (
-            <span className="text-[var(--accent-soft-text)]/80">· {governanceSummary}</span>
-          )}
+        <div className="min-w-0 space-y-1">
+          <div className="inline-flex w-fit max-w-full shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-[var(--accent-soft-border)] bg-[var(--accent-soft)] px-2.5 py-1 text-[11px] font-medium text-[var(--accent-soft-text)]">
+            <span className="text-[var(--accent-hover)]" aria-hidden>
+              ✓
+            </span>
+            {labels.done}
+          </div>
+          {detailSummary ? (
+            <p className="text-[11px] leading-snug text-[var(--accent-soft-text)]/80 break-words">
+              {detailSummary}
+            </p>
+          ) : null}
         </div>
 
         {balanceRows.length > 0 && (
