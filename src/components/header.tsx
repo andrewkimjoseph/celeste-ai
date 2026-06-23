@@ -64,7 +64,7 @@ function HistoryButton({
 }: {
   isConnected: boolean;
 }) {
-  const { chats, openHistory } = useChats();
+  const { openHistory } = useChats();
 
   if (!isConnected) {
     return null;
@@ -75,7 +75,7 @@ function HistoryButton({
       type="button"
       onClick={openHistory}
       aria-label="View chat history"
-      className="relative flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-zinc-400 transition-colors hover:border-zinc-600 hover:text-white sm:h-auto sm:w-auto sm:rounded-lg sm:px-3 sm:py-1.5 lg:hidden"
+      className="flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-zinc-400 transition-colors hover:border-zinc-600 hover:text-white sm:h-auto sm:w-auto sm:rounded-lg sm:px-3 sm:py-1.5 lg:hidden"
     >
       <svg
         className="size-4 sm:mr-1.5"
@@ -92,17 +92,6 @@ function HistoryButton({
         />
       </svg>
       <span className="hidden sm:inline text-xs">History</span>
-      {chats.length > 0 && (
-        <span
-          className={`absolute -right-1 -top-1 inline-flex shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[10px] font-semibold tabular-nums leading-none text-[var(--accent-foreground)] sm:static sm:ml-1.5 ${
-            chats.length > 9
-              ? "h-4 min-w-[1.125rem] px-1 sm:h-5 sm:min-w-[1.375rem]"
-              : "size-4 sm:size-5"
-          }`}
-        >
-          {chats.length > 9 ? "9+" : chats.length}
-        </span>
-      )}
     </button>
   );
 }
@@ -130,7 +119,7 @@ function TransactionsButton({
       type="button"
       onClick={handleOpenDrawer}
       aria-label="View transactions"
-      className="relative flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-zinc-400 transition-colors hover:border-zinc-600 hover:text-white sm:h-auto sm:w-auto sm:rounded-lg sm:px-3 sm:py-1.5"
+      className="flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-zinc-400 transition-colors hover:border-zinc-600 hover:text-white sm:h-auto sm:w-auto sm:rounded-lg sm:px-3 sm:py-1.5"
     >
       <svg
         className="size-4 sm:mr-1.5"
@@ -147,17 +136,6 @@ function TransactionsButton({
         />
       </svg>
       <span className="hidden sm:inline text-xs">Transactions</span>
-      {transactions.length > 0 && (
-        <span
-          className={`absolute -right-1 -top-1 inline-flex shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[10px] font-semibold tabular-nums leading-none text-[var(--accent-foreground)] sm:static sm:ml-1.5 ${
-            transactions.length > 9
-              ? "h-4 min-w-[1.125rem] px-1 sm:h-5 sm:min-w-[1.375rem]"
-              : "size-4 sm:size-5"
-          }`}
-        >
-          {transactions.length > 9 ? "9+" : transactions.length}
-        </span>
-      )}
     </button>
   );
 }
