@@ -1,7 +1,29 @@
 "use client";
 
 import type { WalletBalancesResponse } from "@/lib/balances";
-import { useQuery } from "@tanstack/react-query";
+import {
+  type QueryClient,
+  useQuery,
+} from "@tanstack/react-query";
+
+export const WALLET_BALANCES_QUERY_KEY = "wallet-balances";
+export const WALLET_BALANCES_STALE_MS = 120_000;
+
+export function walletBalancesQueryKey(
+  address: `0x${string}`,
+  includeZero = false,
+) {
+  return [WALLET_BALANCES_QUERY_KEY, address, includeZero] as const;
+}
+
+export function invalidateWalletBalances(
+  queryClient: QueryClient,
+  address: `0x${string}`,
+) {
+  return queryClient.invalidateQueries({
+    queryKey: [WALLET_BALANCES_QUERY_KEY, address],
+  });
+}
 
 async function fetchWalletBalances(
   address: `0x${string}`,
@@ -27,11 +49,13 @@ export function useWalletBalances(
   includeZero = false,
 ) {
   const query = useQuery({
-    queryKey: ["wallet-balances", address, includeZero],
+    queryKey: walletBalancesQueryKey(address!, includeZero),
     queryFn: () => fetchWalletBalances(address!, includeZero),
     enabled: Boolean(address),
-    staleTime: 30_000,
-    refetchOnWindowFocus: true,
+    staleTime: WALLET_BALANCES_STALE_MS,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
   });
 
   return {

@@ -24,9 +24,13 @@ import {
   isPreparedFlowSigned,
 } from "@/lib/prepared-flow";
 import { formatFlowSummary } from "@/lib/wallet-error";
+import { useQueryClient } from "@tanstack/react-query";
 import { useMounted } from "@/hooks/use-mounted";
 import { useTransactions } from "@/hooks/use-transactions";
-import { useWalletBalances } from "@/hooks/use-wallet-balances";
+import {
+  invalidateWalletBalances,
+  useWalletBalances,
+} from "@/hooks/use-wallet-balances";
 import { useWalletCapabilities } from "@/hooks/use-wallet-capabilities";
 import { formatWalletBalanceSnapshot } from "@/lib/chat-tools/system-prompt";
 import {
@@ -54,6 +58,7 @@ export function ChatPanel({
   const mounted = mountedProp ?? mountedInternal;
   const isConnected = isConnectedProp ?? false;
   const canChat = mounted && isConnected && Boolean(address);
+  const queryClient = useQueryClient();
   const { addTransaction } = useTransactions();
   const { supportsFeeAbstraction, blocksCeloSend } = useWalletCapabilities();
   const { data: walletBalances } = useWalletBalances(address);
@@ -327,6 +332,10 @@ export function ChatPanel({
                 steps: pendingFlowMeta.flow.steps.map((step) => step.description),
                 status: "confirmed",
               });
+            }
+
+            if (address) {
+              void invalidateWalletBalances(queryClient, address);
             }
 
             const fullHashLine = hashes.join(", ");
