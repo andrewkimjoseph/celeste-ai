@@ -183,20 +183,15 @@ export function Header({
               <h1 className="truncate text-base font-semibold text-white sm:text-lg">
                 Celeste AI
               </h1>
-              <span
-                className="inline-flex items-center rounded-full border border-[var(--surface-2)] px-1.5 py-0.5"
-                aria-label="Celo mainnet"
+              {/* eslint-disable-next-line @next/next/no-img-element -- brand SVG in public/ */}
+              <img
+                src="/celo_symbol.svg"
+                alt="Celo mainnet"
+                width={14}
+                height={14}
+                className="size-3.5 shrink-0 object-contain"
                 title="Celo mainnet"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element -- brand SVG in public/ */}
-                <img
-                  src="/celo_symbol.svg"
-                  alt=""
-                  width={20}
-                  height={20}
-                  className="size-5 object-contain"
-                />
-              </span>
+              />
               <span className="rounded-full border border-[var(--surface-2)] px-2 py-0.5 text-[10px] font-medium text-zinc-400">
                 {CELESTE_VERSION}
               </span>
