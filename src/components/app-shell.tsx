@@ -19,6 +19,7 @@ function AppShellContent() {
   const { activeChatId } = useChats();
   const [navShowNewChat, setNavShowNewChat] = useState(false);
   const [navOnNewChat, setNavOnNewChat] = useState<(() => void) | undefined>();
+  const [isLanding, setIsLanding] = useState(false);
 
   const handleNavStateChange = useCallback(
     (showNewChat: boolean, onNewChat: () => void) => {
@@ -27,6 +28,10 @@ function AppShellContent() {
     },
     [],
   );
+
+  const handleLandingStateChange = useCallback((landing: boolean) => {
+    setIsLanding(landing);
+  }, []);
 
   return (
     <>
@@ -48,6 +53,7 @@ function AppShellContent() {
               isConnected={isConnected}
               mounted={mounted}
               variant="mobile-collapsible"
+              hiddenOnLanding={isLanding}
             />
           </div>
           <ChatPanel
@@ -56,6 +62,7 @@ function AppShellContent() {
             isConnected={isConnected}
             mounted={mounted}
             onNavStateChange={handleNavStateChange}
+            onLandingStateChange={handleLandingStateChange}
           />
         </div>
       </div>

@@ -40,6 +40,7 @@ interface ChatPanelProps {
   isConnected?: boolean;
   mounted?: boolean;
   onNavStateChange?: (showNewChat: boolean, onNewChat: () => void) => void;
+  onLandingStateChange?: (isLanding: boolean) => void;
 }
 
 export function ChatPanel({
@@ -47,6 +48,7 @@ export function ChatPanel({
   isConnected: isConnectedProp,
   mounted: mountedProp,
   onNavStateChange,
+  onLandingStateChange,
 }: ChatPanelProps = {}) {
   const mountedInternal = useMounted();
   const mounted = mountedProp ?? mountedInternal;
@@ -231,6 +233,23 @@ export function ChatPanel({
     onNavStateChange?.(messages.length > 0, handleNewChat);
   }, [messages.length, onNavStateChange, handleNewChat]);
 
+  const showLoading = status === "streaming" || status === "submitted";
+
+  useEffect(() => {
+    const isLandingView =
+      mounted &&
+      messages.length === 0 &&
+      !showLoading &&
+      !showTxCard;
+    onLandingStateChange?.(isLandingView);
+  }, [
+    mounted,
+    messages.length,
+    showLoading,
+    showTxCard,
+    onLandingStateChange,
+  ]);
+
   useEffect(() => {
     if (!error) {
       lastTrackedErrorRef.current = null;
@@ -267,7 +286,8 @@ export function ChatPanel({
           status={status}
           mounted={mounted}
           isConnected={isConnected}
-          address={address}
+          walletBalances={walletBalances}
+          blocksCeloSend={blocksCeloSend}
           errorMessage={error ? formatChatError(error.message) : null}
           showTxCard={showTxCard}
           confirmedFlowHashes={confirmedFlowHashes}
@@ -370,6 +390,7 @@ export function ChatPanel({
           input={input}
           canChat={canChat}
           status={status}
+          showLandingHint={messages.length === 0 && canChat}
           onInputChange={setInput}
           onSubmit={handleSubmit}
         />

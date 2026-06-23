@@ -6,6 +6,7 @@ interface ChatComposerProps {
   input: string;
   canChat: boolean;
   status: ChatStatus;
+  showLandingHint?: boolean;
   onInputChange: (value: string) => void;
   onSubmit: (event: React.FormEvent) => void;
 }
@@ -14,6 +15,7 @@ export function ChatComposer({
   input,
   canChat,
   status,
+  showLandingHint = false,
   onInputChange,
   onSubmit,
 }: ChatComposerProps) {
@@ -64,6 +66,11 @@ export function ChatComposer({
       <p className="mt-1.5 hidden text-[10px] text-zinc-600 sm:block">
         Enter to send · Shift+Enter for new line
       </p>
+      {showLandingHint ? (
+        <p className="mt-1 text-center text-[10px] text-zinc-500 sm:hidden">
+          Or tap a suggestion above
+        </p>
+      ) : null}
     </form>
   );
 }

@@ -11,6 +11,7 @@ interface WalletBalancePanelProps {
   isConnected: boolean;
   mounted: boolean;
   variant?: "sidebar" | "mobile-collapsible";
+  hiddenOnLanding?: boolean;
 }
 
 function formatRelativeTime(iso: string): string {
@@ -161,9 +162,11 @@ function PanelBody({
 function MobileBalanceAccordion({
   address,
   isConnected,
+  hiddenOnLanding,
 }: {
   address: `0x${string}` | undefined;
   isConnected: boolean;
+  hiddenOnLanding?: boolean;
 }) {
   const [includeZero, setIncludeZero] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -172,7 +175,7 @@ function MobileBalanceAccordion({
     includeZero,
   );
 
-  if (!isConnected || !address) {
+  if (!isConnected || !address || hiddenOnLanding) {
     return null;
   }
 
@@ -253,6 +256,7 @@ export function WalletBalancePanel({
   isConnected,
   mounted,
   variant = "sidebar",
+  hiddenOnLanding,
 }: WalletBalancePanelProps) {
   const [includeZero, setIncludeZero] = useState(false);
 
@@ -262,7 +266,11 @@ export function WalletBalancePanel({
 
   if (variant === "mobile-collapsible") {
     return (
-      <MobileBalanceAccordion address={address} isConnected={isConnected} />
+      <MobileBalanceAccordion
+        address={address}
+        isConnected={isConnected}
+        hiddenOnLanding={hiddenOnLanding}
+      />
     );
   }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChatStatus } from "ai";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AssistantLoading } from "@/components/chat/assistant-loading";
 import { AssistantColumn, AssistantMessageSlot } from "@/components/chat/assistant-message-slot";
 import { ChatTurnRow } from "@/components/chat/chat-turn-row";
@@ -19,56 +19,22 @@ import {
 import { CelesteLogoMark } from "@/components/celeste-logo";
 import { TxConfirmCard } from "@/components/tx-confirm-card";
 import { TxConfirmCardSnapshot } from "@/components/tx-confirm-card-snapshot";
-import { useWalletCapabilities } from "@/hooks/use-wallet-capabilities";
 import { trackEvent } from "@/lib/analytics/amplitude-browser";
 import type { PromptGroup } from "@/lib/analytics/events";
 import { inferFlowCategory } from "@/lib/analytics/flow-category";
-import { formatAddressShort } from "@/lib/format-balance";
-
-const SUGGESTED_PROMPT_GROUPS = [
-  {
-    label: "Send",
-    prompts: [
-      "Send 1 USDC to ",
-      "Send 5 USDm to andrewkimjoseph.celo.eth",
-    ],
-  },
-  {
-    label: "Swap",
-    prompts: [
-      "Swap 10 USDm to CELO",
-      "Get a quote to swap CELO to USDC",
-    ],
-  },
-  {
-    label: "FX",
-    prompts: [
-      "Convert 50 USDm to EURm",
-      "Convert 20 EURm to USDC",
-    ],
-  },
-  {
-    label: "Earn",
-    prompts: [
-      "Save 10 USDT to Aave",
-      "Withdraw my entire Aave savings",
-    ],
-  },
-  {
-    label: "GoodDollar",
-    prompts: [
-      "Claim my GoodDollar UBI",
-      "Check my GoodDollar status",
-    ],
-  },
-] as const;
+import type { WalletBalancesResponse } from "@/lib/balances";
+import {
+  buildLandingPrompts,
+  formatLandingBalanceLine,
+} from "@/lib/landing-prompts";
 
 interface ChatMessageListProps {
   messages: CelesteUIMessage[];
   status: ChatStatus;
   mounted: boolean;
   isConnected: boolean;
-  address?: `0x${string}`;
+  walletBalances?: WalletBalancesResponse;
+  blocksCeloSend?: boolean;
   errorMessage: string | null;
   showTxCard: boolean;
   confirmedFlowHashes: Record<string, string[]>;
@@ -85,7 +51,8 @@ export function ChatMessageList({
   status,
   mounted,
   isConnected,
-  address,
+  walletBalances,
+  blocksCeloSend = false,
   errorMessage,
   showTxCard,
   confirmedFlowHashes,
@@ -96,7 +63,7 @@ export function ChatMessageList({
   onTxComplete,
   onTxReject,
 }: ChatMessageListProps) {
-  const { blocksCeloSend } = useWalletCapabilities();
+  const [showMoreSuggestions, setShowMoreSuggestions] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const trackedTxCardKeyRef = useRef<string | null>(null);
@@ -104,6 +71,11 @@ export function ChatMessageList({
   const isStreaming = status === "streaming";
   const signedFlowMetas = getSignedPreparedFlowMetas(messages, confirmedFlowHashes);
   const recipientLabel = extractRecipientLabel(messages);
+  const landingPrompts = useMemo(
+    () => buildLandingPrompts(walletBalances, { blocksCeloSend }),
+    [walletBalances, blocksCeloSend],
+  );
+  const balanceLine = formatLandingBalanceLine(walletBalances);
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -179,7 +151,7 @@ export function ChatMessageList({
     <div
       ref={scrollContainerRef}
       className={`min-h-0 flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] ${
-        isLandingView ? "flex flex-col justify-center" : ""
+        isLandingView ? "flex flex-col justify-start sm:justify-center" : ""
       }`}
     >
       <div
@@ -199,50 +171,67 @@ export function ChatMessageList({
       )}
 
       {showEmptyState && (
-        <div className="rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)]/60 px-4 py-6">
+        <div className="rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)]/60 px-3 py-4 sm:px-4 sm:py-6">
           <h2 className="text-center text-base font-semibold text-white">
-            What can Celeste AI do?
+            What can I help with?
           </h2>
           <p className="mt-1 text-center text-sm text-zinc-400">
-            Ask in plain English — send, swap, FX, earn on Aave, and claim
-            GoodDollar UBI, all on Celo.
+            Send, swap, earn, or claim GoodDollar on Celo — ask in plain English.
           </p>
-          {address ? (
-            <p className="mt-2 text-center text-xs text-zinc-500">
-              Connected as{" "}
-              <span className="font-mono text-zinc-400">
-                {formatAddressShort(address)}
-              </span>
-            </p>
+          {balanceLine ? (
+            <p className="mt-2 text-center text-xs text-zinc-500">{balanceLine}</p>
           ) : null}
-          <CelesteLogoMark className="my-6 sm:my-8" />
-          <div className="space-y-3">
-            {SUGGESTED_PROMPT_GROUPS.map((group) => {
-              const prompts =
-                group.label === "Send" && blocksCeloSend
-                  ? group.prompts.filter((prompt) => !/^Send .* CELO to /i.test(prompt))
-                  : group.prompts;
-
-              return (
-              <div key={group.label}>
-                <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wide text-zinc-500">
-                  {group.label}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {prompts.map((prompt) => (
-                    <button
-                      key={prompt}
-                      type="button"
-                      onClick={() => onPromptSelect(prompt, group.label)}
-                      className="rounded-full border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-1.5 text-xs text-zinc-300 transition-colors hover:border-[var(--accent)]/40 hover:text-white"
-                    >
-                      {prompt}
-                    </button>
-                  ))}
-                </div>
+          <CelesteLogoMark className="my-4 hidden sm:block sm:my-6" />
+          <div className="mt-4 space-y-3">
+            <div className="flex flex-wrap justify-center gap-2 sm:justify-start">
+              {landingPrompts.primary.map((prompt) => (
+                <button
+                  key={prompt.text}
+                  type="button"
+                  onClick={() => onPromptSelect(prompt.text, prompt.group)}
+                  className="rounded-full border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-1.5 text-xs text-zinc-300 transition-colors hover:border-[var(--accent)]/40 hover:text-white"
+                >
+                  {prompt.text}
+                </button>
+              ))}
+            </div>
+            {landingPrompts.more.length > 0 && (
+              <div className="flex flex-col items-center sm:items-start">
+                <button
+                  type="button"
+                  onClick={() => setShowMoreSuggestions((open) => !open)}
+                  className="text-xs font-medium text-[var(--accent-soft-text)] transition-colors hover:text-white"
+                  aria-expanded={showMoreSuggestions}
+                >
+                  {showMoreSuggestions ? "Fewer suggestions" : "More suggestions"}
+                </button>
+                {showMoreSuggestions && (
+                  <div className="mt-3 w-full space-y-3">
+                    {landingPrompts.more.map((group) => (
+                      <div key={group.label}>
+                        <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wide text-zinc-500">
+                          {group.label}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {group.prompts.map((prompt) => (
+                            <button
+                              key={prompt.text}
+                              type="button"
+                              onClick={() =>
+                                onPromptSelect(prompt.text, prompt.group)
+                              }
+                              className="rounded-full border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-1.5 text-xs text-zinc-300 transition-colors hover:border-[var(--accent)]/40 hover:text-white"
+                            >
+                              {prompt.text}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-              );
-            })}
+            )}
           </div>
         </div>
       )}
