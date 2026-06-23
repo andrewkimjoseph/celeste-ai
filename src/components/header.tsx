@@ -180,20 +180,19 @@ export function Header({
           />
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <div className="flex min-w-0 items-center gap-2 sm:gap-2.5">
-                <h1 className="truncate text-base font-semibold text-white sm:text-lg">
-                  Celeste AI
-                </h1>
-                {/* eslint-disable-next-line @next/next/no-img-element -- brand SVG in public/ */}
-                <img
-                  src="/celo_symbol.svg"
-                  alt="Celo mainnet"
-                  width={14}
-                  height={14}
-                  className="size-3.5 shrink-0 object-contain"
-                  title="Celo mainnet"
-                />
-              </div>
+              <h1 className="truncate text-base font-semibold text-white sm:text-lg">
+                Celeste AI
+              </h1>
+              {/* Celo mainnet logo — hidden for now
+              <img
+                src="/celo_symbol.svg"
+                alt="Celo mainnet"
+                width={14}
+                height={14}
+                className="size-3.5 shrink-0 object-contain"
+                title="Celo mainnet"
+              />
+              */}
               <span className="rounded-full border border-[var(--surface-2)] px-2 py-0.5 text-[10px] font-medium text-zinc-400">
                 {CELESTE_VERSION}
               </span>
