@@ -1,6 +1,6 @@
 {
   "name": "celeste-ai",
-  "version": "0.2.15",
+  "version": "0.2.16",
   "description": "DeFAI chat UI for Celo — applied Celina (unofficial Celo MCP server). Connect a wallet, ask about balances, and prepare sends, swaps (Mento FX + Uniswap v4), and Aave actions — you sign in your wallet.",
   "private": true,
   "scripts": {

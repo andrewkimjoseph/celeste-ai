@@ -6,6 +6,7 @@ import { useMounted } from "@/hooks/use-mounted";
 import { useChats } from "@/hooks/use-chats";
 import { useTransactions } from "@/hooks/use-transactions";
 import { trackEvent } from "@/lib/analytics/amplitude-browser";
+import { CELESTE_VERSION } from "@/lib/app-version";
 
 interface HeaderProps {
   showNewChat?: boolean;
@@ -184,6 +185,9 @@ export function Header({
               </h1>
               <span className="hidden rounded-full border border-[var(--surface-2)] px-2 py-0.5 text-[10px] font-medium text-zinc-400 sm:inline-flex">
                 Celo mainnet
+              </span>
+              <span className="rounded-full border border-[var(--surface-2)] px-2 py-0.5 text-[10px] font-medium text-zinc-400">
+                {CELESTE_VERSION}
               </span>
             </div>
             <p className="hidden truncate text-xs text-zinc-400 sm:block">
