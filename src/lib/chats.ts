@@ -1,6 +1,9 @@
 import { isTextUIPart } from "ai";
+import {
+  getMessageCreatedAt,
+  type CelesteUIMessage,
+} from "@/lib/chat-message-metadata";
 import { getActivePreparedFlowWithMeta, isPreparedFlowConfirmed } from "@/lib/prepared-flow";
-import type { CelesteUIMessage } from "@/lib/chat-message-metadata";
 
 export const MAX_CHATS_PER_WALLET = 50;
 
@@ -63,11 +66,27 @@ export function deriveChatTitle(messages: CelesteUIMessage[]): string {
   return DEFAULT_CHAT_TITLE;
 }
 
+export function deriveChatLastActivityAt(
+  messages: CelesteUIMessage[],
+  fallback: number,
+): number {
+  let fromMessages: number | undefined;
+
+  for (const message of messages) {
+    const createdAt = getMessageCreatedAt(message);
+    if (createdAt != null && (fromMessages == null || createdAt > fromMessages)) {
+      fromMessages = createdAt;
+    }
+  }
+
+  return fromMessages ?? fallback;
+}
+
 export function toChatListItem(chat: StoredChat): ChatListItem {
   return {
     id: chat.id,
     title: chat.title,
-    updatedAt: chat.updatedAt,
+    updatedAt: deriveChatLastActivityAt(chat.messages, chat.updatedAt),
     messageCount: chat.messages.length,
   };
 }

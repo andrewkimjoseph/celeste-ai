@@ -1,4 +1,5 @@
 import {
+  deriveChatLastActivityAt,
   deriveChatTitle,
   MAX_CHATS_PER_WALLET,
   type ChatUiState,
@@ -12,11 +13,16 @@ function normalizeAddress(address: string): string {
 }
 
 export async function listChats(address: string): Promise<StoredChat[]> {
-  return celesteDb.chats
+  const rows = await celesteDb.chats
     .where("address")
     .equals(normalizeAddress(address))
-    .reverse()
-    .sortBy("updatedAt");
+    .toArray();
+
+  return rows.sort(
+    (a, b) =>
+      deriveChatLastActivityAt(b.messages, b.updatedAt) -
+      deriveChatLastActivityAt(a.messages, a.updatedAt),
+  );
 }
 
 export async function getChat(id: string): Promise<StoredChat | undefined> {
@@ -28,14 +34,19 @@ async function trimChatsForAddress(address: string): Promise<void> {
   const rows = await celesteDb.chats
     .where("address")
     .equals(normalized)
-    .reverse()
-    .sortBy("updatedAt");
+    .toArray();
 
-  if (rows.length <= MAX_CHATS_PER_WALLET) {
+  const sorted = rows.sort(
+    (a, b) =>
+      deriveChatLastActivityAt(b.messages, b.updatedAt) -
+      deriveChatLastActivityAt(a.messages, a.updatedAt),
+  );
+
+  if (sorted.length <= MAX_CHATS_PER_WALLET) {
     return;
   }
 
-  const overflow = rows.slice(MAX_CHATS_PER_WALLET);
+  const overflow = sorted.slice(MAX_CHATS_PER_WALLET);
   await celesteDb.chats.bulkDelete(overflow.map((row) => row.id));
 }
 
@@ -69,7 +80,10 @@ export async function upsertChat(input: {
     confirmedFlowHashes: input.uiState.confirmedFlowHashes,
     confirmedFlowTimestamps: input.uiState.confirmedFlowTimestamps,
     createdAt: existing?.createdAt ?? input.createdAt ?? now,
-    updatedAt: now,
+    updatedAt: deriveChatLastActivityAt(
+      input.messages,
+      existing?.updatedAt ?? now,
+    ),
   };
 
   await celesteDb.chats.put(record);

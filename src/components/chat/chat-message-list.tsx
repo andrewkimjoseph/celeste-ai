@@ -16,7 +16,6 @@ import {
   getPreparedFlowMetasForMessage,
   getSignedPreparedFlowMetas,
 } from "@/lib/prepared-flow";
-import { CelesteLogoMark } from "@/components/celeste-logo";
 import { TxConfirmCard } from "@/components/tx-confirm-card";
 import { TxConfirmCardSnapshot } from "@/components/tx-confirm-card-snapshot";
 import { trackEvent } from "@/lib/analytics/amplitude-browser";
@@ -151,14 +150,14 @@ export function ChatMessageList({
     <div
       ref={scrollContainerRef}
       className={`min-h-0 flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] ${
-        isLandingView ? "flex flex-col justify-start sm:justify-center" : ""
+        isLandingView ? "flex flex-col justify-start" : ""
       }`}
     >
       <div
-        className={`w-full py-4 sm:py-5 ${
+        className={`w-full ${
           isLandingView
-            ? "mx-auto max-w-2xl px-3 sm:px-6"
-            : "space-y-8 px-4 sm:space-y-10 sm:px-5"
+            ? "max-w-2xl px-3 py-4 sm:px-6 sm:py-5 lg:mx-0"
+            : "space-y-8 px-4 py-4 sm:space-y-10 sm:px-5 sm:py-5"
         }`}
       >
       {showConnectPrompt && (
@@ -172,16 +171,15 @@ export function ChatMessageList({
 
       {showEmptyState && (
         <div className="rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)]/60 px-3 py-4 sm:px-4 sm:py-6">
-          <h2 className="text-center text-base font-semibold text-white">
+          <h2 className="text-center text-base font-semibold text-white sm:text-left">
             What can I help with?
           </h2>
-          <p className="mt-1 text-center text-sm text-zinc-400">
+          <p className="mt-1 text-center text-sm text-zinc-400 sm:text-left">
             Send, swap, earn, or claim GoodDollar on Celo — ask in plain English.
           </p>
           {balanceLine ? (
-            <p className="mt-2 text-center text-xs text-zinc-500">{balanceLine}</p>
+            <p className="mt-2 text-center text-xs text-zinc-500 sm:text-left">{balanceLine}</p>
           ) : null}
-          <CelesteLogoMark className="my-4 hidden sm:block sm:my-6" />
           <div className="mt-4 space-y-3">
             <div className="flex flex-wrap justify-center gap-2 sm:justify-start">
               {landingPrompts.primary.map((prompt) => (
