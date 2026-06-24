@@ -150,7 +150,7 @@ export function ChatMessageList({
     <div
       ref={scrollContainerRef}
       className={`min-h-0 flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] ${
-        isLandingView ? "flex flex-col items-center justify-start" : ""
+        isLandingView ? "flex min-h-full flex-col items-center justify-center" : ""
       }`}
     >
       <div
