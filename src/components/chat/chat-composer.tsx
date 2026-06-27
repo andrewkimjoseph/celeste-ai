@@ -6,7 +6,7 @@ interface ChatComposerProps {
   input: string;
   canChat: boolean;
   status: ChatStatus;
-  showLandingHint?: boolean;
+  variant?: "bar" | "embedded";
   onInputChange: (value: string) => void;
   onSubmit: (event: React.FormEvent) => void;
 }
@@ -15,11 +15,12 @@ export function ChatComposer({
   input,
   canChat,
   status,
-  showLandingHint = false,
+  variant = "bar",
   onInputChange,
   onSubmit,
 }: ChatComposerProps) {
   const isBusy = status === "streaming" || status === "submitted";
+  const isEmbedded = variant === "embedded";
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (event.key === "Enter" && !event.shiftKey) {
@@ -37,7 +38,11 @@ export function ChatComposer({
   return (
     <form
       onSubmit={onSubmit}
-      className="composer-safe-bottom shrink-0 border-t border-[var(--surface-2)] bg-[var(--surface-0)]/95 px-3 pt-3 backdrop-blur-md sm:px-4 sm:pt-4"
+      className={
+        isEmbedded
+          ? "w-full"
+          : "composer-safe-bottom shrink-0 border-t border-[var(--surface-2)] bg-[var(--surface-0)]/95 px-3 pt-3 backdrop-blur-md sm:px-4 sm:pt-4"
+      }
     >
       <div className="flex items-center gap-2">
         <textarea
@@ -63,12 +68,9 @@ export function ChatComposer({
           Send
         </button>
       </div>
-      <p className="mt-1.5 hidden text-[10px] text-zinc-600 sm:block">
-        Enter to send · Shift+Enter for new line
-      </p>
-      {showLandingHint ? (
-        <p className="mt-1 text-center text-[10px] text-zinc-500 sm:hidden">
-          Or tap a suggestion above
+      {!isEmbedded ? (
+        <p className="mt-1.5 hidden text-[10px] text-zinc-600 sm:block">
+          Enter to send · Shift+Enter for new line
         </p>
       ) : null}
     </form>

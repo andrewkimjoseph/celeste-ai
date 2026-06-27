@@ -1,6 +1,7 @@
 "use client";
 
 import type { ChatStatus } from "ai";
+import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AssistantLoading } from "@/components/chat/assistant-loading";
 import { AssistantColumn, AssistantMessageSlot } from "@/components/chat/assistant-message-slot";
@@ -40,6 +41,7 @@ interface ChatMessageListProps {
   confirmedFlowTimestamps: Record<string, number>;
   pendingFlow: PreparedFlowWithExtras | undefined;
   txCardFlowKey: string | null;
+  landingComposer?: ReactNode;
   onPromptSelect: (prompt: string, promptGroup?: PromptGroup) => void;
   onTxComplete: (hashes: string[]) => void;
   onTxReject: () => void;
@@ -58,6 +60,7 @@ export function ChatMessageList({
   confirmedFlowTimestamps,
   pendingFlow,
   txCardFlowKey,
+  landingComposer,
   onPromptSelect,
   onTxComplete,
   onTxReject,
@@ -150,7 +153,7 @@ export function ChatMessageList({
     <div
       ref={scrollContainerRef}
       className={`min-h-0 flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] ${
-        isLandingView ? "flex min-h-full flex-col items-center justify-center" : ""
+        isLandingView ? "flex min-h-full flex-col items-center justify-start" : ""
       }`}
     >
       <div
@@ -180,7 +183,17 @@ export function ChatMessageList({
           {balanceLine ? (
             <p className="mt-2 text-center text-xs text-zinc-500">{balanceLine}</p>
           ) : null}
+          {landingComposer ? (
+            <div className="mt-4">{landingComposer}</div>
+          ) : null}
           <div className="mt-4 space-y-3">
+            {landingComposer ? (
+              <div className="flex items-center gap-3">
+                <div className="h-px flex-1 bg-[var(--surface-2)]" aria-hidden />
+                <p className="shrink-0 text-xs text-zinc-500">Or try a suggestion</p>
+                <div className="h-px flex-1 bg-[var(--surface-2)]" aria-hidden />
+              </div>
+            ) : null}
             <div className="flex flex-wrap justify-center gap-2">
               {landingPrompts.primary.map((prompt) => (
                 <button

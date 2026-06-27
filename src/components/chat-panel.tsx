@@ -239,21 +239,13 @@ export function ChatPanel({
   }, [messages.length, onNavStateChange, handleNewChat]);
 
   const showLoading = status === "streaming" || status === "submitted";
+  const isLandingView =
+    mounted && messages.length === 0 && !showLoading && !showTxCard;
+  const showEmbeddedComposer = isLandingView && canChat;
 
   useEffect(() => {
-    const isLandingView =
-      mounted &&
-      messages.length === 0 &&
-      !showLoading &&
-      !showTxCard;
     onLandingStateChange?.(isLandingView);
-  }, [
-    mounted,
-    messages.length,
-    showLoading,
-    showTxCard,
-    onLandingStateChange,
-  ]);
+  }, [isLandingView, onLandingStateChange]);
 
   useEffect(() => {
     if (!error) {
@@ -284,6 +276,17 @@ export function ChatPanel({
     );
   }
 
+  const composer = (
+    <ChatComposer
+      input={input}
+      canChat={canChat}
+      status={status}
+      variant={showEmbeddedComposer ? "embedded" : "bar"}
+      onInputChange={setInput}
+      onSubmit={handleSubmit}
+    />
+  );
+
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <ChatMessageList
@@ -299,6 +302,7 @@ export function ChatPanel({
           confirmedFlowTimestamps={confirmedFlowTimestamps}
           pendingFlow={pendingFlowMeta?.flow}
           txCardFlowKey={flowKey}
+          landingComposer={showEmbeddedComposer ? composer : undefined}
           onPromptSelect={(prompt, promptGroup) =>
             void handlePromptSelect(prompt, promptGroup)
           }
@@ -395,14 +399,7 @@ export function ChatPanel({
             );
           }}
         />
-        <ChatComposer
-          input={input}
-          canChat={canChat}
-          status={status}
-          showLandingHint={messages.length === 0 && canChat}
-          onInputChange={setInput}
-          onSubmit={handleSubmit}
-        />
+        {!showEmbeddedComposer ? composer : null}
     </div>
   );
 }
