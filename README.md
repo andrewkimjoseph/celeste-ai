@@ -15,7 +15,7 @@ npm install
 npm run dev
 ```
 
-Installs `@andrewkimjoseph/celina-sdk` **`0.9.6`** from npm (not a monorepo file link — required for Vercel deploys).
+Installs `@andrewkimjoseph/celina-sdk` **`0.11.0`** from npm (not a monorepo file link — required for Vercel deploys).
 
 ## Stack
 
@@ -127,9 +127,8 @@ See [`.env.example`](.env.example):
 | `NEXT_PUBLIC_AMPLITUDE_API_KEY` | Celeste browser product analytics (separate Amplitude project) |
 | `NEXT_PUBLIC_AMPLITUDE_DISABLED` | Set to `1` to disable browser analytics |
 | `NEXT_PUBLIC_AMPLITUDE_SERVER_ZONE` | Optional `EU` if your Amplitude project is EU-resident (default US) |
-| `CELINA_ANALYTICS_DISABLED` | Set to `1` to opt out of Celina SDK **server** read telemetry (unchanged Celina Amplitude project) |
 
-Browser analytics (`NEXT_PUBLIC_AMPLITUDE_*`) tracks product UX events (wallet connect, chat, tx funnel). Celina SDK server telemetry (`celeste_ai` `device_id`, connected wallet as Amplitude `user_id` via `runWithAnalyticsWallet`) is a separate stream for read-tool usage unless you set `CELINA_ANALYTICS_DISABLED=1`.
+Browser analytics (`NEXT_PUBLIC_AMPLITUDE_*`) tracks product UX events (wallet connect, chat, tx funnel). Celina SDK server telemetry (`celeste_ai` `device_id`, connected wallet as Amplitude `user_id` via `runWithAnalyticsWallet`) is a separate stream for read-tool usage. Opt out in [`src/lib/celina.ts`](src/lib/celina.ts) with `analyticsEnabled: false` on `createCelinaClient()`.
 
 ### Next.js config notes
 
