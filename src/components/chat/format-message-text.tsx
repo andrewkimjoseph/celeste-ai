@@ -1,10 +1,34 @@
 import type { ReactNode } from "react";
+import { isAddress } from "viem";
 import { trimTrailingUrlPunctuation } from "@/lib/trim-url-punctuation";
 
 export type MessageTextVariant = "assistant" | "user";
 
+export type HexTokenKind = "address" | "txHash" | "truncatedHash" | "ambiguous";
+
 const INLINE_PATTERN =
   /(\*\*[^*\n]+\*\*|\*[^*\n]+\*|`[^`\n]+`|0x[a-fA-F0-9]{40,}|0x[a-fA-F0-9]{4,}…[a-fA-F0-9]{4,}|https?:\/\/[^\s]+)/g;
+
+const TRUNCATED_HASH_PATTERN = /^0x[a-fA-F0-9]{4,}…[a-fA-F0-9]{4,}$/;
+const TX_HASH_PATTERN = /^0x[a-fA-F0-9]{64}$/;
+
+export function classifyHexToken(token: string): HexTokenKind {
+  if (TRUNCATED_HASH_PATTERN.test(token)) {
+    return "truncatedHash";
+  }
+  if (TX_HASH_PATTERN.test(token)) {
+    return "txHash";
+  }
+  if (isAddress(token)) {
+    return "address";
+  }
+  return "ambiguous";
+}
+
+export function isClickableHexToken(token: string): boolean {
+  const kind = classifyHexToken(token);
+  return kind === "txHash" || kind === "truncatedHash";
+}
 
 interface FormatOptions {
   variant?: MessageTextVariant;
@@ -69,7 +93,7 @@ function parseInline(text: string, options: FormatOptions = {}): ReactNode[] {
         </code>,
       );
     } else if (token.startsWith("0x")) {
-      if (onHashClick) {
+      if (isClickableHexToken(token) && onHashClick) {
         nodes.push(
           <button
             key={`${keyPrefix}-${key++}`}
