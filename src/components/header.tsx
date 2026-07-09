@@ -8,7 +8,108 @@ import { useMounted } from "@/hooks/use-mounted";
 import { useChats } from "@/hooks/use-chats";
 import { useTransactions } from "@/hooks/use-transactions";
 import { trackEvent } from "@/lib/analytics/amplitude-browser";
-import { useState } from "react";
+import {
+  getCelestialPersonality,
+  type CelestialPersonalityId,
+} from "@/lib/celestial-personalities";
+import { useEffect, useRef, useState } from "react";
+
+function useDismissOnOutsideClick(
+  isOpen: boolean,
+  onDismiss: () => void,
+) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    function handlePointerDown(event: MouseEvent) {
+      const target = event.target;
+      if (
+        ref.current &&
+        target instanceof Node &&
+        !ref.current.contains(target)
+      ) {
+        onDismiss();
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        onDismiss();
+      }
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onDismiss]);
+
+  return ref;
+}
+
+function PersonalityButtonIcon({
+  selectedId,
+}: {
+  selectedId: CelestialPersonalityId | null;
+}) {
+  const personality = getCelestialPersonality(selectedId);
+
+  if (personality) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- static personality assets in public
+      <img
+        src={personality.imageSrc}
+        alt=""
+        width={16}
+        height={16}
+        className="size-4 shrink-0 rounded-full object-contain sm:mr-1.5"
+        aria-hidden
+      />
+    );
+  }
+
+  return (
+    <svg
+      className="size-4 shrink-0 sm:mr-1.5"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      aria-hidden
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"
+      />
+    </svg>
+  );
+}
+
+function NewChatIcon() {
+  return (
+    <svg
+      className="size-4 sm:mr-1.5"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      aria-hidden
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 4.5v15m7.5-7.5h-15"
+      />
+    </svg>
+  );
+}
 
 interface HeaderProps {
   showNewChat?: boolean;
@@ -28,36 +129,15 @@ function NewChatButton({
   }
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={onNewChat}
-        aria-label="New chat"
-        className="flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-[var(--text-secondary)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:hidden"
-      >
-        <svg
-          className="size-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={1.75}
-          aria-hidden
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M12 4.5v15m7.5-7.5h-15"
-          />
-        </svg>
-      </button>
-      <button
-        type="button"
-        onClick={onNewChat}
-        className="hidden rounded-lg border border-[var(--surface-2)] px-3 py-1.5 text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:inline-flex"
-      >
-        New chat
-      </button>
-    </>
+    <button
+      type="button"
+      onClick={onNewChat}
+      aria-label="New chat"
+      className="flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-[var(--text-secondary)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:h-auto sm:w-auto sm:rounded-lg sm:px-3 sm:py-1.5"
+    >
+      <NewChatIcon />
+      <span className="hidden text-xs sm:inline">New chat</span>
+    </button>
   );
 }
 
@@ -149,26 +229,42 @@ export function Header({
 }: HeaderProps) {
   const mounted = useMounted();
   const [showPersonalityPicker, setShowPersonalityPicker] = useState(false);
-  const [showFxControls, setShowFxControls] = useState(false);
+  // const [showFxControls, setShowFxControls] = useState(false);
   const {
     selectedPersonalityId,
     hasSelectedPersonality,
     setSelectedPersonality,
-    fxEnabled,
-    fxIntensity,
-    setFxEnabled,
-    setFxIntensity,
+    // fxEnabled,
+    // fxIntensity,
+    // setFxEnabled,
+    // setFxIntensity,
   } = useChats();
+
+  const personalityPickerRef = useDismissOnOutsideClick(
+    showPersonalityPicker,
+    () => setShowPersonalityPicker(false),
+  );
+  // const fxControlsRef = useDismissOnOutsideClick(showFxControls, () =>
+  //   setShowFxControls(false),
+  // );
 
   return (
     <header className="border-b border-[var(--surface-2)] bg-[var(--surface-0)]/80 px-3 py-2.5 backdrop-blur-md sm:px-4 sm:py-3">
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
-          <CelesteLogoAvatar
-            size="md"
-            shape="squircle"
-            className="shadow-sm ring-1 ring-[var(--accent)]/20"
-          />
+          <button
+            type="button"
+            onClick={() => onNewChat?.()}
+            disabled={!onNewChat}
+            aria-label="New chat"
+            className="shrink-0 rounded-xl transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] disabled:cursor-default sm:rounded-lg"
+          >
+            <CelesteLogoAvatar
+              size="md"
+              shape="squircle"
+              className="shadow-sm ring-1 ring-[var(--accent)]/20"
+            />
+          </button>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 sm:gap-2">
               <h1 className="hidden truncate text-base font-semibold text-[var(--text-primary)] sm:block sm:text-lg">
@@ -196,17 +292,34 @@ export function Header({
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           <Link
             href="/about"
-            className="hidden rounded-lg border border-[var(--surface-2)] px-3 py-1.5 text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:inline-flex"
+            aria-label="About Celeste AI"
+            className="flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-[var(--text-muted)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:h-auto sm:w-auto sm:rounded-lg sm:px-3 sm:py-1.5"
           >
-            About
+            <svg
+              className="size-4 sm:mr-1.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.75}
+              aria-hidden
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+              />
+            </svg>
+            <span className="hidden text-xs sm:inline">About</span>
           </Link>
           <HistoryButton isConnected={isConnected} />
           <TransactionsButton isConnected={isConnected} />
+          {/* FX toggle — hidden for now
           {isConnected ? (
-            <div className="relative">
+            <div className="relative" ref={fxControlsRef}>
               <button
                 type="button"
                 onClick={() => {
+                  setShowPersonalityPicker(false);
                   setShowFxControls((open) => !open);
                   void setFxEnabled(!fxEnabled);
                 }}
@@ -221,6 +334,7 @@ export function Header({
               <button
                 type="button"
                 onClick={() => {
+                  setShowPersonalityPicker(false);
                   setShowFxControls((open) => !open);
                   void setFxEnabled(!fxEnabled);
                 }}
@@ -270,19 +384,9 @@ export function Header({
               ) : null}
             </div>
           ) : null}
+          */}
           {isConnected ? (
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setShowPersonalityPicker((open) => !open)}
-                className={`hidden rounded-lg border px-3 py-1.5 text-xs transition-colors sm:inline-flex ${
-                  hasSelectedPersonality
-                    ? "border-[var(--surface-2)] text-[var(--text-secondary)] hover:border-[var(--border-strong)] hover:text-[var(--text-primary)]"
-                    : "border-[var(--accent)]/60 text-[var(--accent-soft-text)] hover:border-[var(--accent)]"
-                }`}
-              >
-                {hasSelectedPersonality ? "Personality" : "Choose personality"}
-              </button>
+            <div className="relative" ref={personalityPickerRef}>
               <button
                 type="button"
                 onClick={() => setShowPersonalityPicker((open) => !open)}
@@ -291,22 +395,18 @@ export function Header({
                     ? "Change personality"
                     : "Choose personality"
                 }
-                className="flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-[var(--text-muted)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:hidden"
+                className={`flex size-9 items-center justify-center rounded-full border transition-colors sm:h-auto sm:w-auto sm:rounded-lg sm:px-3 sm:py-1.5 ${
+                  hasSelectedPersonality
+                    ? "border-[var(--surface-2)] text-[var(--text-muted)] hover:border-[var(--border-strong)] hover:text-[var(--text-primary)]"
+                    : "border-[var(--accent)]/60 text-[var(--accent-soft-text)] hover:border-[var(--accent)]"
+                }`}
               >
-                <svg
-                  className="size-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={1.75}
-                  aria-hidden
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15.75 7.5a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.25a7.5 7.5 0 0 1 15 0"
-                  />
-                </svg>
+                <PersonalityButtonIcon selectedId={selectedPersonalityId} />
+                <span className="hidden text-xs sm:inline">
+                  {hasSelectedPersonality
+                    ? "Personality"
+                    : "Choose personality"}
+                </span>
               </button>
               {showPersonalityPicker ? (
                 <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[300px] rounded-xl border border-[var(--surface-2)] bg-[var(--surface-0)] p-3 shadow-2xl shadow-black/40 sm:w-[340px]">
