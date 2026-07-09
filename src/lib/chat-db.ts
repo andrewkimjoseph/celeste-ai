@@ -47,9 +47,48 @@ export async function upsertPersonalityPreference(
   address: string,
   personalityId: CelestialPersonalityId,
 ): Promise<void> {
+  const normalized = normalizeAddress(address);
+  const existing = await celesteDb.preferences.get(normalized);
   await celesteDb.preferences.put({
-    address: normalizeAddress(address),
+    ...existing,
+    address: normalized,
     personalityId,
+    updatedAt: Date.now(),
+  });
+}
+
+export type FxIntensity = "low" | "medium" | "high";
+
+export interface FxPreference {
+  enabled: boolean;
+  intensity: FxIntensity;
+}
+
+export async function getFxPreferenceByAddress(
+  address: string,
+): Promise<FxPreference> {
+  const record = await celesteDb.preferences.get(normalizeAddress(address));
+  const intensity: FxIntensity =
+    record?.fxIntensity === "low" || record?.fxIntensity === "high"
+      ? record.fxIntensity
+      : "medium";
+  return {
+    enabled: record?.fxEnabled ?? true,
+    intensity,
+  };
+}
+
+export async function upsertFxPreference(
+  address: string,
+  preference: FxPreference,
+): Promise<void> {
+  const normalized = normalizeAddress(address);
+  const existing = await celesteDb.preferences.get(normalized);
+  await celesteDb.preferences.put({
+    ...existing,
+    address: normalized,
+    fxEnabled: preference.enabled,
+    fxIntensity: preference.intensity,
     updatedAt: Date.now(),
   });
 }

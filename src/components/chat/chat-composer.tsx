@@ -52,7 +52,7 @@ export function ChatComposer({
           onFocus={handleFocus}
           placeholder={
             canChat
-              ? "Describe your next mission: swap, send, earn, or claim on Celo…"
+              ? "Describe your next Celo mission…"
               : "Connect wallet to activate mission control…"
           }
           disabled={!canChat || isBusy}

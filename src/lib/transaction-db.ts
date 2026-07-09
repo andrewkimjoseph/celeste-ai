@@ -9,7 +9,9 @@ import {
 
 export interface UserPreference {
   address: string;
-  personalityId: CelestialPersonalityId;
+  personalityId?: CelestialPersonalityId;
+  fxEnabled?: boolean;
+  fxIntensity?: "low" | "medium" | "high";
   updatedAt: number;
 }
 
@@ -28,6 +30,11 @@ class CelesteDatabase extends Dexie {
       chats: "id, address, updatedAt",
     });
     this.version(3).stores({
+      transactions: "id, address, timestamp",
+      chats: "id, address, updatedAt",
+      preferences: "address, updatedAt",
+    });
+    this.version(4).stores({
       transactions: "id, address, timestamp",
       chats: "id, address, updatedAt",
       preferences: "address, updatedAt",

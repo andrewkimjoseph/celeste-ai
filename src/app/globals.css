@@ -163,3 +163,31 @@ body {
     animation: none;
   }
 }
+
+@keyframes celestial-atmosphere {
+  0%,
+  100% {
+    opacity: 0.28;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.celestial-atmosphere::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 15% 20%, rgb(158 178 210 / 0.09), transparent 36%),
+    radial-gradient(circle at 78% 10%, rgb(193 136 185 / 0.08), transparent 35%),
+    radial-gradient(circle at 70% 70%, rgb(90 121 175 / 0.07), transparent 40%);
+  animation: celestial-atmosphere 12s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .celestial-atmosphere::before {
+    animation: none;
+  }
+}

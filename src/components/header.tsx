@@ -150,10 +150,15 @@ export function Header({
 }: HeaderProps) {
   const mounted = useMounted();
   const [showPersonalityPicker, setShowPersonalityPicker] = useState(false);
+  const [showFxControls, setShowFxControls] = useState(false);
   const {
     selectedPersonalityId,
     hasSelectedPersonality,
     setSelectedPersonality,
+    fxEnabled,
+    fxIntensity,
+    setFxEnabled,
+    setFxIntensity,
   } = useChats();
 
   return (
@@ -201,6 +206,61 @@ export function Header({
           </Link>
           <HistoryButton isConnected={isConnected} />
           <TransactionsButton isConnected={isConnected} />
+          {isConnected ? (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowFxControls((open) => !open);
+                  void setFxEnabled(!fxEnabled);
+                }}
+                className={`hidden rounded-lg border px-3 py-1.5 text-xs transition-colors sm:inline-flex ${
+                  fxEnabled
+                    ? "border-[var(--accent)]/60 text-[var(--accent-soft-text)] hover:border-[var(--accent)]"
+                    : "border-[var(--surface-2)] text-[var(--text-secondary)] hover:border-[var(--border-strong)] hover:text-[var(--text-primary)]"
+                }`}
+              >
+                FX {fxEnabled ? "On" : "Off"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowFxControls((open) => !open);
+                  void setFxEnabled(!fxEnabled);
+                }}
+                aria-label="Toggle celestial effects"
+                className="flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-[var(--text-muted)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:hidden"
+              >
+                ✧
+              </button>
+              {showFxControls ? (
+                <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[220px] rounded-xl border border-[var(--surface-2)] bg-[var(--surface-0)] p-3 shadow-2xl shadow-black/40">
+                  <p className="text-xs font-medium text-[var(--text-primary)]">
+                    Celestial FX
+                  </p>
+                  <p className="mt-1 text-[11px] text-[var(--text-subtle)]">
+                    Atmospheric stars and falling streaks.
+                  </p>
+                  <div className="mt-2 flex gap-1">
+                    {(["low", "medium", "high"] as const).map((level) => (
+                      <button
+                        key={level}
+                        type="button"
+                        onClick={() => void setFxIntensity(level)}
+                        className={`rounded-md border px-2 py-1 text-[10px] uppercase tracking-wide transition-colors ${
+                          fxIntensity === level
+                            ? "border-[var(--accent)]/70 bg-[var(--accent-soft)] text-[var(--text-primary)]"
+                            : "border-[var(--surface-2)] text-[var(--text-subtle)] hover:text-[var(--text-secondary)]"
+                        }`}
+                      >
+                        {level}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
           {isConnected ? (
             <div className="relative">
               <button
