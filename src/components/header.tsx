@@ -8,7 +8,6 @@ import { useMounted } from "@/hooks/use-mounted";
 import { useChats } from "@/hooks/use-chats";
 import { useTransactions } from "@/hooks/use-transactions";
 import { trackEvent } from "@/lib/analytics/amplitude-browser";
-import { CELESTE_VERSION } from "@/lib/app-version";
 import { useState } from "react";
 
 interface HeaderProps {
@@ -172,7 +171,7 @@ export function Header({
           />
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <h1 className="truncate text-base font-semibold text-[var(--text-primary)] sm:text-lg">
+              <h1 className="hidden truncate text-base font-semibold text-[var(--text-primary)] sm:block sm:text-lg">
                 Celeste AI
               </h1>
               {/* Celo mainnet logo — hidden for now
@@ -185,9 +184,6 @@ export function Header({
                 title="Celo mainnet"
               />
               */}
-              <span className="rounded-full border border-[var(--surface-2)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-muted)]">
-                {CELESTE_VERSION}
-              </span>
             </div>
             <p className="hidden truncate text-xs text-[var(--text-muted)] sm:block">
               {isConnected
@@ -229,10 +225,22 @@ export function Header({
                   void setFxEnabled(!fxEnabled);
                 }}
                 aria-label="Toggle celestial effects"
-                className="inline-flex h-9 items-center justify-center gap-1 rounded-full border border-[var(--surface-2)] px-2 text-[10px] font-medium uppercase tracking-wide text-[var(--text-muted)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:hidden"
+                className="flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-[var(--text-muted)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:hidden"
               >
-                <span aria-hidden>✧</span>
-                <span>FX</span>
+                <svg
+                  className="size-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.75}
+                  aria-hidden
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m12 3 1.2 2.9L16 7.1l-2.8 1.2L12 11l-1.2-2.7L8 7.1l2.8-1.2L12 3Zm6 9 .8 1.9 1.9.8-1.9.8-.8 1.9-.8-1.9-1.9-.8 1.9-.8.8-1.9ZM6 14l1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1 2.4-1 1-2.4Z"
+                  />
+                </svg>
               </button>
               {showFxControls ? (
                 <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[220px] rounded-xl border border-[var(--surface-2)] bg-[var(--surface-0)] p-3 shadow-2xl shadow-black/40">
@@ -283,10 +291,22 @@ export function Header({
                     ? "Change personality"
                     : "Choose personality"
                 }
-                className="inline-flex h-9 items-center justify-center gap-1 rounded-full border border-[var(--surface-2)] px-2 text-[10px] font-medium uppercase tracking-wide text-[var(--text-muted)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:hidden"
+                className="flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-[var(--text-muted)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:hidden"
               >
-                <span aria-hidden>✦</span>
-                <span>Persona</span>
+                <svg
+                  className="size-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.75}
+                  aria-hidden
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.75 7.5a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.25a7.5 7.5 0 0 1 15 0"
+                  />
+                </svg>
               </button>
               {showPersonalityPicker ? (
                 <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[300px] rounded-xl border border-[var(--surface-2)] bg-[var(--surface-0)] p-3 shadow-2xl shadow-black/40 sm:w-[340px]">
