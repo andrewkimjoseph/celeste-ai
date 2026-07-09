@@ -42,7 +42,7 @@ function HashActions({
       <button
         type="button"
         onClick={() => onCopy(hash)}
-        className="rounded-md border border-[var(--surface-2)] bg-black/20 px-2 py-1 font-mono text-[11px] text-zinc-300 transition-colors hover:border-zinc-600 hover:text-white"
+        className="rounded-md border border-[var(--surface-2)] bg-[var(--surface-0)]/40 px-2 py-1 font-mono text-[11px] text-[var(--text-secondary)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)]"
         title="Copy transaction hash"
       >
         {copiedHash === hash ? "Copied" : formatTxHash(hash)}
@@ -62,7 +62,7 @@ function HashActions({
 function ChevronIcon({ expanded }: { expanded: boolean }) {
   return (
     <svg
-      className={`size-4 text-zinc-500 transition-transform duration-200 ${
+      className={`size-4 text-[var(--text-muted)] transition-transform duration-200 ${
         expanded ? "rotate-180" : ""
       }`}
       fill="none"
@@ -111,10 +111,10 @@ export function TransactionRow({
 
   return (
     <article
-      className={`rounded-xl border bg-gradient-to-b from-[var(--surface-1)] to-zinc-900/70 p-3.5 shadow-sm transition-colors ${
+      className={`rounded-xl border bg-gradient-to-b from-[var(--surface-1)] to-[rgb(16_12_24/0.92)] p-3.5 shadow-sm transition-colors ${
         selected
           ? "border-[var(--accent)]/40 ring-1 ring-[var(--accent)]/20"
-          : "border-white/[0.06]"
+          : "border-[var(--surface-2)]"
       }`}
     >
       <button
@@ -148,20 +148,20 @@ export function TransactionRow({
               Confirmed
             </span>
             {protocolLabel && (
-              <span className="inline-flex items-center rounded-full border border-white/[0.08] bg-white/[0.04] px-2 py-0.5 text-[10px] font-medium text-zinc-300">
+              <span className="inline-flex items-center rounded-full border border-[var(--surface-2)] bg-[var(--surface-0)]/35 px-2 py-0.5 text-[10px] font-medium text-[var(--text-secondary)]">
                 {protocolLabel}
               </span>
             )}
             {multiStep && (
-              <span className="text-[10px] text-zinc-500">
+              <span className="text-[10px] text-[var(--text-muted)]">
                 {stepEntries.length} steps
               </span>
             )}
-            <span className="text-[11px] text-zinc-500">
+            <span className="text-[11px] text-[var(--text-muted)]">
               {formatRelativeTime(transaction.timestamp)}
             </span>
           </div>
-          <p className="mt-2 text-sm leading-relaxed text-zinc-100">
+          <p className="mt-2 text-sm leading-relaxed text-[var(--text-primary)]">
             {displaySummary}
           </p>
         </div>
@@ -180,14 +180,14 @@ export function TransactionRow({
       )}
 
       {expanded && (
-        <ol className="mt-3 space-y-3 border-t border-white/[0.06] pt-3 pl-11">
+        <ol className="mt-3 space-y-3 border-t border-[var(--surface-2)] pt-3 pl-11">
           {stepEntries.map((entry, index) => (
             <li
               key={`${transaction.id}-step-${index}`}
               className="space-y-2"
             >
-              <div className="flex gap-2 text-sm text-zinc-300">
-                <span className="font-medium text-zinc-500">{index + 1}.</span>
+              <div className="flex gap-2 text-sm text-[var(--text-secondary)]">
+                <span className="font-medium text-[var(--text-muted)]">{index + 1}.</span>
                 <span className="min-w-0 flex-1 leading-relaxed">
                   {formatTransactionStep(entry.step, {
                     summary: transaction.summary,

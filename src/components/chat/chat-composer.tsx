@@ -58,18 +58,18 @@ export function ChatComposer({
           disabled={!canChat || isBusy}
           rows={1}
           suppressHydrationWarning
-          className="max-h-28 min-h-[44px] flex-1 resize-none rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/30 disabled:opacity-50"
+          className="max-h-28 min-h-[44px] flex-1 resize-none rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/30 disabled:opacity-50"
         />
         <button
           type="submit"
           disabled={!canChat || !input.trim() || isBusy}
-          className="h-[44px] shrink-0 rounded-xl bg-[var(--accent-strong)] px-4 text-sm font-semibold text-white transition-colors hover:bg-[var(--accent)] disabled:cursor-not-allowed disabled:bg-[var(--surface-2)] disabled:text-zinc-500"
+          className="h-[44px] shrink-0 rounded-xl bg-[var(--accent-strong)] px-4 text-sm font-semibold text-[var(--accent-foreground)] transition-colors hover:bg-[var(--accent)] disabled:cursor-not-allowed disabled:bg-[var(--surface-2)] disabled:text-[var(--text-subtle)]"
         >
           Send
         </button>
       </div>
       {!isEmbedded ? (
-        <p className="mt-1.5 hidden text-[10px] text-zinc-600 sm:block">
+        <p className="mt-1.5 hidden text-[10px] text-[var(--text-subtle)] sm:block">
           Enter to send · Shift+Enter for new line
         </p>
       ) : null}

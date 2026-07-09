@@ -19,6 +19,7 @@ import {
 } from "@/lib/prepared-flow";
 import { TxConfirmCard } from "@/components/tx-confirm-card";
 import { TxConfirmCardSnapshot } from "@/components/tx-confirm-card-snapshot";
+import { CelesteLogo } from "@/components/celeste-logo";
 import { trackEvent } from "@/lib/analytics/amplitude-browser";
 import type { PromptGroup } from "@/lib/analytics/events";
 import { inferFlowCategory } from "@/lib/analytics/flow-category";
@@ -33,6 +34,7 @@ interface ChatMessageListProps {
   status: ChatStatus;
   mounted: boolean;
   isConnected: boolean;
+  address?: `0x${string}`;
   walletBalances?: WalletBalancesResponse;
   blocksCeloSend?: boolean;
   errorMessage: string | null;
@@ -52,6 +54,7 @@ export function ChatMessageList({
   status,
   mounted,
   isConnected,
+  address,
   walletBalances,
   blocksCeloSend = false,
   errorMessage,
@@ -78,6 +81,9 @@ export function ChatMessageList({
     [walletBalances, blocksCeloSend],
   );
   const balanceLine = formatLandingBalanceLine(walletBalances);
+  const addressLabel = address
+    ? `${address.slice(0, 6)}...${address.slice(-4)}`
+    : null;
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -153,7 +159,7 @@ export function ChatMessageList({
     <div
       ref={scrollContainerRef}
       className={`min-h-0 flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] ${
-        isLandingView ? "flex min-h-full flex-col items-center justify-start" : ""
+        isLandingView ? "flex min-h-full flex-col items-center justify-center" : ""
       }`}
     >
       <div
@@ -165,23 +171,34 @@ export function ChatMessageList({
       >
       {showConnectPrompt && (
         <div className="rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)]/60 px-4 py-6 text-center">
-          <p className="text-sm text-zinc-300">Connect your wallet to start chatting with Celeste AI.</p>
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="text-sm text-[var(--text-secondary)]">Connect your wallet to start chatting with Celeste AI.</p>
+          <p className="mt-1 text-xs text-[var(--text-muted)]">
             Your balances will show up once you&apos;re connected.
           </p>
         </div>
       )}
 
       {showEmptyState && (
-        <div className="rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)]/60 px-3 py-4 sm:px-4 sm:py-6">
-          <h2 className="text-center text-base font-semibold text-white">
+        <div>
+          <div className="mb-4 flex items-center justify-center gap-2.5 sm:mb-5">
+            <CelesteLogo
+              size="xs"
+              rounded="full"
+              className="shadow-sm ring-1 ring-[var(--accent)]/25"
+            />
+            <h2 className="text-center text-2xl font-medium tracking-tight text-[var(--text-primary)] sm:text-3xl">
+              {addressLabel ? `Back at it, ${addressLabel}.` : "Back at it."}
+            </h2>
+          </div>
+          <div className="rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)]/60 px-3 py-4 sm:px-4 sm:py-6">
+          <h2 className="text-center text-base font-semibold text-[var(--text-primary)]">
             What can I help with?
           </h2>
-          <p className="mt-1 text-center text-sm text-zinc-400">
+          <p className="mt-1 text-center text-sm text-[var(--text-secondary)]">
             Send, swap, earn, or claim GoodDollar on Celo — ask in plain English.
           </p>
           {balanceLine ? (
-            <p className="mt-2 text-center text-xs text-zinc-500">{balanceLine}</p>
+            <p className="mt-2 text-center text-xs text-[var(--text-muted)]">{balanceLine}</p>
           ) : null}
           {landingComposer ? (
             <div className="mt-4">{landingComposer}</div>
@@ -190,7 +207,7 @@ export function ChatMessageList({
             {landingComposer ? (
               <div className="flex items-center gap-3">
                 <div className="h-px flex-1 bg-[var(--surface-2)]" aria-hidden />
-                <p className="shrink-0 text-xs text-zinc-500">Or try a suggestion</p>
+                <p className="shrink-0 text-xs text-[var(--text-muted)]">Or try a suggestion</p>
                 <div className="h-px flex-1 bg-[var(--surface-2)]" aria-hidden />
               </div>
             ) : null}
@@ -200,7 +217,7 @@ export function ChatMessageList({
                   key={prompt.text}
                   type="button"
                   onClick={() => onPromptSelect(prompt.text, prompt.group)}
-                  className="rounded-full border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-1.5 text-xs text-zinc-300 transition-colors hover:border-[var(--accent)]/40 hover:text-white"
+                  className="rounded-full border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-1.5 text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--accent)]/40 hover:text-[var(--text-primary)]"
                 >
                   {prompt.text}
                 </button>
@@ -211,7 +228,7 @@ export function ChatMessageList({
                 <button
                   type="button"
                   onClick={() => setShowMoreSuggestions((open) => !open)}
-                  className="text-xs font-medium text-[var(--accent-soft-text)] transition-colors hover:text-white"
+                  className="text-xs font-medium text-[var(--accent-soft-text)] transition-colors hover:text-[var(--text-primary)]"
                   aria-expanded={showMoreSuggestions}
                 >
                   {showMoreSuggestions ? "Fewer suggestions" : "More suggestions"}
@@ -220,7 +237,7 @@ export function ChatMessageList({
                   <div className="mt-3 w-full space-y-3">
                     {landingPrompts.more.map((group) => (
                       <div key={group.label}>
-                        <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wide text-zinc-500">
+                        <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wide text-[var(--text-muted)]">
                           {group.label}
                         </p>
                         <div className="flex flex-wrap gap-2">
@@ -231,7 +248,7 @@ export function ChatMessageList({
                               onClick={() =>
                                 onPromptSelect(prompt.text, prompt.group)
                               }
-                              className="rounded-full border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-1.5 text-xs text-zinc-300 transition-colors hover:border-[var(--accent)]/40 hover:text-white"
+                              className="rounded-full border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-1.5 text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--accent)]/40 hover:text-[var(--text-primary)]"
                             >
                               {prompt.text}
                             </button>
@@ -244,6 +261,7 @@ export function ChatMessageList({
               </div>
             )}
           </div>
+        </div>
         </div>
       )}
 

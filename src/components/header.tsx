@@ -31,7 +31,7 @@ function NewChatButton({
         type="button"
         onClick={onNewChat}
         aria-label="New chat"
-        className="flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-zinc-300 transition-colors hover:border-zinc-600 hover:text-white sm:hidden"
+        className="flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-[var(--text-secondary)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:hidden"
       >
         <svg
           className="size-4"
@@ -51,7 +51,7 @@ function NewChatButton({
       <button
         type="button"
         onClick={onNewChat}
-        className="hidden rounded-lg border border-[var(--surface-2)] px-3 py-1.5 text-xs text-zinc-300 transition-colors hover:border-zinc-600 hover:text-white sm:inline-flex"
+        className="hidden rounded-lg border border-[var(--surface-2)] px-3 py-1.5 text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:inline-flex"
       >
         New chat
       </button>
@@ -75,7 +75,7 @@ function HistoryButton({
       type="button"
       onClick={openHistory}
       aria-label="View chat history"
-      className="flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-zinc-400 transition-colors hover:border-zinc-600 hover:text-white sm:h-auto sm:w-auto sm:rounded-lg sm:px-3 sm:py-1.5 lg:hidden"
+      className="flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-[var(--text-muted)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:h-auto sm:w-auto sm:rounded-lg sm:px-3 sm:py-1.5 lg:hidden"
     >
       <svg
         className="size-4 sm:mr-1.5"
@@ -119,7 +119,7 @@ function TransactionsButton({
       type="button"
       onClick={handleOpenDrawer}
       aria-label="View transactions"
-      className="flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-zinc-400 transition-colors hover:border-zinc-600 hover:text-white sm:h-auto sm:w-auto sm:rounded-lg sm:px-3 sm:py-1.5"
+      className="flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-[var(--text-muted)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:h-auto sm:w-auto sm:rounded-lg sm:px-3 sm:py-1.5"
     >
       <svg
         className="size-4 sm:mr-1.5"
@@ -158,7 +158,7 @@ export function Header({
           />
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <h1 className="truncate text-base font-semibold text-white sm:text-lg">
+              <h1 className="truncate text-base font-semibold text-[var(--text-primary)] sm:text-lg">
                 Celeste AI
               </h1>
               {/* Celo mainnet logo — hidden for now
@@ -171,11 +171,11 @@ export function Header({
                 title="Celo mainnet"
               />
               */}
-              <span className="rounded-full border border-[var(--surface-2)] px-2 py-0.5 text-[10px] font-medium text-zinc-400">
+              <span className="rounded-full border border-[var(--surface-2)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-muted)]">
                 {CELESTE_VERSION}
               </span>
             </div>
-            <p className="hidden truncate text-xs text-zinc-400 sm:block">
+            <p className="hidden truncate text-xs text-[var(--text-muted)] sm:block">
               {isConnected
                 ? "Your DeFAI assistant for Celo"
                 : "Connect your wallet to get started"}
@@ -205,7 +205,7 @@ export function Header({
               </div>
             </>
           ) : (
-            <div className="size-9 rounded-full bg-zinc-800 sm:h-10 sm:w-[140px] sm:rounded-full" aria-hidden />
+            <div className="size-9 rounded-full bg-[var(--surface-2)] sm:h-10 sm:w-[140px] sm:rounded-full" aria-hidden />
           )}
         </div>
       </div>

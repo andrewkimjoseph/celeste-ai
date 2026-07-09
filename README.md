@@ -4,6 +4,12 @@ DeFAI chat UI for Celo — applied Celina. Connect a wallet, ask about balances,
 
 **Live:** [celeste.usecelina.xyz](https://celeste.usecelina.xyz)
 
+## 8004 submission
+
+- Submission worksheet: [`8004.md`](8004.md)
+- Public EIP-8004 manifest: [`public/agent.json`](public/agent.json)
+- Expected production manifest URL: [https://celeste.usecelina.xyz/agent.json](https://celeste.usecelina.xyz/agent.json)
+
 **Celeste is independent of Celina MCP.** It does not run `@andrewkimjoseph/celina-mcp`, does not use `CELO_PRIVATE_KEY` or `get_wallet_address`, and is not the same product as [usecelina.xyz](https://usecelina.xyz). It is a Next.js app that calls **`@andrewkimjoseph/celina-sdk`** with the connected wallet address from wagmi (same pattern as any custom SDK + wagmi frontend).
 
 ## Setup

@@ -294,6 +294,7 @@ export function ChatPanel({
           status={status}
           mounted={mounted}
           isConnected={isConnected}
+          address={address}
           walletBalances={walletBalances}
           blocksCeloSend={blocksCeloSend}
           errorMessage={error ? formatChatError(error.message) : null}

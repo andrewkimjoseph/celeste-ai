@@ -1,0 +1,21 @@
+{
+  "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+  "name": "Celeste AI",
+  "description": "Celeste AI is a DeFAI chat app for Celo that helps users check balances and prepare wallet-signed transactions for sends, swaps, GoodDollar actions, and Aave flows.",
+  "image": "https://celeste.usecelina.xyz/logo.svg",
+  "active": true,
+  "x402Support": false,
+  "services": [
+    {
+      "name": "web",
+      "endpoint": "https://celeste.usecelina.xyz"
+    },
+    {
+      "name": "chat-api",
+      "endpoint": "https://celeste.usecelina.xyz/api/chat"
+    }
+  ],
+  "supportedTrust": [
+    "reputation"
+  ]
+}

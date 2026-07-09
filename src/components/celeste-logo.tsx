@@ -60,7 +60,7 @@ export function CelesteLogoMark({ className = "" }: { className?: string }) {
       alt="Celeste AI"
       width={192}
       height={192}
-      className={`mx-auto size-36 object-contain drop-shadow-[0_0_24px_rgb(108_180_238/0.55)] sm:size-44 md:size-48 ${className}`}
+      className={`mx-auto size-36 object-contain drop-shadow-[0_0_24px_rgb(166_80_148/0.5)] sm:size-44 md:size-48 ${className}`}
     />
   );
 }
@@ -75,7 +75,7 @@ export function CelesteLogoAvatar({
 
   return (
     <div
-      className={`relative shrink-0 overflow-hidden bg-black ${SHAPE_CLASS[shape]} ${className}`}
+      className={`relative shrink-0 overflow-hidden bg-[var(--surface-0)] ${SHAPE_CLASS[shape]} ${className}`}
       style={{ width: px, height: px }}
       role="img"
       aria-label="Celeste AI"

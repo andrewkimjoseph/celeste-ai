@@ -50,7 +50,7 @@ export function ChatHistoryDrawer() {
       <button
         type="button"
         aria-label="Close chat history panel"
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-[var(--overlay-backdrop)] backdrop-blur-sm transition-opacity"
         onClick={closeHistory}
       />
 
@@ -61,18 +61,18 @@ export function ChatHistoryDrawer() {
         className="absolute left-0 top-0 flex h-dvh w-full max-w-sm flex-col border-r border-[var(--surface-2)] bg-[var(--surface-0)] shadow-2xl shadow-black/40"
         style={{
           backgroundImage:
-            "radial-gradient(ellipse 80% 40% at 50% 0%, rgb(108 180 238 / 0.08), transparent)",
+            "radial-gradient(ellipse 80% 40% at 50% 0%, rgb(166 80 148 / 0.14), transparent)",
         }}
       >
         <div className="flex items-center justify-between gap-3 border-b border-[var(--surface-2)] px-4 py-4">
           <div>
             <h2
               id="chat-history-drawer-title"
-              className="text-base font-semibold text-white"
+              className="text-base font-semibold text-[var(--text-primary)]"
             >
               Chat history
             </h2>
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-[var(--text-muted)]">
               {chats.length === 0
                 ? "Saved on this device"
                 : `${chats.length} saved`}
@@ -83,7 +83,7 @@ export function ChatHistoryDrawer() {
             type="button"
             onClick={closeHistory}
             aria-label="Close"
-            className="flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-zinc-400 transition-colors hover:border-zinc-600 hover:text-white"
+            className="flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-[var(--text-muted)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)]"
           >
             <svg
               className="size-4"
@@ -106,7 +106,7 @@ export function ChatHistoryDrawer() {
           <button
             type="button"
             onClick={() => void createChat()}
-            className="flex w-full items-center justify-center gap-2 rounded-lg border border-[var(--surface-2)] px-3 py-2 text-sm text-zinc-200 transition-colors hover:border-zinc-600 hover:text-white"
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-[var(--surface-2)] px-3 py-2 text-sm text-[var(--text-secondary)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)]"
           >
             <svg
               className="size-4"
@@ -130,14 +130,14 @@ export function ChatHistoryDrawer() {
           {isLoading ? (
             <div className="flex items-center justify-center py-16">
               <span
-                className="inline-block size-5 animate-spin rounded-full border-2 border-zinc-600 border-t-[var(--accent-hover)]"
+                className="inline-block size-5 animate-spin rounded-full border-2 border-[var(--surface-3)] border-t-[var(--accent-hover)]"
                 aria-hidden
               />
             </div>
           ) : chats.length === 0 ? (
             <div className="flex flex-col items-center justify-center px-4 py-16 text-center">
-              <p className="text-sm font-medium text-zinc-200">No saved chats</p>
-              <p className="mt-1 max-w-xs text-sm leading-relaxed text-zinc-500">
+              <p className="text-sm font-medium text-[var(--text-secondary)]">No saved chats</p>
+              <p className="mt-1 max-w-xs text-sm leading-relaxed text-[var(--text-muted)]">
                 Start a conversation and it will appear here after your first
                 message.
               </p>

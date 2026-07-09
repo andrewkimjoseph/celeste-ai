@@ -2,17 +2,32 @@
 
 :root {
   --background: #000000;
-  --foreground: #fafafa;
+  --foreground: #f7f4fb;
   --surface-0: #000000;
-  --surface-1: #0a0a0a;
-  --surface-2: #1a1a1a;
-  --accent: #6cb4ee;
-  --accent-hover: #8cc5f2;
-  --accent-strong: #5090c8;
-  --accent-soft: rgb(108 180 238 / 0.15);
-  --accent-soft-border: rgb(108 180 238 / 0.2);
-  --accent-soft-text: rgb(184 218 247 / 0.9);
-  --accent-foreground: #000000;
+  --surface-1: #09070e;
+  --surface-2: #1b1527;
+  --surface-3: #251d34;
+
+  --brand-primary: #5e4180;
+  --brand-secondary: #a65094;
+  --brand-tertiary: #c188b9;
+  --brand-cool: #5a79af;
+  --brand-cool-light: #9eb2d2;
+
+  --accent: var(--brand-secondary);
+  --accent-hover: var(--brand-tertiary);
+  --accent-strong: var(--brand-primary);
+  --accent-soft: rgb(166 80 148 / 0.2);
+  --accent-soft-border: rgb(193 136 185 / 0.35);
+  --accent-soft-text: rgb(221 188 216 / 0.96);
+  --accent-foreground: #f7f4fb;
+
+  --text-primary: #f7f4fb;
+  --text-secondary: #d7cbdf;
+  --text-muted: #aa9fb7;
+  --text-subtle: #857994;
+  --border-strong: rgb(193 136 185 / 0.28);
+  --overlay-backdrop: rgb(9 7 14 / 0.72);
   --warn: #f59e0b;
   --app-height: 100dvh;
   --app-offset-top: 0px;
@@ -39,9 +54,9 @@ body {
   width: 100%;
   background: var(--surface-0);
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgb(108 180 238 / 0.1), transparent),
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgb(90 121 175 / 0.2), transparent),
     linear-gradient(to bottom, var(--surface-0), #050505);
-  color: var(--foreground);
+  color: var(--text-primary);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
@@ -93,12 +108,12 @@ body {
   border-radius: 1px;
   background: linear-gradient(
     180deg,
-    rgb(140 197 242 / 0.95) 0%,
-    rgb(108 180 238 / 0.85) 100%
+    rgb(193 136 185 / 0.96) 0%,
+    rgb(90 121 175 / 0.9) 100%
   );
   box-shadow:
-    0 0 6px rgb(108 180 238 / 0.55),
-    0 0 14px rgb(108 180 238 / 0.25);
+    0 0 6px rgb(166 80 148 / 0.52),
+    0 0 14px rgb(90 121 175 / 0.28);
   transform-origin: center bottom;
   will-change: opacity, transform, box-shadow;
   animation: stream-cursor-breathe 1.05s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
@@ -110,8 +125,8 @@ body {
     opacity: 1;
     transform: scaleY(1);
     box-shadow:
-      0 0 6px rgb(108 180 238 / 0.55),
-      0 0 14px rgb(108 180 238 / 0.25);
+      0 0 6px rgb(166 80 148 / 0.52),
+      0 0 14px rgb(90 121 175 / 0.28);
   }
 
   45% {
@@ -123,8 +138,8 @@ body {
     opacity: 0.28;
     transform: scaleY(0.94);
     box-shadow:
-      0 0 2px rgb(108 180 238 / 0.2),
-      0 0 6px rgb(108 180 238 / 0.08);
+      0 0 2px rgb(166 80 148 / 0.22),
+      0 0 6px rgb(90 121 175 / 0.12);
   }
 
   55% {
