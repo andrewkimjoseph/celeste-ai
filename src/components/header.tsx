@@ -1,12 +1,15 @@
 "use client";
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import Link from "next/link";
 import { CelesteLogoAvatar } from "@/components/celeste-logo";
+import { PersonalityPicker } from "@/components/chat/personality-picker";
 import { useMounted } from "@/hooks/use-mounted";
 import { useChats } from "@/hooks/use-chats";
 import { useTransactions } from "@/hooks/use-transactions";
 import { trackEvent } from "@/lib/analytics/amplitude-browser";
 import { CELESTE_VERSION } from "@/lib/app-version";
+import { useState } from "react";
 
 interface HeaderProps {
   showNewChat?: boolean;
@@ -146,6 +149,12 @@ export function Header({
   isConnected = false,
 }: HeaderProps) {
   const mounted = useMounted();
+  const [showPersonalityPicker, setShowPersonalityPicker] = useState(false);
+  const {
+    selectedPersonalityId,
+    hasSelectedPersonality,
+    setSelectedPersonality,
+  } = useChats();
 
   return (
     <header className="border-b border-[var(--surface-2)] bg-[var(--surface-0)]/80 px-3 py-2.5 backdrop-blur-md sm:px-4 sm:py-3">
@@ -177,15 +186,62 @@ export function Header({
             </div>
             <p className="hidden truncate text-xs text-[var(--text-muted)] sm:block">
               {isConnected
-                ? "Your DeFAI assistant for Celo"
-                : "Connect your wallet to get started"}
+                ? "Navigate Celo like a cosmic atlas"
+                : "Connect your wallet to begin your first mission"}
             </p>
           </div>
         </div>
 
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <Link
+            href="/about"
+            className="hidden rounded-lg border border-[var(--surface-2)] px-3 py-1.5 text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:inline-flex"
+          >
+            About
+          </Link>
           <HistoryButton isConnected={isConnected} />
           <TransactionsButton isConnected={isConnected} />
+          {isConnected ? (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowPersonalityPicker((open) => !open)}
+                className={`hidden rounded-lg border px-3 py-1.5 text-xs transition-colors sm:inline-flex ${
+                  hasSelectedPersonality
+                    ? "border-[var(--surface-2)] text-[var(--text-secondary)] hover:border-[var(--border-strong)] hover:text-[var(--text-primary)]"
+                    : "border-[var(--accent)]/60 text-[var(--accent-soft-text)] hover:border-[var(--accent)]"
+                }`}
+              >
+                {hasSelectedPersonality ? "Personality" : "Choose personality"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowPersonalityPicker((open) => !open)}
+                aria-label={
+                  hasSelectedPersonality
+                    ? "Change personality"
+                    : "Choose personality"
+                }
+                className="flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-[var(--text-muted)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:hidden"
+              >
+                ✦
+              </button>
+              {showPersonalityPicker ? (
+                <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[300px] rounded-xl border border-[var(--surface-2)] bg-[var(--surface-0)] p-3 shadow-2xl shadow-black/40 sm:w-[340px]">
+                  <PersonalityPicker
+                    compact
+                    selectedId={selectedPersonalityId}
+                    onSelect={(id) => {
+                      setShowPersonalityPicker(false);
+                      void setSelectedPersonality(id);
+                    }}
+                    title="Your personality"
+                    description="Change how you appear in chat."
+                  />
+                </div>
+              ) : null}
+            </div>
+          ) : null}
           <NewChatButton showNewChat={showNewChat} onNewChat={onNewChat} />
           {mounted ? (
             <>

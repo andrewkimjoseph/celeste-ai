@@ -37,8 +37,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-space-grotesk);
+  --font-mono: var(--font-inter);
 }
 
 html,
@@ -57,7 +57,7 @@ body {
     radial-gradient(ellipse 80% 50% at 50% -20%, rgb(90 121 175 / 0.2), transparent),
     linear-gradient(to bottom, var(--surface-0), #050505);
   color: var(--text-primary);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-space-grotesk), system-ui, sans-serif;
 }
 
 @supports (height: 100dvh) {
@@ -145,5 +145,21 @@ body {
   55% {
     opacity: 0.92;
     transform: scaleY(1);
+  }
+}
+
+@keyframes globe-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.globe-spin {
+  animation: globe-spin 24s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .globe-spin {
+    animation: none;
   }
 }

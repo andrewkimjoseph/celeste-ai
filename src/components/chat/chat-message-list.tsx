@@ -19,7 +19,7 @@ import {
 } from "@/lib/prepared-flow";
 import { TxConfirmCard } from "@/components/tx-confirm-card";
 import { TxConfirmCardSnapshot } from "@/components/tx-confirm-card-snapshot";
-import { CelesteLogo } from "@/components/celeste-logo";
+import { CelesteGlobeMark } from "@/components/celeste-logo";
 import { trackEvent } from "@/lib/analytics/amplitude-browser";
 import type { PromptGroup } from "@/lib/analytics/events";
 import { inferFlowCategory } from "@/lib/analytics/flow-category";
@@ -43,6 +43,8 @@ interface ChatMessageListProps {
   confirmedFlowTimestamps: Record<string, number>;
   pendingFlow: PreparedFlowWithExtras | undefined;
   txCardFlowKey: string | null;
+  hasSelectedPersonality: boolean;
+  personalityPicker?: ReactNode;
   landingComposer?: ReactNode;
   onPromptSelect: (prompt: string, promptGroup?: PromptGroup) => void;
   onTxComplete: (hashes: string[]) => void;
@@ -63,6 +65,8 @@ export function ChatMessageList({
   confirmedFlowTimestamps,
   pendingFlow,
   txCardFlowKey,
+  hasSelectedPersonality,
+  personalityPicker,
   landingComposer,
   onPromptSelect,
   onTxComplete,
@@ -171,43 +175,48 @@ export function ChatMessageList({
       >
       {showConnectPrompt && (
         <div className="rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)]/60 px-4 py-6 text-center">
-          <p className="text-sm text-[var(--text-secondary)]">Connect your wallet to start chatting with Celeste AI.</p>
+          <p className="text-sm text-[var(--text-secondary)]">Connect your wallet to open your celestial control deck.</p>
           <p className="mt-1 text-xs text-[var(--text-muted)]">
-            Your balances will show up once you&apos;re connected.
+            Your balances and route intelligence appear as soon as you connect.
           </p>
         </div>
       )}
 
       {showEmptyState && (
         <div>
-          <div className="mb-4 flex items-center justify-center gap-2.5 sm:mb-5">
-            <CelesteLogo
-              size="xs"
-              rounded="full"
-              className="shadow-sm ring-1 ring-[var(--accent)]/25"
-            />
-            <h2 className="text-center text-2xl font-medium tracking-tight text-[var(--text-primary)] sm:text-3xl">
-              {addressLabel ? `Back at it, ${addressLabel}.` : "Back at it."}
-            </h2>
-          </div>
+          <CelesteGlobeMark className="mb-4 sm:mb-5" />
+          <h2 className="mb-4 text-center text-2xl font-medium tracking-tight text-[var(--text-primary)] sm:mb-5 sm:text-3xl">
+            {addressLabel
+              ? `Welcome back, ${addressLabel}. Chart your next orbit.`
+              : "Welcome back. Chart your next orbit."}
+          </h2>
           <div className="rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)]/60 px-3 py-4 sm:px-4 sm:py-6">
+          {!hasSelectedPersonality && personalityPicker ? (
+            <div className="mx-auto mb-4 max-w-xl rounded-xl border border-[var(--surface-2)] bg-[var(--surface-0)]/55 p-3 sm:p-4">
+              {personalityPicker}
+            </div>
+          ) : null}
           <h2 className="text-center text-base font-semibold text-[var(--text-primary)]">
-            What can I help with?
+            Where should we travel next?
           </h2>
           <p className="mt-1 text-center text-sm text-[var(--text-secondary)]">
-            Send, swap, earn, or claim GoodDollar on Celo — ask in plain English.
+            Send, swap, earn, and claim on Celo with guided mission control.
           </p>
           {balanceLine ? (
             <p className="mt-2 text-center text-xs text-[var(--text-muted)]">{balanceLine}</p>
           ) : null}
           {landingComposer ? (
             <div className="mt-4">{landingComposer}</div>
+          ) : !hasSelectedPersonality ? (
+            <p className="mt-4 text-center text-xs text-[var(--text-subtle)]">
+              Choose a celestial personality to unlock mission chat.
+            </p>
           ) : null}
           <div className="mt-4 space-y-3">
             {landingComposer ? (
               <div className="flex items-center gap-3">
                 <div className="h-px flex-1 bg-[var(--surface-2)]" aria-hidden />
-                <p className="shrink-0 text-xs text-[var(--text-muted)]">Or try a suggestion</p>
+                <p className="shrink-0 text-xs text-[var(--text-muted)]">Or launch a suggested mission</p>
                 <div className="h-px flex-1 bg-[var(--surface-2)]" aria-hidden />
               </div>
             ) : null}
@@ -231,7 +240,7 @@ export function ChatMessageList({
                   className="text-xs font-medium text-[var(--accent-soft-text)] transition-colors hover:text-[var(--text-primary)]"
                   aria-expanded={showMoreSuggestions}
                 >
-                  {showMoreSuggestions ? "Fewer suggestions" : "More suggestions"}
+                  {showMoreSuggestions ? "Show fewer missions" : "Show more missions"}
                 </button>
                 {showMoreSuggestions && (
                   <div className="mt-3 w-full space-y-3">

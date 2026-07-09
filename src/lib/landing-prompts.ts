@@ -23,45 +23,48 @@ const STATIC_MORE_GROUPS: Array<{ label: string; group: PromptGroup; prompts: st
     label: "Send",
     group: "Send",
     prompts: [
-      "Send 5 USDm to andrewkimjoseph.celo.eth",
-      "Send 1 USDC to andrewkimjoseph.celo.eth",
+      "Launch a transfer: send 5 USDm to andrewkimjoseph.celo.eth",
+      "Beam 1 USDC to andrewkimjoseph.celo.eth",
     ],
   },
   {
     label: "Swap / convert",
     group: "Swap",
     prompts: [
-      "Swap 10 USDm to CELO",
-      "Get a quote to swap CELO to USDC",
-      "Convert 50 USDm to EURm",
-      "Convert 20 EURm to USDC",
+      "Route 10 USDm into CELO",
+      "Plot a quote for CELO to USDC",
+      "Convert 50 USDm into EURm",
+      "Convert 20 EURm into USDC",
     ],
   },
   {
     label: "Earn",
     group: "Earn",
     prompts: [
-      "Save 10 USDT to Aave",
-      "Withdraw my entire Aave savings",
-      "Check my Aave balances",
+      "Deploy 10 USDT to Aave",
+      "Withdraw my full Aave position",
+      "Scan my Aave balances",
     ],
   },
   {
     label: "GoodDollar",
     group: "GoodDollar",
     prompts: [
-      "Claim my GoodDollar UBI",
-      "Check my GoodDollar status",
-      "How much G$ do I need to get 0.6 USDm?",
+      "Claim my GoodDollar UBI mission",
+      "Check my GoodDollar orbit status",
+      "How much G$ is needed to receive 0.6 USDm?",
     ],
   },
 ];
 
 const PRIMARY_BACKFILL: LandingPrompt[] = [
-  { text: "Send 5 USDm to andrewkimjoseph.celo.eth", group: "Send" },
-  { text: "Get a quote to swap CELO to USDC", group: "Swap" },
-  { text: "Claim my GoodDollar UBI", group: "GoodDollar" },
-  { text: "Check my Aave balances", group: "Earn" },
+  {
+    text: "Launch a transfer: send 5 USDm to andrewkimjoseph.celo.eth",
+    group: "Send",
+  },
+  { text: "Plot a quote for CELO to USDC", group: "Swap" },
+  { text: "Claim my GoodDollar UBI mission", group: "GoodDollar" },
+  { text: "Scan my Aave balances", group: "Earn" },
 ];
 
 function parseBalance(value: string): number {
@@ -122,31 +125,31 @@ function buildPrimaryFromBalances(
 
   if (stable) {
     primary.push({
-      text: `Send 1 ${stable} to andrewkimjoseph.celo.eth`,
+      text: `Launch transfer: send 1 ${stable} to andrewkimjoseph.celo.eth`,
       group: "Send",
     });
   }
 
   if (stable && hasCelo) {
     primary.push({
-      text: `Swap 10 ${stable} to CELO`,
+      text: `Route 10 ${stable} into CELO`,
       group: "Swap",
     });
   } else {
     primary.push({
-      text: "Get a quote to swap CELO to USDC",
+      text: "Plot a quote for CELO to USDC",
       group: "Swap",
     });
   }
 
   if (hasGoodDollarBalance(balances.tokens)) {
     primary.push({
-      text: "How much G$ do I need to get 0.6 USDm?",
+      text: "How much G$ is needed to receive 0.6 USDm?",
       group: "GoodDollar",
     });
   } else {
     primary.push({
-      text: "Claim my GoodDollar UBI",
+      text: "Claim my GoodDollar UBI mission",
       group: "GoodDollar",
     });
   }
@@ -154,12 +157,12 @@ function buildPrimaryFromBalances(
   const earn = earnSymbol(balances.tokens);
   if (earn) {
     primary.push({
-      text: `Save 10 ${earn} to Aave`,
+      text: `Deploy 10 ${earn} to Aave`,
       group: "Earn",
     });
   } else {
     primary.push({
-      text: "Check my Aave balances",
+      text: "Scan my Aave balances",
       group: "Earn",
     });
   }
@@ -256,5 +259,5 @@ export function formatLandingBalanceLine(
     return null;
   }
 
-  return `You have ${holdings} — try a swap or send below.`;
+  return `Stellar holdings detected: ${holdings}. Launch a mission below.`;
 }

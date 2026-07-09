@@ -52,8 +52,8 @@ export function ChatComposer({
           onFocus={handleFocus}
           placeholder={
             canChat
-              ? "Ask about swaps, sends, or DeFi on Celo…"
-              : "Connect wallet first…"
+              ? "Describe your next mission: swap, send, earn, or claim on Celo…"
+              : "Connect wallet to activate mission control…"
           }
           disabled={!canChat || isBusy}
           rows={1}
@@ -70,7 +70,7 @@ export function ChatComposer({
       </div>
       {!isEmbedded ? (
         <p className="mt-1.5 hidden text-[10px] text-[var(--text-subtle)] sm:block">
-          Enter to send · Shift+Enter for new line
+          Enter to launch · Shift+Enter for new line
         </p>
       ) : null}
     </form>
