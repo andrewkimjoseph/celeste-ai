@@ -78,6 +78,8 @@ export function ChatMessageList({
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const trackedTxCardKeyRef = useRef<string | null>(null);
+  const activeChatIdRef = useRef<string | null>(null);
+  const pendingInitialScrollRef = useRef(false);
   const showLoading = shouldShowAssistantLoading(status, messages);
   const isStreaming = status === "streaming";
   const signedFlowMetas = getSignedPreparedFlowMetas(messages, confirmedFlowHashes);
@@ -92,9 +94,30 @@ export function ChatMessageList({
     : null;
 
   useEffect(() => {
-    const container = scrollContainerRef.current;
+    if (chatId !== activeChatIdRef.current) {
+      activeChatIdRef.current = chatId ?? null;
+      pendingInitialScrollRef.current = true;
+    }
+  }, [chatId]);
+
+  useEffect(() => {
     const bottom = bottomRef.current;
-    if (!container || !bottom) {
+    const container = scrollContainerRef.current;
+    if (!bottom || !container) {
+      return;
+    }
+
+    const scrollToBottom = (behavior: ScrollBehavior) => {
+      bottom.scrollIntoView({ behavior, block: "end" });
+    };
+
+    if (pendingInitialScrollRef.current) {
+      pendingInitialScrollRef.current = false;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          scrollToBottom("smooth");
+        });
+      });
       return;
     }
 
@@ -106,23 +129,8 @@ export function ChatMessageList({
       return;
     }
 
-    container.scrollTo({
-      top: container.scrollHeight,
-      behavior: isStreaming ? "auto" : "smooth",
-    });
-  }, [messages, status, showTxCard, showLoading, isStreaming]);
-
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) {
-      return;
-    }
-
-    container.scrollTo({
-      top: container.scrollHeight,
-      behavior: "auto",
-    });
-  }, [chatId]);
+    scrollToBottom(isStreaming ? "auto" : "smooth");
+  }, [messages, status, showTxCard, showLoading, isStreaming, chatId]);
 
   useEffect(() => {
     if (!showTxCard || !pendingFlow || !txCardFlowKey) {
