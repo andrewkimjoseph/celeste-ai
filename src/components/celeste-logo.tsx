@@ -1,4 +1,5 @@
 export const CELESTE_LOGO_SRC = "/logo.svg";
+export const CELESTE_GLOBE_SRC = "/globe.svg";
 
 const LOGO_SIZES = {
   xs: 28,
@@ -50,6 +51,21 @@ const SHAPE_CLASS = {
   circle: "rounded-full",
   squircle: "rounded-xl sm:rounded-lg",
 } as const;
+
+/** Slow-spinning Celo globe for the landing hero. */
+export function CelesteGlobeMark({ className = "" }: { className?: string }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- static brand asset; public/globe.svg
+    <img
+      src={CELESTE_GLOBE_SRC}
+      alt=""
+      width={160}
+      height={160}
+      aria-hidden
+      className={`globe-spin mx-auto size-28 object-contain drop-shadow-[0_0_20px_rgb(90_121_175/0.45)] motion-reduce:animate-none sm:size-36 md:size-40 ${className}`}
+    />
+  );
+}
 
 /** Large centered brand mark for empty states and landing hero. */
 export function CelesteLogoMark({ className = "" }: { className?: string }) {
