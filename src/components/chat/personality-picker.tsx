@@ -59,7 +59,7 @@ export function PersonalityPicker({
                     {option.label}
                   </p>
                   <p className="text-[10px] text-[var(--text-subtle)]">
-                    {isSelected ? "Selected" : "Select personality"}
+                    {isSelected ? "Selected" : "Select"}
                   </p>
                 </div>
               </div>

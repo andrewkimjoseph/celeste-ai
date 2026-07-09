@@ -30,6 +30,7 @@ import {
 } from "@/lib/landing-prompts";
 
 interface ChatMessageListProps {
+  chatId?: string | null;
   messages: CelesteUIMessage[];
   status: ChatStatus;
   mounted: boolean;
@@ -52,6 +53,7 @@ interface ChatMessageListProps {
 }
 
 export function ChatMessageList({
+  chatId,
   messages,
   status,
   mounted,
@@ -109,6 +111,18 @@ export function ChatMessageList({
       behavior: isStreaming ? "auto" : "smooth",
     });
   }, [messages, status, showTxCard, showLoading, isStreaming]);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) {
+      return;
+    }
+
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior: "auto",
+    });
+  }, [chatId]);
 
   useEffect(() => {
     if (!showTxCard || !pendingFlow || !txCardFlowKey) {

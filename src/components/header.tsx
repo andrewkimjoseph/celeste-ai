@@ -229,9 +229,10 @@ export function Header({
                   void setFxEnabled(!fxEnabled);
                 }}
                 aria-label="Toggle celestial effects"
-                className="flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-[var(--text-muted)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:hidden"
+                className="inline-flex h-9 items-center justify-center gap-1 rounded-full border border-[var(--surface-2)] px-2 text-[10px] font-medium uppercase tracking-wide text-[var(--text-muted)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:hidden"
               >
-                ✧
+                <span aria-hidden>✧</span>
+                <span>FX</span>
               </button>
               {showFxControls ? (
                 <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[220px] rounded-xl border border-[var(--surface-2)] bg-[var(--surface-0)] p-3 shadow-2xl shadow-black/40">
@@ -282,9 +283,10 @@ export function Header({
                     ? "Change personality"
                     : "Choose personality"
                 }
-                className="flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-[var(--text-muted)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:hidden"
+                className="inline-flex h-9 items-center justify-center gap-1 rounded-full border border-[var(--surface-2)] px-2 text-[10px] font-medium uppercase tracking-wide text-[var(--text-muted)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:hidden"
               >
-                ✦
+                <span aria-hidden>✦</span>
+                <span>Persona</span>
               </button>
               {showPersonalityPicker ? (
                 <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[300px] rounded-xl border border-[var(--surface-2)] bg-[var(--surface-0)] p-3 shadow-2xl shadow-black/40 sm:w-[340px]">
