@@ -8,6 +8,7 @@ import { DefaultChatTransport } from "ai";
 import { useMemo, useState, useEffect, useCallback, useRef } from "react";
 import { ChatComposer } from "@/components/chat/chat-composer";
 import { ChatMessageList } from "@/components/chat/chat-message-list";
+import { PersonalityPicker } from "@/components/chat/personality-picker";
 import { formatChatError } from "@/components/chat/chat-utils";
 import { useChats } from "@/hooks/use-chats";
 import { trackEvent } from "@/lib/analytics/amplitude-browser";
@@ -57,7 +58,6 @@ export function ChatPanel({
   const mountedInternal = useMounted();
   const mounted = mountedProp ?? mountedInternal;
   const isConnected = isConnectedProp ?? false;
-  const canChat = mounted && isConnected && Boolean(address);
   const queryClient = useQueryClient();
   const { addTransaction } = useTransactions();
   const { supportsFeeAbstraction, blocksCeloSend } = useWalletCapabilities();
@@ -68,7 +68,12 @@ export function ChatPanel({
     isLoading: isChatLoading,
     createChat,
     saveActiveChat,
+    selectedPersonalityId,
+    hasSelectedPersonality,
+    setSelectedPersonality,
   } = useChats();
+  const canChat =
+    mounted && isConnected && Boolean(address) && hasSelectedPersonality;
   const [input, setInput] = useState("");
   const [dismissedFlowKey, setDismissedFlowKey] = useState<string | null>(null);
   /** After dismiss, hide confirm cards until the user sends a new message. */
@@ -242,6 +247,7 @@ export function ChatPanel({
   const isLandingView =
     mounted && messages.length === 0 && !showLoading && !showTxCard;
   const showEmbeddedComposer = isLandingView && canChat;
+  const needsPersonality = isConnected && !hasSelectedPersonality;
 
   useEffect(() => {
     onLandingStateChange?.(isLandingView);
@@ -303,6 +309,17 @@ export function ChatPanel({
           confirmedFlowTimestamps={confirmedFlowTimestamps}
           pendingFlow={pendingFlowMeta?.flow}
           txCardFlowKey={flowKey}
+          hasSelectedPersonality={hasSelectedPersonality}
+          personalityPicker={
+            needsPersonality ? (
+              <PersonalityPicker
+                selectedId={selectedPersonalityId}
+                onSelect={(id) => {
+                  void setSelectedPersonality(id);
+                }}
+              />
+            ) : undefined
+          }
           landingComposer={showEmbeddedComposer ? composer : undefined}
           onPromptSelect={(prompt, promptGroup) =>
             void handlePromptSelect(prompt, promptGroup)

@@ -1,14 +1,22 @@
 import Dexie, { type Table } from "dexie";
 import type { StoredChat } from "@/lib/chats";
+import type { CelestialPersonalityId } from "@/lib/celestial-personalities";
 import {
   MAX_TRANSACTIONS_PER_WALLET,
   type NewSessionTransaction,
   type SessionTransaction,
 } from "@/lib/transactions";
 
+export interface UserPreference {
+  address: string;
+  personalityId: CelestialPersonalityId;
+  updatedAt: number;
+}
+
 class CelesteDatabase extends Dexie {
   transactions!: Table<SessionTransaction, string>;
   chats!: Table<StoredChat, string>;
+  preferences!: Table<UserPreference, string>;
 
   constructor() {
     super("celeste-ai");
@@ -18,6 +26,11 @@ class CelesteDatabase extends Dexie {
     this.version(2).stores({
       transactions: "id, address, timestamp",
       chats: "id, address, updatedAt",
+    });
+    this.version(3).stores({
+      transactions: "id, address, timestamp",
+      chats: "id, address, updatedAt",
+      preferences: "address, updatedAt",
     });
   }
 }

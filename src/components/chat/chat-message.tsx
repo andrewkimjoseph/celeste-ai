@@ -8,6 +8,8 @@ import {
 } from "@/lib/chat-message-metadata";
 import { CelesteLogoAvatar } from "@/components/celeste-logo";
 import { MessagePart } from "@/components/chat/message-part";
+import { useChats } from "@/hooks/use-chats";
+import { getCelestialPersonality } from "@/lib/celestial-personalities";
 
 interface ChatMessageProps {
   message: CelesteUIMessage;
@@ -20,11 +22,13 @@ export function ChatMessage({
   hidePrepareToolDone = false,
   align,
 }: ChatMessageProps) {
+  const { selectedPersonalityId } = useChats();
   const isUser = message.role === "user";
   const messageAlign = align ?? (isUser ? "end" : "start");
   const createdAt = getMessageCreatedAt(message);
   const timestampLabel =
     createdAt != null ? formatMessageTimestamp(createdAt) : null;
+  const selectedPersonality = getCelestialPersonality(selectedPersonalityId);
 
   return (
     <div
@@ -35,13 +39,24 @@ export function ChatMessage({
       }`}
     >
       {isUser ? (
-        <span
-          className="mt-1 flex size-7 shrink-0 items-center justify-center text-lg sm:size-8 sm:text-xl"
-          aria-label="You"
-          role="img"
-        >
-          🙂
-        </span>
+        selectedPersonality ? (
+          // eslint-disable-next-line @next/next/no-img-element -- static personality asset in public
+          <img
+            src={selectedPersonality.imageSrc}
+            alt={selectedPersonality.label}
+            width={32}
+            height={32}
+            className="mt-1 size-7 shrink-0 rounded-full object-contain ring-1 ring-[var(--accent)]/30 sm:size-8"
+          />
+        ) : (
+          <span
+            className="mt-1 flex size-7 shrink-0 items-center justify-center rounded-full border border-[var(--surface-2)] text-xs text-[var(--text-subtle)] sm:size-8"
+            aria-label="Choose personality"
+            role="img"
+          >
+            ✦
+          </span>
+        )
       ) : (
         <CelesteLogoAvatar
           size="sm"

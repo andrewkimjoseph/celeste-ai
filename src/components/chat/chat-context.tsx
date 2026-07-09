@@ -11,11 +11,14 @@ import {
 import {
   deleteChat as deleteChatFromDb,
   getChat,
+  getPersonalityByAddress,
   listChats,
+  upsertPersonalityPreference,
   upsertChat,
 } from "@/lib/chat-db";
 import { trackEvent } from "@/lib/analytics/amplitude-browser";
 import type { CelesteUIMessage } from "@/lib/chat-message-metadata";
+import type { CelestialPersonalityId } from "@/lib/celestial-personalities";
 import {
   createContext,
   useCallback,
@@ -34,8 +37,11 @@ interface ChatContextValue {
   isLoading: boolean;
   persistenceEnabled: boolean;
   isHistoryOpen: boolean;
+  selectedPersonalityId: CelestialPersonalityId | null;
+  hasSelectedPersonality: boolean;
   openHistory: () => void;
   closeHistory: () => void;
+  setSelectedPersonality: (id: CelestialPersonalityId) => Promise<void>;
   createChat: () => Promise<void>;
   selectChat: (id: string) => Promise<void>;
   deleteChat: (id: string) => Promise<void>;
@@ -66,6 +72,8 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [persistenceEnabled, setPersistenceEnabled] = useState(true);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [selectedPersonalityId, setSelectedPersonalityId] =
+    useState<CelestialPersonalityId | null>(null);
   const activeChatRef = useRef<ActiveChatState | null>(null);
   const persistenceEnabledRef = useRef(true);
 
@@ -84,6 +92,23 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
     setChats(rows.map(toChatListItem));
     return rows;
   }, []);
+
+  const setSelectedPersonality = useCallback(
+    async (id: CelestialPersonalityId) => {
+      if (!address) {
+        return;
+      }
+      const normalized = address.toLowerCase();
+      setSelectedPersonalityId(id);
+      try {
+        await upsertPersonalityPreference(normalized, id);
+      } catch (error) {
+        console.warn("Celeste personality persistence failed:", error);
+        setPersistenceEnabled(false);
+      }
+    },
+    [address],
+  );
 
   const persistChat = useCallback(
     async (
@@ -181,6 +206,10 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
 
         setChats(rows.map(toChatListItem));
         setPersistenceEnabled(true);
+        const persistedPersonality = await getPersonalityByAddress(address);
+        if (!cancelled) {
+          setSelectedPersonalityId(persistedPersonality);
+        }
 
         if (rows.length > 0) {
           const latest = rows[0];
@@ -207,6 +236,7 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
         setPersistenceEnabled(false);
         setChats(EMPTY_CHATS);
         setActiveChat(createEmptyActiveChat(createChatId()));
+        setSelectedPersonalityId(null);
       } finally {
         if (!cancelled) {
           setIsLoading(false);
@@ -348,8 +378,11 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
       isLoading,
       persistenceEnabled,
       isHistoryOpen,
+      selectedPersonalityId,
+      hasSelectedPersonality: Boolean(selectedPersonalityId),
       openHistory,
       closeHistory,
+      setSelectedPersonality,
       createChat,
       selectChat,
       deleteChat,
@@ -361,8 +394,10 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
       isLoading,
       persistenceEnabled,
       isHistoryOpen,
+      selectedPersonalityId,
       openHistory,
       closeHistory,
+      setSelectedPersonality,
       createChat,
       selectChat,
       deleteChat,

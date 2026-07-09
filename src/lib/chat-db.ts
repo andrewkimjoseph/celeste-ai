@@ -7,6 +7,10 @@ import {
 } from "@/lib/chats";
 import { celesteDb } from "@/lib/transaction-db";
 import type { CelesteUIMessage } from "@/lib/chat-message-metadata";
+import {
+  isCelestialPersonalityId,
+  type CelestialPersonalityId,
+} from "@/lib/celestial-personalities";
 
 function normalizeAddress(address: string): string {
   return address.toLowerCase();
@@ -27,6 +31,27 @@ export async function listChats(address: string): Promise<StoredChat[]> {
 
 export async function getChat(id: string): Promise<StoredChat | undefined> {
   return celesteDb.chats.get(id);
+}
+
+export async function getPersonalityByAddress(
+  address: string,
+): Promise<CelestialPersonalityId | null> {
+  const record = await celesteDb.preferences.get(normalizeAddress(address));
+  if (!record || !isCelestialPersonalityId(record.personalityId)) {
+    return null;
+  }
+  return record.personalityId;
+}
+
+export async function upsertPersonalityPreference(
+  address: string,
+  personalityId: CelestialPersonalityId,
+): Promise<void> {
+  await celesteDb.preferences.put({
+    address: normalizeAddress(address),
+    personalityId,
+    updatedAt: Date.now(),
+  });
 }
 
 async function trimChatsForAddress(address: string): Promise<void> {
