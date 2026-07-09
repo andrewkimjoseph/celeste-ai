@@ -13,6 +13,7 @@ export function getCelinaClient() {
     rpcUrl: process.env.CELO_RPC_URL_MAINNET ?? "https://forno.celo.org",
     ethRpcUrl: process.env.ETH_RPC_URL_MAINNET,
     analyticsDeviceId: "celeste_ai",
+    attributionTags: ["celo_862c21dd97a7"],
   });
   return cachedClient;
 }
