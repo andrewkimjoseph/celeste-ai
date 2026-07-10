@@ -27,7 +27,7 @@ function formatRelativeTime(iso: string): string {
 function ChevronIcon({ expanded }: { expanded: boolean }) {
   return (
     <svg
-      className={`size-4 text-zinc-500 transition-transform duration-200 ${
+      className={`size-4 text-zinc-500 transition-transform duration-300 ease-in-out motion-reduce:duration-0 ${
         expanded ? "rotate-180" : ""
       }`}
       fill="none"
@@ -210,15 +210,22 @@ function MobileBalanceAccordion({
         <ChevronIcon expanded={expanded} />
       </button>
 
-      {expanded && (
-        <div className="max-h-[45vh] overflow-y-auto border-t border-[var(--surface-2)] bg-[var(--surface-1)]/40 px-3 pb-4 pt-3 sm:px-4">
-          <PanelBody
-            address={address}
-            includeZero={includeZero}
-            onIncludeZeroChange={setIncludeZero}
-          />
+      <div
+        className={`grid transition-[grid-template-rows] duration-300 ease-in-out motion-reduce:duration-0 ${
+          expanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        }`}
+        aria-hidden={!expanded}
+      >
+        <div className="min-h-0 overflow-hidden">
+          <div className="max-h-[45vh] overflow-y-auto border-t border-[var(--surface-2)] bg-[var(--surface-1)]/40 px-3 pb-4 pt-3 sm:px-4">
+            <PanelBody
+              address={address}
+              includeZero={includeZero}
+              onIncludeZeroChange={setIncludeZero}
+            />
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
