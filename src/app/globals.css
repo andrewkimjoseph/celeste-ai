@@ -167,10 +167,10 @@ body {
 @keyframes celestial-atmosphere {
   0%,
   100% {
-    opacity: 0.28;
+    opacity: 0.18;
   }
   50% {
-    opacity: 0.45;
+    opacity: 0.28;
   }
 }
 

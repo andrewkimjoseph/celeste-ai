@@ -64,10 +64,10 @@ export function CelestialFxLayer({ enabled, intensity }: CelestialFxLayerProps) 
 
     const config =
       intensity === "high"
-        ? { stars: 120, streakChance: 0.035, drift: 0.2 }
+        ? { stars: 48, streakChance: 0.012, drift: 0.1 }
         : intensity === "low"
-          ? { stars: 45, streakChance: 0.008, drift: 0.08 }
-          : { stars: 80, streakChance: 0.018, drift: 0.12 };
+          ? { stars: 16, streakChance: 0.003, drift: 0.04 }
+          : { stars: 28, streakChance: 0.006, drift: 0.06 };
 
     let raf = 0;
     let running = true;
@@ -91,9 +91,9 @@ export function CelestialFxLayer({ enabled, intensity }: CelestialFxLayerProps) 
           y: Math.random() * window.innerHeight,
           vx: (Math.random() - 0.5) * config.drift,
           vy: (Math.random() - 0.5) * config.drift,
-          size: Math.random() * 1.6 + 0.4,
-          alpha: Math.random() * 0.45 + 0.2,
-          twinkle: Math.random() * 0.02 + 0.005,
+          size: Math.random() * 0.9 + 0.25,
+          alpha: Math.random() * 0.18 + 0.06,
+          twinkle: Math.random() * 0.012 + 0.003,
         });
       }
     }
@@ -118,8 +118,8 @@ export function CelestialFxLayer({ enabled, intensity }: CelestialFxLayerProps) 
       }
 
       const reduceMotion = reduceMotionRef.current;
-      const parallaxX = reduceMotion ? 0 : pointerRef.current.x * 6;
-      const parallaxY = reduceMotion ? 0 : pointerRef.current.y * 4;
+      const parallaxX = reduceMotion ? 0 : pointerRef.current.x * 3;
+      const parallaxY = reduceMotion ? 0 : pointerRef.current.y * 2;
 
       ctx2d.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
@@ -134,7 +134,7 @@ export function CelestialFxLayer({ enabled, intensity }: CelestialFxLayerProps) 
         if (star.y > window.innerHeight) star.y = 0;
 
         star.alpha += (Math.random() - 0.5) * star.twinkle;
-        star.alpha = Math.max(0.12, Math.min(0.72, star.alpha));
+        star.alpha = Math.max(0.05, Math.min(0.32, star.alpha));
         ctx2d.fillStyle = `rgba(204, 226, 255, ${star.alpha})`;
         ctx2d.beginPath();
         ctx2d.arc(
@@ -162,11 +162,11 @@ export function CelestialFxLayer({ enabled, intensity }: CelestialFxLayerProps) 
           continue;
         }
         const alpha = 1 - t;
-        ctx2d.strokeStyle = `rgba(181, 213, 255, ${0.55 * alpha})`;
-        ctx2d.lineWidth = 1.2;
+        ctx2d.strokeStyle = `rgba(181, 213, 255, ${0.32 * alpha})`;
+        ctx2d.lineWidth = 0.9;
         ctx2d.beginPath();
         ctx2d.moveTo(s.x + parallaxX, s.y + parallaxY);
-        ctx2d.lineTo(s.x - 26 + parallaxX, s.y - 9 + parallaxY);
+        ctx2d.lineTo(s.x - 18 + parallaxX, s.y - 6 + parallaxY);
         ctx2d.stroke();
       }
     }

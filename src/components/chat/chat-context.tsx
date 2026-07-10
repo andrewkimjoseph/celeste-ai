@@ -82,7 +82,7 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
   const [selectedPersonalityId, setSelectedPersonalityId] =
     useState<CelestialPersonalityId | null>(null);
   const [fxEnabled, setFxEnabledState] = useState(true);
-  const [fxIntensity, setFxIntensityState] = useState<FxIntensity>("medium");
+  const [fxIntensity, setFxIntensityState] = useState<FxIntensity>("low");
   const activeChatRef = useRef<ActiveChatState | null>(null);
   const persistenceEnabledRef = useRef(true);
 
@@ -284,7 +284,7 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
         setActiveChat(createEmptyActiveChat(createChatId()));
         setSelectedPersonalityId(null);
         setFxEnabledState(true);
-        setFxIntensityState("medium");
+        setFxIntensityState("low");
       } finally {
         if (!cancelled) {
           setIsLoading(false);

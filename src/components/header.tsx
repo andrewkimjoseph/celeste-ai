@@ -257,7 +257,7 @@ export function Header({
             onClick={() => onNewChat?.()}
             disabled={!onNewChat}
             aria-label="New chat"
-            className="shrink-0 rounded-xl transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] disabled:cursor-default sm:rounded-lg"
+            className="shrink-0 cursor-pointer rounded-xl transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] disabled:cursor-default disabled:opacity-100 sm:rounded-lg"
           >
             <CelesteLogoAvatar
               size="md"

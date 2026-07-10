@@ -71,7 +71,7 @@ export async function getFxPreferenceByAddress(
   const intensity: FxIntensity =
     record?.fxIntensity === "low" || record?.fxIntensity === "high"
       ? record.fxIntensity
-      : "medium";
+      : "low";
   return {
     enabled: record?.fxEnabled ?? true,
     intensity,
