@@ -12,6 +12,8 @@ interface ChatComposerProps {
   onSubmit: (event: React.FormEvent) => void;
 }
 
+const EMBEDDED_MIN_TEXTAREA_HEIGHT = 72;
+
 export function ChatComposer({
   input,
   canChat,
@@ -30,12 +32,17 @@ export function ChatComposer({
       return;
     }
 
+    const maxHeight = isEmbedded ? 320 : 240;
+    const minHeight = isEmbedded ? EMBEDDED_MIN_TEXTAREA_HEIGHT : 44;
+
     el.style.height = "auto";
-    const maxHeight = 240;
-    const nextHeight = Math.min(el.scrollHeight, maxHeight);
+    const nextHeight = Math.max(
+      minHeight,
+      Math.min(el.scrollHeight, maxHeight),
+    );
     el.style.height = `${nextHeight}px`;
     el.style.overflowY = el.scrollHeight > maxHeight ? "auto" : "hidden";
-  }, []);
+  }, [isEmbedded]);
 
   useEffect(() => {
     adjustTextareaHeight();
@@ -79,23 +86,35 @@ export function ChatComposer({
               : "Connect wallet to activate mission control…"
           }
           disabled={!canChat || isBusy}
-          rows={1}
+          rows={isEmbedded ? 2 : 1}
           suppressHydrationWarning
-          className="min-h-[44px] flex-1 resize-none overflow-hidden rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-2.5 text-sm leading-relaxed text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/30 disabled:opacity-50"
+          className={
+            isEmbedded
+              ? "min-h-[72px] w-full flex-1 resize-none overflow-hidden rounded-xl border border-[var(--surface-2)] bg-[var(--surface-0)] px-4 py-3 text-sm leading-relaxed text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/30 disabled:opacity-50"
+              : "min-h-[44px] flex-1 resize-none overflow-hidden rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-2.5 text-sm leading-relaxed text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/30 disabled:opacity-50"
+          }
         />
         <button
           type="submit"
           disabled={!canChat || !input.trim() || isBusy}
-          className="h-[44px] shrink-0 rounded-xl bg-[var(--accent-strong)] px-4 text-sm font-semibold text-[var(--accent-foreground)] transition-colors hover:bg-[var(--accent)] disabled:cursor-not-allowed disabled:bg-[var(--surface-2)] disabled:text-[var(--text-subtle)]"
+          className={
+            isEmbedded
+              ? "h-11 shrink-0 rounded-xl bg-[var(--accent-strong)] px-5 text-sm font-semibold text-[var(--accent-foreground)] transition-colors hover:bg-[var(--accent)] disabled:cursor-not-allowed disabled:bg-[var(--surface-2)] disabled:text-[var(--text-subtle)]"
+              : "h-[44px] shrink-0 rounded-xl bg-[var(--accent-strong)] px-4 text-sm font-semibold text-[var(--accent-foreground)] transition-colors hover:bg-[var(--accent)] disabled:cursor-not-allowed disabled:bg-[var(--surface-2)] disabled:text-[var(--text-subtle)]"
+          }
         >
           Send
         </button>
       </div>
-      {!isEmbedded ? (
-        <p className="mt-1.5 hidden text-[10px] text-[var(--text-subtle)] sm:block">
-          Enter to launch · Shift+Enter for new line
-        </p>
-      ) : null}
+      <p
+        className={`text-[10px] text-[var(--text-subtle)] ${
+          isEmbedded
+            ? "mt-2 text-center sm:text-left"
+            : "mt-1.5 hidden sm:block"
+        }`}
+      >
+        Enter to launch · Shift+Enter for new line
+      </p>
     </form>
   );
 }
