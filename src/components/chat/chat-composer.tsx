@@ -1,6 +1,7 @@
 "use client";
 
 import type { ChatStatus } from "ai";
+import { useCallback, useEffect, useRef } from "react";
 
 interface ChatComposerProps {
   input: string;
@@ -19,8 +20,26 @@ export function ChatComposer({
   onInputChange,
   onSubmit,
 }: ChatComposerProps) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isBusy = status === "streaming" || status === "submitted";
   const isEmbedded = variant === "embedded";
+
+  const adjustTextareaHeight = useCallback((textarea?: HTMLTextAreaElement | null) => {
+    const el = textarea ?? textareaRef.current;
+    if (!el) {
+      return;
+    }
+
+    el.style.height = "auto";
+    const maxHeight = 240;
+    const nextHeight = Math.min(el.scrollHeight, maxHeight);
+    el.style.height = `${nextHeight}px`;
+    el.style.overflowY = el.scrollHeight > maxHeight ? "auto" : "hidden";
+  }, []);
+
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [input, adjustTextareaHeight]);
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (event.key === "Enter" && !event.shiftKey) {
@@ -44,10 +63,14 @@ export function ChatComposer({
           : "composer-safe-bottom shrink-0 border-t border-[var(--surface-2)] bg-[var(--surface-0)]/95 px-3 pt-3 backdrop-blur-md sm:px-4 sm:pt-4"
       }
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-end gap-2">
         <textarea
+          ref={textareaRef}
           value={input}
-          onChange={(event) => onInputChange(event.target.value)}
+          onChange={(event) => {
+            onInputChange(event.target.value);
+            adjustTextareaHeight(event.target);
+          }}
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
           placeholder={
@@ -58,7 +81,7 @@ export function ChatComposer({
           disabled={!canChat || isBusy}
           rows={1}
           suppressHydrationWarning
-          className="max-h-28 min-h-[44px] flex-1 resize-none rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/30 disabled:opacity-50"
+          className="min-h-[44px] flex-1 resize-none overflow-hidden rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-2.5 text-sm leading-relaxed text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/30 disabled:opacity-50"
         />
         <button
           type="submit"
