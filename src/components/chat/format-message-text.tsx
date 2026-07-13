@@ -27,13 +27,14 @@ export function classifyHexToken(token: string): HexTokenKind {
 
 export function isClickableHexToken(token: string): boolean {
   const kind = classifyHexToken(token);
-  return kind === "txHash" || kind === "truncatedHash";
+  return kind === "address" || kind === "txHash" || kind === "truncatedHash";
 }
 
 interface FormatOptions {
   variant?: MessageTextVariant;
   keyPrefix?: string;
   onHashClick?: (hash: string) => void;
+  copiedToken?: string | null;
 }
 
 function parseInline(text: string, options: FormatOptions = {}): ReactNode[] {
@@ -41,6 +42,7 @@ function parseInline(text: string, options: FormatOptions = {}): ReactNode[] {
     variant = "assistant",
     keyPrefix = "inline",
     onHashClick,
+    copiedToken,
   } = options;
   const nodes: ReactNode[] = [];
   let lastIndex = 0;
@@ -94,17 +96,22 @@ function parseInline(text: string, options: FormatOptions = {}): ReactNode[] {
       );
     } else if (token.startsWith("0x")) {
       if (isClickableHexToken(token) && onHashClick) {
+        const copied = copiedToken === token;
         nodes.push(
           <button
             key={`${keyPrefix}-${key++}`}
             type="button"
-            onClick={() => onHashClick(token)}
+            onClick={(event) => {
+              event.stopPropagation();
+              onHashClick(token);
+            }}
             className={`${hashClass} cursor-pointer transition-colors ${
               variant === "user"
                 ? "hover:bg-white/25"
                 : "hover:text-[var(--accent-hover)]"
-            }`}
-            title="View in transactions"
+            } ${copied ? "ring-[var(--accent-hover)]/50" : ""}`}
+            title={copied ? "Copied" : "Copy to clipboard"}
+            aria-label={copied ? "Copied" : "Copy to clipboard"}
           >
             {token}
           </button>,

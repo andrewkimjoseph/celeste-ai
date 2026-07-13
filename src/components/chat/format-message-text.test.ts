@@ -67,7 +67,7 @@ function collectHexElements(node: ReactNode, out: HexElement[] = []): HexElement
 describe("classifyHexToken", () => {
   it("classifies 40-char wallet addresses", () => {
     expect(classifyHexToken(ADDRESS)).toBe("address");
-    expect(isClickableHexToken(ADDRESS)).toBe(false);
+    expect(isClickableHexToken(ADDRESS)).toBe(true);
   });
 
   it("classifies 64-char transaction hashes", () => {
@@ -88,16 +88,18 @@ describe("classifyHexToken", () => {
 });
 
 describe("formatMessageText hex rendering", () => {
-  it("renders addresses as non-clickable spans", () => {
+  it("renders addresses as clickable buttons when onHashClick is provided", () => {
     const onHashClick = vi.fn();
     const nodes = formatMessageText(`Check ${ADDRESS}`, { onHashClick });
     const hexElements = collectHexElements(nodes);
 
     expect(hexElements).toHaveLength(1);
-    expect(hexElements[0]?.tag).toBe("span");
+    expect(hexElements[0]?.tag).toBe("button");
     expect(hexElements[0]?.text).toBe(ADDRESS);
-    expect(hexElements[0]?.onClick).toBeUndefined();
-    expect(onHashClick).not.toHaveBeenCalled();
+    expect(hexElements[0]?.onClick).toBeTypeOf("function");
+
+    hexElements[0]?.onClick?.({ stopPropagation: vi.fn() });
+    expect(onHashClick).toHaveBeenCalledWith(ADDRESS);
   });
 
   it("renders tx hashes as clickable buttons when onHashClick is provided", () => {
@@ -110,7 +112,7 @@ describe("formatMessageText hex rendering", () => {
     expect(hexElements[0]?.text).toBe(TX_HASH);
     expect(hexElements[0]?.onClick).toBeTypeOf("function");
 
-    hexElements[0]?.onClick?.();
+    hexElements[0]?.onClick?.({ stopPropagation: vi.fn() });
     expect(onHashClick).toHaveBeenCalledWith(TX_HASH);
   });
 
@@ -123,11 +125,11 @@ describe("formatMessageText hex rendering", () => {
     expect(hexElements[0]?.tag).toBe("button");
     expect(hexElements[0]?.text).toBe(TRUNCATED_HASH);
 
-    hexElements[0]?.onClick?.();
+    hexElements[0]?.onClick?.({ stopPropagation: vi.fn() });
     expect(onHashClick).toHaveBeenCalledWith(TRUNCATED_HASH);
   });
 
-  it("renders mixed address and hash lines with the correct element per token", () => {
+  it("renders mixed address and hash lines as clickable buttons", () => {
     const onHashClick = vi.fn();
     const nodes = formatMessageText(`Wallet ${ADDRESS} sent ${TX_HASH}`, {
       onHashClick,
@@ -135,7 +137,7 @@ describe("formatMessageText hex rendering", () => {
     const hexElements = collectHexElements(nodes);
 
     expect(hexElements).toHaveLength(2);
-    expect(hexElements[0]).toMatchObject({ tag: "span", text: ADDRESS });
+    expect(hexElements[0]).toMatchObject({ tag: "button", text: ADDRESS });
     expect(hexElements[1]).toMatchObject({ tag: "button", text: TX_HASH });
   });
 });
