@@ -29,7 +29,7 @@ Installs `@andrewkimjoseph/celina-sdk` from npm at the exact version in [`packag
 - wagmi + RainbowKit (Celo mainnet)
 - `@andrewkimjoseph/celina-sdk` for chain reads and `prepare*` flows
 
-Prepared transactions include **dual on-chain attribution** via SDK config in [`src/lib/celina.ts`](src/lib/celina.ts): legacy `CELINA|…` UTF-8 suffix plus ERC-8021 `toDataSuffix` codes (Celo leaderboards / `verifyTx`). Use the `verify_attribution_tag` chat tool to confirm tags on a tx hash after signing.
+Prepared transactions include **dual on-chain attribution** via SDK config in [`src/lib/celina.ts`](src/lib/celina.ts): legacy `CELINA|…` UTF-8 suffix plus ERC-8021 `toDataSuffix` codes (Celo leaderboards / `verifyTx`). Prefer the `check_attribution_tag` chat tool to list or confirm custom tags on a tx hash after signing (`verify_attribution_tag` for raw layer decode).
 
 No `CELO_PRIVATE_KEY` — writes require wallet confirmation via `TxConfirmCard`.
 
