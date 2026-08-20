@@ -83,7 +83,7 @@ export function ChatComposer({
           placeholder={
             canChat
               ? "Describe your next Celo mission…"
-              : "Connect wallet to activate mission control…"
+              : "Connect wallet to chat with Celeste…"
           }
           disabled={!canChat || isBusy}
           rows={isEmbedded ? 2 : 1}

@@ -57,9 +57,36 @@ export function ChatSidebar({
 
       <div className="min-h-0 flex-1 overflow-y-auto p-2">
         {!isConnected ? (
-          <p className="px-2 py-3 text-xs text-zinc-500">
-            Connect your wallet to save chat history.
-          </p>
+          <div className="space-y-3 px-2 py-3">
+            <p className="text-[10px] font-medium uppercase tracking-wide text-[var(--text-muted)]">
+              Example missions
+            </p>
+            <ul className="space-y-1.5">
+              {(
+                [
+                  { label: "Send", example: "Send 5 USDm to a Celo ENS" },
+                  { label: "Swap", example: "Quote CELO to USDC" },
+                  { label: "Earn", example: "Scan Aave balances" },
+                  { label: "GoodDollar", example: "Claim daily UBI" },
+                ] as const
+              ).map((mission) => (
+                <li
+                  key={mission.label}
+                  className="rounded-lg border border-[var(--surface-2)] bg-[var(--surface-0)]/40 px-2.5 py-2"
+                >
+                  <p className="text-[11px] font-medium text-[var(--text-secondary)]">
+                    {mission.label}
+                  </p>
+                  <p className="mt-0.5 text-[10px] leading-4 text-zinc-500">
+                    {mission.example}
+                  </p>
+                </li>
+              ))}
+            </ul>
+            <p className="text-[10px] leading-4 text-zinc-500">
+              Connect your wallet to save chat history.
+            </p>
+          </div>
         ) : isLoading ? (
           <div className="flex items-center justify-center py-8">
             <span

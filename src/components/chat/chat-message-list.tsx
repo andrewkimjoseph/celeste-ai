@@ -20,6 +20,7 @@ import {
 import { TxConfirmCard } from "@/components/tx-confirm-card";
 import { TxConfirmCardSnapshot } from "@/components/tx-confirm-card-snapshot";
 import { CelesteGlobeMark } from "@/components/celeste-logo";
+import { PreConnectLanding } from "@/components/chat/pre-connect-landing";
 import { trackEvent } from "@/lib/analytics/amplitude-browser";
 import type { PromptGroup } from "@/lib/analytics/events";
 import { inferFlowCategory } from "@/lib/analytics/flow-category";
@@ -195,14 +196,7 @@ export function ChatMessageList({
             : "space-y-8 px-4 py-4 sm:space-y-10 sm:px-5 sm:py-5"
         }`}
       >
-      {showConnectPrompt && (
-        <div className="rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)]/60 px-4 py-6 text-center">
-          <p className="text-sm text-[var(--text-secondary)]">Connect your wallet to open your celestial control deck.</p>
-          <p className="mt-1 text-xs text-[var(--text-muted)]">
-            Your balances and route intelligence appear as soon as you connect.
-          </p>
-        </div>
-      )}
+      {showConnectPrompt && <PreConnectLanding />}
 
       {showEmptyState && (
         <div>

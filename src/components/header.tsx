@@ -284,7 +284,7 @@ export function Header({
             <p className="hidden truncate text-xs text-[var(--text-muted)] sm:block">
               {isConnected
                 ? "Navigate Celo like a cosmic atlas"
-                : "Connect your wallet to begin your first mission"}
+                : "DeFAI copilot for Celo — send, swap, earn, claim"}
             </p>
           </div>
         </div>
