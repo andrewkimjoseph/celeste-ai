@@ -15,7 +15,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider theme={darkTheme()} modalSize="compact">
+        <RainbowKitProvider
+          theme={darkTheme({
+            accentColor: "#5e4180",
+            accentColorForeground: "#f7f4fb",
+            borderRadius: "medium",
+          })}
+          modalSize="compact"
+        >
           <AmplitudeProvider>
             <VisualViewportSync />
             <MiniPayAutoConnect />

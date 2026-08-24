@@ -3,6 +3,7 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import { CelesteGlobeMark } from "@/components/celeste-logo";
+import { ConnectWalletButton } from "@/components/connect-wallet-button";
 
 const CAPABILITIES = [
   {
@@ -74,14 +75,10 @@ export function PreConnectLanding() {
       </ol>
 
       <div className="mt-6 flex flex-col items-center gap-3">
-        <button
-          type="button"
+        <ConnectWalletButton
           onClick={() => openConnectModal?.()}
           disabled={!openConnectModal}
-          className="rounded-lg bg-[var(--accent-strong)] px-5 py-2.5 text-sm font-semibold text-[var(--accent-foreground)] transition-colors hover:bg-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          Connect wallet
-        </button>
+        />
         <Link
           href="/about"
           className="text-xs text-[var(--accent-soft-text)] transition-colors hover:text-[var(--text-primary)]"

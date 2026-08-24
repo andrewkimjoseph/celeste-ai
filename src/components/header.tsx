@@ -1,6 +1,6 @@
 "use client";
 
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { HeaderConnectButton } from "@/components/header-connect-button";
 import Link from "next/link";
 import { CelesteLogoAvatar } from "@/components/celeste-logo";
 import { PersonalityPicker } from "@/components/chat/personality-picker";
@@ -426,22 +426,7 @@ export function Header({
           ) : null}
           <NewChatButton showNewChat={showNewChat} onNewChat={onNewChat} />
           {mounted ? (
-            <>
-              <div className="sm:hidden">
-                <ConnectButton
-                  showBalance={false}
-                  chainStatus="none"
-                  accountStatus="avatar"
-                />
-              </div>
-              <div className="hidden sm:block">
-                <ConnectButton
-                  showBalance={false}
-                  chainStatus="icon"
-                  accountStatus="address"
-                />
-              </div>
-            </>
+            <HeaderConnectButton />
           ) : (
             <div className="size-9 rounded-full bg-[var(--surface-2)] sm:h-10 sm:w-[140px] sm:rounded-full" aria-hidden />
           )}
