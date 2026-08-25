@@ -6,34 +6,36 @@ import { ConnectWalletButton } from "@/components/connect-wallet-button";
 const headerChipClassName =
   "flex items-center justify-center rounded-full border border-[var(--surface-2)] text-[var(--text-muted)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:rounded-lg";
 
-function AccountAvatar({
-  ensAvatar,
-  displayName,
-}: {
-  ensAvatar?: string;
-  displayName: string;
-}) {
-  if (ensAvatar) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element -- ENS avatar from wallet
-      <img
-        src={ensAvatar}
-        alt=""
-        width={20}
-        height={20}
-        className="size-5 shrink-0 rounded-full object-cover"
-        aria-hidden
-      />
-    );
-  }
-
+function WalletIcon() {
   return (
-    <span
-      className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[var(--surface-2)] text-[10px] font-semibold uppercase text-[var(--text-secondary)]"
+    <svg
+      className="size-4 shrink-0"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.75}
       aria-hidden
     >
-      {displayName.slice(0, 2)}
-    </span>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M21 12a2.25 2.25 0 0 0-2.25-2.25H15a3 3 0 1 1-6 0H5.25A2.25 2.25 0 0 0 3 12m18 0v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 9m18 0V6a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 6v3"
+      />
+    </svg>
+  );
+}
+
+function AccountAvatar({ ensAvatar }: { ensAvatar: string }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- ENS avatar from wallet
+    <img
+      src={ensAvatar}
+      alt=""
+      width={20}
+      height={20}
+      className="size-5 shrink-0 rounded-full object-cover"
+      aria-hidden
+    />
   );
 }
 
@@ -76,10 +78,11 @@ export function HeaderConnectButton() {
               aria-label={`Account: ${account.displayName}`}
               className={`${headerChipClassName} size-9 sm:hidden`}
             >
-              <AccountAvatar
-                ensAvatar={account.ensAvatar}
-                displayName={account.displayName}
-              />
+              {account.ensAvatar ? (
+                <AccountAvatar ensAvatar={account.ensAvatar} />
+              ) : (
+                <WalletIcon />
+              )}
             </button>
 
             <div className="hidden items-center gap-1.5 sm:flex">
@@ -114,11 +117,10 @@ export function HeaderConnectButton() {
                 className={`${headerChipClassName} gap-2 px-3 py-1.5 text-xs`}
               >
                 {account.ensAvatar ? (
-                  <AccountAvatar
-                    ensAvatar={account.ensAvatar}
-                    displayName={account.displayName}
-                  />
-                ) : null}
+                  <AccountAvatar ensAvatar={account.ensAvatar} />
+                ) : (
+                  <WalletIcon />
+                )}
                 <span className="max-w-[7rem] truncate">{account.displayName}</span>
               </button>
             </div>
