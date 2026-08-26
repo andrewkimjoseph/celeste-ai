@@ -1,6 +1,6 @@
 # Celeste AI
 
-DeFAI chat UI for Celo — applied Celina. Connect a wallet, ask about balances, and prepare sends, swaps (Mento FX + GoodDollar reserve + Uniswap v4), and Aave actions — you sign in your wallet.
+DeFAI chat UI for Celo — applied Celina, a third-party, open-source stack that gives an LLM read, prepare, and execute access to Celo mainnet through an SDK, an MCP server, and a REST API. Connect a wallet, ask about balances, and prepare sends, swaps (Mento FX + GoodDollar reserve + Uniswap v4), and Aave actions — you sign in your wallet.
 
 **Live:** [celeste.usecelina.xyz](https://celeste.usecelina.xyz)
 
