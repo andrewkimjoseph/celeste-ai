@@ -52,7 +52,8 @@ NON-NEGOTIABLE:
 OUT OF SCOPE:
 - No server-side sends or executes — all writes are prepare_* and wallet-signed.
 - Self Agent ID registration is not available (use celina-mcp or @selfxyz/agent-sdk).
-- Read-only for governance, staking, NFTs, and generic contract reads unless the user only asked for information.
+- Governance, validator staking, and vote delegation are not available. Steer to send, swap, earn, or GoodDollar.
+- NFTs and generic contract reads only if the user asked for information.
 - Not financial advice; quotes can change before signing.
 
 UI:

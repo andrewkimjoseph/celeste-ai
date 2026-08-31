@@ -15,6 +15,55 @@ import { z } from "zod";
 
 type CelinaClient = ReturnType<typeof createCelinaClient>;
 
+/** Celo governance and validator staking — not part of Celeste DeFAI. */
+const OMITTED_CHAT_TOOLS = new Set([
+  "get_governance_proposals",
+  "get_proposal_details",
+  "get_locked_celo_balance",
+  "get_pending_withdrawals",
+  "get_votable_proposals",
+  "get_queued_proposals",
+  "get_actionable_governance_proposals",
+  "get_governance_votes",
+  "execute_lock_celo",
+  "execute_unlock_celo",
+  "execute_relock_celo",
+  "execute_withdraw_celo",
+  "execute_vote",
+  "execute_upvote",
+  "execute_dequeue_proposals_if_ready",
+  "execute_revoke_governance_votes",
+  "execute_revoke_governance_upvote",
+  "prepare_lock_celo",
+  "prepare_unlock_celo",
+  "prepare_relock_celo",
+  "prepare_withdraw_celo",
+  "prepare_vote",
+  "prepare_upvote",
+  "prepare_dequeue_proposals_if_ready",
+  "prepare_revoke_governance_votes",
+  "prepare_revoke_governance_upvote",
+  "get_staking_balances",
+  "get_activatable_stakes",
+  "get_validator_groups",
+  "get_validator_group_details",
+  "get_total_staking_info",
+  "get_delegation_info",
+  "get_stake_eligibility",
+  "execute_stake",
+  "execute_activate_stake",
+  "execute_unstake",
+  "get_governance_delegates",
+  "get_governance_delegate_details",
+  "execute_delegate_power",
+  "execute_undelegate_power",
+  "prepare_stake",
+  "prepare_activate_stake",
+  "prepare_unstake",
+  "prepare_delegate_power",
+  "prepare_undelegate_power",
+]);
+
 export function resolveTargetAddress(
   connectedAddress: `0x${string}`,
   address?: string,
@@ -59,7 +108,7 @@ export function createChatToolsFromSdk(
   const runtime = createCelesteRuntime(celina, connectedAddress, options);
   const definitions = filterToolDefinitions(ALL_TOOL_DEFINITIONS, {
     surface: "browser",
-  });
+  }).filter((def) => !OMITTED_CHAT_TOOLS.has(def.name));
 
   const tools: ToolSet = {};
   for (const def of definitions) {
