@@ -7,21 +7,18 @@ import {
   type ActiveChatState,
   type ChatListItem,
   type ChatUiState,
-} from "@/lib/chats";
+} from "@/lib/chat/chats";
 import {
   deleteChat as deleteChatFromDb,
-  getFxPreferenceByAddress,
   getChat,
-  type FxIntensity,
   getPersonalityByAddress,
   listChats,
-  upsertFxPreference,
   upsertPersonalityPreference,
   upsertChat,
-} from "@/lib/chat-db";
+} from "@/lib/chat/chat-db";
 import { trackEvent } from "@/lib/analytics/amplitude-browser";
-import type { CelesteUIMessage } from "@/lib/chat-message-metadata";
-import type { CelestialPersonalityId } from "@/lib/celestial-personalities";
+import type { CelesteUIMessage } from "@/lib/chat/chat-message-metadata";
+import type { CelestialPersonalityId } from "@/lib/chat/celestial-personalities";
 import {
   createContext,
   useCallback,
@@ -42,13 +39,9 @@ interface ChatContextValue {
   isHistoryOpen: boolean;
   selectedPersonalityId: CelestialPersonalityId | null;
   hasSelectedPersonality: boolean;
-  fxEnabled: boolean;
-  fxIntensity: FxIntensity;
   openHistory: () => void;
   closeHistory: () => void;
   setSelectedPersonality: (id: CelestialPersonalityId) => Promise<void>;
-  setFxEnabled: (enabled: boolean) => Promise<void>;
-  setFxIntensity: (intensity: FxIntensity) => Promise<void>;
   createChat: () => Promise<void>;
   selectChat: (id: string) => Promise<void>;
   deleteChat: (id: string) => Promise<void>;
@@ -81,8 +74,6 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [selectedPersonalityId, setSelectedPersonalityId] =
     useState<CelestialPersonalityId | null>(null);
-  const [fxEnabled, setFxEnabledState] = useState(true);
-  const [fxIntensity, setFxIntensityState] = useState<FxIntensity>("low");
   const activeChatRef = useRef<ActiveChatState | null>(null);
   const persistenceEnabledRef = useRef(true);
 
@@ -117,40 +108,6 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
       }
     },
     [address],
-  );
-
-  const setFxEnabled = useCallback(
-    async (enabled: boolean) => {
-      if (!address) return;
-      setFxEnabledState(enabled);
-      try {
-        await upsertFxPreference(address, {
-          enabled,
-          intensity: fxIntensity,
-        });
-      } catch (error) {
-        console.warn("Celeste FX preference persistence failed:", error);
-        setPersistenceEnabled(false);
-      }
-    },
-    [address, fxIntensity],
-  );
-
-  const setFxIntensity = useCallback(
-    async (intensity: FxIntensity) => {
-      if (!address) return;
-      setFxIntensityState(intensity);
-      try {
-        await upsertFxPreference(address, {
-          enabled: fxEnabled,
-          intensity,
-        });
-      } catch (error) {
-        console.warn("Celeste FX preference persistence failed:", error);
-        setPersistenceEnabled(false);
-      }
-    },
-    [address, fxEnabled],
   );
 
   const persistChat = useCallback(
@@ -250,11 +207,8 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
         setChats(rows.map(toChatListItem));
         setPersistenceEnabled(true);
         const persistedPersonality = await getPersonalityByAddress(address);
-        const persistedFx = await getFxPreferenceByAddress(address);
         if (!cancelled) {
           setSelectedPersonalityId(persistedPersonality);
-          setFxEnabledState(persistedFx.enabled);
-          setFxIntensityState(persistedFx.intensity);
         }
 
         if (rows.length > 0) {
@@ -283,8 +237,6 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
         setChats(EMPTY_CHATS);
         setActiveChat(createEmptyActiveChat(createChatId()));
         setSelectedPersonalityId(null);
-        setFxEnabledState(true);
-        setFxIntensityState("low");
       } finally {
         if (!cancelled) {
           setIsLoading(false);
@@ -428,13 +380,9 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
       isHistoryOpen,
       selectedPersonalityId,
       hasSelectedPersonality: Boolean(selectedPersonalityId),
-      fxEnabled,
-      fxIntensity,
       openHistory,
       closeHistory,
       setSelectedPersonality,
-      setFxEnabled,
-      setFxIntensity,
       createChat,
       selectChat,
       deleteChat,
@@ -447,13 +395,9 @@ export function ChatProvider({ address, children }: ChatProviderProps) {
       persistenceEnabled,
       isHistoryOpen,
       selectedPersonalityId,
-      fxEnabled,
-      fxIntensity,
       openHistory,
       closeHistory,
       setSelectedPersonality,
-      setFxEnabled,
-      setFxIntensity,
       createChat,
       selectChat,
       deleteChat,
