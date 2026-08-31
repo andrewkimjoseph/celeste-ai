@@ -11,12 +11,12 @@ import {
   groupMessagesIntoTurns,
   shouldShowAssistantLoading,
 } from "@/components/chat/chat-utils";
-import type { CelesteUIMessage } from "@/lib/chat-message-metadata";
-import type { PreparedFlowWithExtras } from "@/lib/prepared-flow";
+import type { CelesteUIMessage } from "@/lib/chat/chat-message-metadata";
+import type { PreparedFlowWithExtras } from "@/lib/tx/prepared-flow";
 import {
   getPreparedFlowMetasForMessage,
   getSignedPreparedFlowMetas,
-} from "@/lib/prepared-flow";
+} from "@/lib/tx/prepared-flow";
 import { TxConfirmCard } from "@/components/tx-confirm-card";
 import { TxConfirmCardSnapshot } from "@/components/tx-confirm-card-snapshot";
 import { CelesteGlobeMark } from "@/components/celeste-logo";
@@ -24,11 +24,11 @@ import { PreConnectLanding } from "@/components/chat/pre-connect-landing";
 import { trackEvent } from "@/lib/analytics/amplitude-browser";
 import type { PromptGroup } from "@/lib/analytics/events";
 import { inferFlowCategory } from "@/lib/analytics/flow-category";
-import type { WalletBalancesResponse } from "@/lib/balances";
+import type { WalletBalancesResponse } from "@/lib/wallet/balances";
 import {
   buildLandingPrompts,
   formatLandingBalanceLine,
-} from "@/lib/landing-prompts";
+} from "@/lib/chat/landing-prompts";
 
 interface ChatMessageListProps {
   chatId?: string | null;
@@ -201,48 +201,52 @@ export function ChatMessageList({
       {showEmptyState && (
         <div>
           <CelesteGlobeMark className="mb-4 sm:mb-5" />
-          <h2 className="mb-4 text-center text-2xl font-medium tracking-tight text-[var(--text-primary)] sm:mb-5 sm:text-3xl">
+          <h2 className="mb-4 text-center text-2xl font-bold tracking-tight text-[var(--ink)] sm:mb-5 sm:text-3xl">
             {addressLabel
               ? `Welcome back, ${addressLabel}. Chart your next orbit.`
               : "Welcome back. Chart your next orbit."}
           </h2>
-          <div className="rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)]/60 px-3 py-4 sm:px-4 sm:py-6">
+          <div className="card-brutal px-3 py-4 sm:px-4 sm:py-6">
           {!hasSelectedPersonality && personalityPicker ? (
-            <div className="mx-auto mb-4 max-w-xl rounded-xl border border-[var(--surface-2)] bg-[var(--surface-0)]/55 p-3 sm:p-4">
+            <div className="card-brutal mx-auto mb-4 max-w-xl bg-[var(--canvas)] p-3 sm:p-4">
               {personalityPicker}
             </div>
           ) : null}
-          <h2 className="text-center text-base font-semibold text-[var(--text-primary)]">
+          <h2 className="text-center text-base font-bold tracking-tight text-[var(--ink)]">
             Where should we travel next?
           </h2>
           <p className="mt-1 text-center text-sm text-[var(--text-secondary)]">
             Send, swap, earn, and claim on Celo with guided mission control.
           </p>
           {balanceLine ? (
-            <p className="mt-2 text-center text-xs text-[var(--text-muted)]">{balanceLine}</p>
+            <p className="mt-2 text-center text-xs font-bold text-[var(--text-muted)]">{balanceLine}</p>
           ) : null}
           {landingComposer ? (
             <div className="mt-4">{landingComposer}</div>
           ) : !hasSelectedPersonality ? (
-            <p className="mt-4 text-center text-xs text-[var(--text-subtle)]">
+            <p className="mt-4 text-center text-xs text-[var(--text-muted)]">
               Choose a celestial personality to unlock mission chat.
             </p>
           ) : null}
           <div className="mt-4 space-y-3">
             {landingComposer ? (
               <div className="flex items-center gap-3">
-                <div className="h-px flex-1 bg-[var(--surface-2)]" aria-hidden />
-                <p className="shrink-0 text-xs text-[var(--text-muted)]">Or launch a suggested mission</p>
-                <div className="h-px flex-1 bg-[var(--surface-2)]" aria-hidden />
+                <div className="h-0.5 flex-1 bg-[var(--ink)]" aria-hidden />
+                <p className="shrink-0 text-xs font-bold uppercase tracking-wide text-[var(--text-muted)]">Or launch a suggested mission</p>
+                <div className="h-0.5 flex-1 bg-[var(--ink)]" aria-hidden />
               </div>
             ) : null}
             <div className="flex flex-wrap justify-center gap-2">
-              {landingPrompts.primary.map((prompt) => (
+              {landingPrompts.primary.map((prompt, index) => (
                 <button
                   key={prompt.text}
                   type="button"
                   onClick={() => onPromptSelect(prompt.text, prompt.group)}
-                  className="rounded-full border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-1.5 text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--accent)]/40 hover:text-[var(--text-primary)]"
+                  className={`rounded-[2px] border-2 border-[var(--ink)] px-3 py-1.5 text-xs font-semibold shadow-[var(--shadow-brutal-sm)] transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none ${
+                    index === landingPrompts.primary.length - 1
+                      ? "bg-[var(--accent)] text-[var(--accent-foreground)]"
+                      : "bg-[var(--surface)] text-[var(--ink)]"
+                  }`}
                 >
                   {prompt.text}
                 </button>
@@ -253,7 +257,7 @@ export function ChatMessageList({
                 <button
                   type="button"
                   onClick={() => setShowMoreSuggestions((open) => !open)}
-                  className="text-xs font-medium text-[var(--accent-soft-text)] transition-colors hover:text-[var(--text-primary)]"
+                  className="btn-brutal btn-primary px-3 py-1.5 text-xs"
                   aria-expanded={showMoreSuggestions}
                 >
                   {showMoreSuggestions ? "Show fewer missions" : "Show more missions"}
@@ -262,7 +266,7 @@ export function ChatMessageList({
                   <div className="mt-3 w-full space-y-3">
                     {landingPrompts.more.map((group) => (
                       <div key={group.label}>
-                        <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wide text-[var(--text-muted)]">
+                        <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-[var(--text-muted)]">
                           {group.label}
                         </p>
                         <div className="flex flex-wrap gap-2">
@@ -273,7 +277,7 @@ export function ChatMessageList({
                               onClick={() =>
                                 onPromptSelect(prompt.text, prompt.group)
                               }
-                              className="rounded-full border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-1.5 text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--accent)]/40 hover:text-[var(--text-primary)]"
+                              className="rounded-[2px] border-2 border-[var(--ink)] bg-[var(--surface)] px-3 py-1.5 text-xs font-semibold text-[var(--ink)] shadow-[var(--shadow-brutal-sm)] transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
                             >
                               {prompt.text}
                             </button>
@@ -348,7 +352,7 @@ export function ChatMessageList({
       )}
 
       {errorMessage && (
-        <p className="rounded-lg border border-red-500/25 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+        <p className="rounded-[2px] border-2 border-[var(--ink)] bg-[var(--warn)] px-3 py-2 text-sm font-semibold text-white shadow-[var(--shadow-brutal-sm)]">
           {errorMessage}
         </p>
       )}
