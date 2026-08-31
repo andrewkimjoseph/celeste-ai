@@ -59,7 +59,7 @@ export function ChatSidebar({
         {!isConnected ? (
           <div className="space-y-3 px-2 py-3">
             <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-muted)]">
-              Example missions
+              Example prompts
             </p>
             <ul className="space-y-1.5">
               {(

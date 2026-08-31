@@ -14,11 +14,11 @@ export default function AboutPage() {
           </div>
           <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
             <span className="box-decoration-clone bg-[var(--accent)] px-1.5 text-[var(--accent-foreground)]">
-              Your cosmic copilot for Celo
+              Your wallet copilot for Celo
             </span>
           </h1>
           <p className="mt-4 text-sm leading-6 text-[var(--text-secondary)] sm:text-base">
-            Celeste turns wallet actions into guided cosmic missions. Connect your
+            Celeste turns wallet actions into guided chats. Connect your
             wallet, ask in plain language, and Celeste helps you route sends,
             swaps, savings, and GoodDollar actions across the Celo ecosystem.
           </p>
@@ -29,7 +29,7 @@ export default function AboutPage() {
                 4
               </span>
               <h2 className="text-sm font-bold text-[var(--ink)]">
-                Stellar capabilities
+                What Celeste can do
               </h2>
               <ul className="mt-2 space-y-1 text-xs text-[var(--text-secondary)] sm:text-sm">
                 <li>Send stablecoins and tokens on Celo</li>
@@ -41,7 +41,7 @@ export default function AboutPage() {
 
             <section className="rounded-[2px] border-2 border-[var(--ink)] bg-[var(--surface)] p-4 shadow-[var(--shadow-brutal-sm)]">
               <h2 className="text-sm font-bold text-[var(--ink)]">
-                How each mission works
+                How it works
               </h2>
               <ol className="mt-2 space-y-1 text-xs text-[var(--text-secondary)] sm:text-sm">
                 <li>1. You describe the action in chat.</li>
@@ -59,7 +59,7 @@ export default function AboutPage() {
             </h2>
             <p className="mt-2 text-xs leading-6 text-[var(--text-secondary)] sm:text-sm">
               Celeste does not auto-send transactions. It prepares flows and keeps
-              the final signature with you. You stay captain of the wallet while
+              the final signature with you. You stay in control of the wallet while
               Celeste handles route intelligence and execution guidance.
             </p>
           </section>

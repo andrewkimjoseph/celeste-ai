@@ -203,8 +203,8 @@ export function ChatMessageList({
           <CelesteGlobeMark className="mb-4 sm:mb-5" />
           <h2 className="mb-4 text-center text-2xl font-bold tracking-tight text-[var(--ink)] sm:mb-5 sm:text-3xl">
             {addressLabel
-              ? `Welcome back, ${addressLabel}. Chart your next orbit.`
-              : "Welcome back. Chart your next orbit."}
+              ? `Welcome back, ${addressLabel}. What next?`
+              : "Welcome back. What next?"}
           </h2>
           <div className="card-brutal px-3 py-4 sm:px-4 sm:py-6">
           {!hasSelectedPersonality && personalityPicker ? (
@@ -213,10 +213,10 @@ export function ChatMessageList({
             </div>
           ) : null}
           <h2 className="text-center text-base font-bold tracking-tight text-[var(--ink)]">
-            Where should we travel next?
+            What should we do next?
           </h2>
           <p className="mt-1 text-center text-sm text-[var(--text-secondary)]">
-            Send, swap, earn, and claim on Celo with guided mission control.
+            Send, swap, earn, and claim on Celo.
           </p>
           {balanceLine ? (
             <p className="mt-2 text-center text-xs font-bold text-[var(--text-muted)]">{balanceLine}</p>
@@ -225,14 +225,14 @@ export function ChatMessageList({
             <div className="mt-4">{landingComposer}</div>
           ) : !hasSelectedPersonality ? (
             <p className="mt-4 text-center text-xs text-[var(--text-muted)]">
-              Choose a celestial personality to unlock mission chat.
+              Choose a personality to start chatting.
             </p>
           ) : null}
           <div className="mt-4 space-y-3">
             {landingComposer ? (
               <div className="flex items-center gap-3">
                 <div className="h-0.5 flex-1 bg-[var(--ink)]" aria-hidden />
-                <p className="shrink-0 text-xs font-bold uppercase tracking-wide text-[var(--text-muted)]">Or launch a suggested mission</p>
+                <p className="shrink-0 text-xs font-bold uppercase tracking-wide text-[var(--text-muted)]">Or try a suggestion</p>
                 <div className="h-0.5 flex-1 bg-[var(--ink)]" aria-hidden />
               </div>
             ) : null}
@@ -260,7 +260,7 @@ export function ChatMessageList({
                   className="btn-brutal btn-primary px-3 py-1.5 text-xs"
                   aria-expanded={showMoreSuggestions}
                 >
-                  {showMoreSuggestions ? "Show fewer missions" : "Show more missions"}
+                  {showMoreSuggestions ? "Show fewer suggestions" : "Show more suggestions"}
                 </button>
                 {showMoreSuggestions && (
                   <div className="mt-3 w-full space-y-3">

@@ -82,7 +82,7 @@ export function ChatComposer({
           onFocus={handleFocus}
           placeholder={
             canChat
-              ? "Describe your next Celo mission…"
+              ? "Ask Celeste to send, swap, earn, or claim…"
               : "Connect wallet to chat with Celeste…"
           }
           disabled={!canChat || isBusy}

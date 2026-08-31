@@ -39,7 +39,7 @@ export function PreConnectLanding() {
       <CelesteGlobeMark className="mb-4 sm:mb-5" />
       <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
         <span className="box-decoration-clone bg-[var(--accent)] px-1.5 text-[var(--accent-foreground)]">
-          Your cosmic copilot for Celo
+          Your wallet copilot for Celo
         </span>
       </h2>
       <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)] sm:text-base">

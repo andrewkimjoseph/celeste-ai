@@ -19,7 +19,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Celeste AI",
-  description: "A celestial DeFAI copilot for Celo wallets.",
+  description: "A DeFAI copilot for Celo wallets.",
   icons: {
     icon: [{ url: "/logo.svg", type: "image/svg+xml" }],
     apple: "/logo.svg",
