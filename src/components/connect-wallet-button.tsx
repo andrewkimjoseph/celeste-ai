@@ -16,7 +16,7 @@ export function ConnectWalletButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`rounded-lg bg-[var(--accent-strong)] px-5 py-2.5 text-sm font-semibold text-[var(--accent-foreground)] transition-colors hover:bg-[var(--accent)] disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      className={`btn-brutal btn-primary px-5 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
     >
       Connect wallet
     </button>
