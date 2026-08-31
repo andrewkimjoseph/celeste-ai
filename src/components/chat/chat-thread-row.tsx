@@ -1,6 +1,6 @@
 "use client";
 
-import { DEFAULT_CHAT_TITLE } from "@/lib/chats";
+import { DEFAULT_CHAT_TITLE } from "@/lib/chat/chats";
 
 function formatRelativeTimestamp(timestamp: number): string {
   const diffMs = Date.now() - timestamp;
@@ -43,10 +43,10 @@ export function ChatThreadRow({
 
   return (
     <div
-      className={`group relative flex items-stretch rounded-lg transition-colors ${
+      className={`group relative flex items-stretch rounded-[2px] border-2 ${
         isActive
-          ? "bg-[var(--accent-soft)] ring-1 ring-[var(--accent-soft-border)]"
-          : "hover:bg-white/[0.04]"
+          ? "border-[var(--ink)] bg-[var(--accent)] shadow-[var(--shadow-brutal-sm)]"
+          : "border-transparent hover:border-[var(--ink)] hover:bg-[var(--canvas)]"
       }`}
     >
       <button
@@ -55,13 +55,21 @@ export function ChatThreadRow({
         className="min-w-0 flex-1 px-3 py-2.5 text-left"
       >
         <p
-          className={`truncate text-sm ${
-            isActive ? "font-medium text-white" : "text-zinc-200"
+          className={`truncate text-sm font-semibold ${
+            isActive
+              ? "text-[var(--accent-foreground)]"
+              : "text-[var(--ink)]"
           }`}
         >
           {displayTitle}
         </p>
-        <p className="mt-0.5 text-[10px] text-zinc-500">
+        <p
+          className={`mt-0.5 text-[10px] ${
+            isActive
+              ? "text-[var(--accent-foreground)]/80"
+              : "text-[var(--text-muted)]"
+          }`}
+        >
           {formatRelativeTimestamp(updatedAt)}
         </p>
       </button>
@@ -72,7 +80,11 @@ export function ChatThreadRow({
           onDelete(id);
         }}
         aria-label={`Delete chat: ${displayTitle}`}
-        className="mr-1.5 flex size-8 shrink-0 items-center justify-center self-center rounded-md text-zinc-500 opacity-100 transition-opacity hover:bg-white/[0.06] hover:text-red-400 lg:opacity-0 lg:group-hover:opacity-100 lg:focus:opacity-100"
+        className={`mr-1.5 flex size-8 shrink-0 items-center justify-center self-center opacity-100 transition-colors hover:bg-[var(--canvas)] hover:text-[var(--accent)] lg:opacity-0 lg:group-hover:opacity-100 lg:focus:opacity-100 ${
+          isActive
+            ? "text-[var(--accent-foreground)]"
+            : "text-[var(--text-muted)]"
+        }`}
       >
         <svg
           className="size-3.5"
