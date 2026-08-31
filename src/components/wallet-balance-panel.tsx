@@ -127,7 +127,7 @@ function PanelBody({ address }: { address: `0x${string}` }) {
         onRefresh={() => void refetch()}
       />
 
-      <div className="card-brutal mt-3 min-w-0 overflow-hidden px-3 py-2">
+      <div className="card-brutal mt-3 min-w-0 px-3 py-2">
         <BalanceRow
           row={{
             symbol: "CELO",
@@ -144,7 +144,7 @@ function PanelBody({ address }: { address: `0x${string}` }) {
         <GroupedBalanceList groups={groups} />
       </div>
 
-      <p className="mt-3 px-1 text-[10px] text-[var(--text-muted)]">
+      <p className="mt-4 border-t-2 border-[var(--ink)] px-1 pt-3 text-[10px] text-[var(--text-muted)]">
         {data.totalChecked} tokens scanned on Celo mainnet
         {data.totalNonZero > 0 && (
           <> · {data.totalNonZero} with balance</>
@@ -176,7 +176,7 @@ function MobileBalanceAccordion({
   const tokenCount = data?.totalNonZero ?? 0;
 
   return (
-    <div className="shrink-0 lg:hidden">
+    <div className="shrink-0 border-b-2 border-[var(--ink)] lg:hidden">
       <button
         type="button"
         onClick={() => setExpanded((open) => !open)}
@@ -210,7 +210,7 @@ function MobileBalanceAccordion({
         aria-hidden={!expanded}
       >
         <div className="min-h-0 overflow-hidden">
-          <div className="max-h-[45vh] overflow-y-auto border-t-2 border-[var(--ink)] bg-[var(--canvas)] px-3 pb-4 pt-3 sm:px-4">
+          <div className="max-h-[45vh] overflow-x-hidden overflow-y-auto border-t-2 border-[var(--ink)] bg-[var(--canvas)] px-3 pb-5 pt-3 sm:px-4">
             <PanelBody address={address} />
           </div>
         </div>
@@ -235,7 +235,7 @@ export function WalletBalanceSection({
   }
 
   return (
-    <div className="max-h-[40vh] overflow-x-hidden overflow-y-auto pr-1">
+    <div className="max-h-[40vh] overflow-x-hidden overflow-y-auto pb-2 pr-1">
       <PanelBody address={address} />
     </div>
   );

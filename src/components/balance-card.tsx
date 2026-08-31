@@ -148,7 +148,7 @@ export function GroupedBalanceList({
           <p className="mb-1 px-1 text-[10px] font-bold uppercase tracking-wide text-[var(--text-muted)]">
             {group.label}
           </p>
-          <div className="card-brutal min-w-0 overflow-hidden px-3 py-1">
+          <div className="card-brutal min-w-0 px-3 py-2">
             {group.tokens.map((row) => (
               <BalanceRow key={`${row.symbol}-${row.address}`} row={row} compact />
             ))}
