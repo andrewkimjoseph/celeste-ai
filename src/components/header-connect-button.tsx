@@ -4,7 +4,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { ConnectWalletButton } from "@/components/connect-wallet-button";
 
 const headerChipClassName =
-  "flex items-center justify-center rounded-full border border-[var(--surface-2)] text-[var(--text-muted)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] sm:rounded-lg";
+  "flex h-9 items-center justify-center rounded-[2px] border-2 border-[var(--ink)] bg-[var(--surface)] text-[var(--ink)] font-semibold shadow-[var(--shadow-brutal-sm)] transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none";
 
 function WalletIcon() {
   return (
@@ -33,7 +33,7 @@ function AccountAvatar({ ensAvatar }: { ensAvatar: string }) {
       alt=""
       width={20}
       height={20}
-      className="size-5 shrink-0 rounded-full object-cover"
+      className="size-5 shrink-0 rounded-[2px] border border-[var(--ink)] object-cover"
       aria-hidden
     />
   );
@@ -63,7 +63,7 @@ export function HeaderConnectButton() {
             <button
               type="button"
               onClick={openChainModal}
-              className={`${headerChipClassName} px-3 py-1.5 text-xs text-red-400 hover:text-red-300`}
+              className={`${headerChipClassName} bg-[var(--accent)] px-3 text-xs text-[var(--accent-foreground)]`}
             >
               Wrong network
             </button>
@@ -76,7 +76,7 @@ export function HeaderConnectButton() {
               type="button"
               onClick={openAccountModal}
               aria-label={`Account: ${account.displayName}`}
-              className={`${headerChipClassName} size-9 sm:hidden`}
+              className={`${headerChipClassName} w-9 sm:hidden`}
             >
               {account.ensAvatar ? (
                 <AccountAvatar ensAvatar={account.ensAvatar} />
@@ -91,7 +91,7 @@ export function HeaderConnectButton() {
                   type="button"
                   onClick={openChainModal}
                   aria-label={`Network: ${chain.name ?? chain.id}`}
-                  className={`${headerChipClassName} size-9`}
+                  className={`${headerChipClassName} w-9`}
                 >
                   {chain.hasIcon && chain.iconUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element -- chain icon from RainbowKit
@@ -100,7 +100,7 @@ export function HeaderConnectButton() {
                       alt=""
                       width={16}
                       height={16}
-                      className="size-4 shrink-0 rounded-full object-cover"
+                      className="size-4 shrink-0 object-cover"
                       aria-hidden
                     />
                   ) : (
@@ -114,7 +114,7 @@ export function HeaderConnectButton() {
                 type="button"
                 onClick={openAccountModal}
                 aria-label={`Account: ${account.displayName}`}
-                className={`${headerChipClassName} gap-2 px-3 py-1.5 text-xs`}
+                className={`${headerChipClassName} gap-2 px-3 text-xs`}
               >
                 {account.ensAvatar ? (
                   <AccountAvatar ensAvatar={account.ensAvatar} />
