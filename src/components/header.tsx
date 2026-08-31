@@ -5,7 +5,6 @@ import Link from "next/link";
 import { CelesteLogoAvatar } from "@/components/celeste-logo";
 import { PersonalityPicker } from "@/components/chat/personality-picker";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { useMounted } from "@/hooks/use-mounted";
 import { useChats } from "@/hooks/use-chats";
 import { useTransactions } from "@/hooks/use-transactions";
 import { trackEvent } from "@/lib/analytics/amplitude-browser";
@@ -78,6 +77,7 @@ function NewChatIcon() {
 }
 
 interface HeaderProps {
+  variant?: "chat" | "about";
   showNewChat?: boolean;
   onNewChat?: () => void;
   isConnected?: boolean;
@@ -188,12 +188,11 @@ function TransactionsButton({
   );
 }
 
-export function Header({
-  showNewChat = false,
-  onNewChat,
-  isConnected = false,
-}: HeaderProps) {
-  const mounted = useMounted();
+function ChatPersonalityControls({
+  isConnected,
+}: {
+  isConnected: boolean;
+}) {
   const [showPersonalityPicker, setShowPersonalityPicker] = useState(false);
   const {
     selectedPersonalityId,
@@ -235,91 +234,34 @@ export function Header({
     void setSelectedPersonality(id);
   }
 
-  return (
-    <header className="z-30 shrink-0 border-b-2 border-[var(--ink)] bg-[var(--surface)] px-3 py-2.5 sm:px-4 sm:py-3">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
-          <button
-            type="button"
-            onClick={() => onNewChat?.()}
-            disabled={!onNewChat}
-            aria-label="New chat"
-            className="shrink-0 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)] disabled:cursor-default"
-          >
-            <CelesteLogoAvatar size="md" />
-          </button>
-          <div className="min-w-0">
-            <h1 className="hidden truncate text-base font-bold tracking-tight text-[var(--ink)] sm:block sm:text-lg">
-              Celeste AI
-            </h1>
-            <p className="hidden truncate text-xs font-medium text-[var(--text-muted)] sm:block">
-              {isConnected
-                ? "Send, swap, earn, and claim on Celo"
-                : "DeFAI copilot for Celo — send, swap, earn, claim"}
-            </p>
-          </div>
-        </div>
+  if (!isConnected) {
+    return null;
+  }
 
-        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-          <Link
-            href="/about"
-            aria-label="About Celeste AI"
-            className={`${headerChipClassName} w-9 sm:w-auto sm:px-3`}
-          >
-            <svg
-              className="size-4 sm:mr-1.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={1.75}
-              aria-hidden
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
-              />
-            </svg>
-            <span className="hidden text-xs sm:inline">About</span>
-          </Link>
-          <HistoryButton isConnected={isConnected} />
-          <TransactionsButton isConnected={isConnected} />
-          {isConnected ? (
-            <button
-              type="button"
-              onClick={() => setShowPersonalityPicker((open) => !open)}
-              aria-label={
-                hasSelectedPersonality
-                  ? "Change personality"
-                  : "Choose personality"
-              }
-              aria-expanded={showPersonalityPicker}
-              aria-haspopup="dialog"
-              className={`${headerChipClassName} w-9 sm:w-auto sm:px-3 ${
-                hasSelectedPersonality ? "" : "bg-[var(--accent)] text-[var(--accent-foreground)]"
-              }`}
-            >
-              <PersonalityButtonIcon selectedId={selectedPersonalityId} />
-              <span className="hidden text-xs sm:inline">
-                {hasSelectedPersonality
-                  ? "Personality"
-                  : "Choose personality"}
-              </span>
-            </button>
-          ) : null}
-          <NewChatButton showNewChat={showNewChat} onNewChat={onNewChat} />
-          <ThemeToggle />
-          {mounted ? (
-            <HeaderConnectButton />
-          ) : (
-            <div
-              className="h-9 w-9 rounded-[2px] border-2 border-[var(--ink)] bg-[var(--surface-3)] sm:w-[140px]"
-              aria-hidden
-            />
-          )}
-        </div>
-      </div>
-      {isConnected && showPersonalityPicker && typeof document !== "undefined"
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setShowPersonalityPicker((open) => !open)}
+        aria-label={
+          hasSelectedPersonality
+            ? "Change personality"
+            : "Choose personality"
+        }
+        aria-expanded={showPersonalityPicker}
+        aria-haspopup="dialog"
+        className={`${headerChipClassName} w-9 sm:w-auto sm:px-3 ${
+          hasSelectedPersonality ? "" : "bg-[var(--accent)] text-[var(--accent-foreground)]"
+        }`}
+      >
+        <PersonalityButtonIcon selectedId={selectedPersonalityId} />
+        <span className="hidden text-xs sm:inline">
+          {hasSelectedPersonality
+            ? "Personality"
+            : "Choose personality"}
+        </span>
+      </button>
+      {showPersonalityPicker && typeof document !== "undefined"
         ? createPortal(
             <div className="fixed inset-0 z-50">
               <button
@@ -385,6 +327,103 @@ export function Header({
             document.body,
           )
         : null}
+    </>
+  );
+}
+
+function AboutChip({ current }: { current: boolean }) {
+  const className = `${headerChipClassName} w-9 sm:w-auto sm:px-3`;
+  const icon = (
+    <svg
+      className="size-4 sm:mr-1.5"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      aria-hidden
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+      />
+    </svg>
+  );
+
+  if (current) {
+    return (
+      <span aria-current="page" className={className}>
+        {icon}
+        <span className="hidden text-xs sm:inline">About</span>
+      </span>
+    );
+  }
+
+  return (
+    <Link href="/about" aria-label="About Celeste AI" className={className}>
+      {icon}
+      <span className="hidden text-xs sm:inline">About</span>
+    </Link>
+  );
+}
+
+export function Header({
+  variant = "chat",
+  showNewChat = false,
+  onNewChat,
+  isConnected = false,
+}: HeaderProps) {
+  const isAbout = variant === "about";
+
+  return (
+    <header className="z-30 shrink-0 border-b-2 border-[var(--ink)] bg-[var(--surface)] px-3 py-2.5 sm:px-4 sm:py-3">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+          {isAbout ? (
+            <Link
+              href="/"
+              aria-label="Back to chat"
+              className="shrink-0 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+            >
+              <CelesteLogoAvatar size="md" />
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={() => onNewChat?.()}
+              disabled={!onNewChat}
+              aria-label="New chat"
+              className="shrink-0 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)] disabled:cursor-default"
+            >
+              <CelesteLogoAvatar size="md" />
+            </button>
+          )}
+          <div className="min-w-0">
+            <h1 className="hidden truncate text-base font-bold tracking-tight text-[var(--ink)] sm:block sm:text-lg">
+              Celeste AI
+            </h1>
+            <p className="hidden truncate text-xs font-medium text-[var(--text-muted)] sm:block">
+              {isConnected
+                ? "Send, swap, earn, and claim on Celo"
+                : "DeFAI copilot for Celo — send, swap, earn, claim"}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <AboutChip current={isAbout} />
+          {isAbout ? null : (
+            <>
+              <HistoryButton isConnected={isConnected} />
+              <TransactionsButton isConnected={isConnected} />
+              <ChatPersonalityControls isConnected={isConnected} />
+              <NewChatButton showNewChat={showNewChat} onNewChat={onNewChat} />
+            </>
+          )}
+          <ThemeToggle />
+          <HeaderConnectButton />
+        </div>
+      </div>
     </header>
   );
 }
