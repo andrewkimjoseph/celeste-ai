@@ -1,14 +1,14 @@
 "use client";
 
-import { formatFlowSummary } from "@/lib/wallet-error";
-import { formatTxHash } from "@/lib/format-balance";
-import { celoscanTxUrl } from "@/lib/links";
+import { formatFlowSummary } from "@/lib/tx/wallet-error";
+import { formatTxHash } from "@/lib/wallet/format-balance";
+import { celoscanTxUrl } from "@/lib/wallet/links";
 import {
   formatTransactionStep,
   getTransactionProtocolLabel,
   pairTransactionStepsWithHashes,
-} from "@/lib/transaction-display";
-import type { SessionTransaction } from "@/lib/transactions";
+} from "@/lib/tx/transaction-display";
+import type { SessionTransaction } from "@/lib/tx/transactions";
 import { useState } from "react";
 
 function formatRelativeTime(timestamp: number): string {
@@ -42,7 +42,7 @@ function HashActions({
       <button
         type="button"
         onClick={() => onCopy(hash)}
-        className="rounded-md border border-[var(--surface-2)] bg-[var(--surface-0)]/40 px-2 py-1 font-mono text-[11px] text-[var(--text-secondary)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)]"
+        className="rounded-[2px] border-2 border-[var(--ink)] bg-[var(--canvas)] px-2 py-1 font-mono text-[11px] font-bold text-[var(--ink)] shadow-[var(--shadow-brutal-sm)] transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
         title="Copy transaction hash"
       >
         {copiedHash === hash ? "Copied" : formatTxHash(hash)}
@@ -51,7 +51,7 @@ function HashActions({
         href={celoscanTxUrl(hash)}
         target="_blank"
         rel="noopener noreferrer"
-        className="rounded-md border border-[var(--surface-2)] px-2 py-1 text-[11px] text-[var(--accent-hover)] transition-colors hover:border-[var(--accent)]/30 hover:text-[var(--accent-soft-text)]"
+        className="rounded-[2px] border-2 border-[var(--ink)] bg-[var(--accent)] px-2 py-1 text-[11px] font-semibold text-[var(--accent-foreground)] shadow-[var(--shadow-brutal-sm)] transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
       >
         View
       </a>
@@ -111,10 +111,8 @@ export function TransactionRow({
 
   return (
     <article
-      className={`rounded-xl border bg-gradient-to-b from-[var(--surface-1)] to-[rgb(16_12_24/0.92)] p-3.5 shadow-sm transition-colors ${
-        selected
-          ? "border-[var(--accent)]/40 ring-1 ring-[var(--accent)]/20"
-          : "border-[var(--surface-2)]"
+      className={`border-2 bg-[var(--surface)] p-3.5 ${
+        selected ? "border-[var(--accent)]" : "border-[var(--ink)]"
       }`}
     >
       <button
@@ -125,7 +123,7 @@ export function TransactionRow({
         }}
         className="flex w-full items-start gap-3 text-left"
       >
-        <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-hover)]">
+        <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-[2px] border-2 border-[var(--ink)] bg-[var(--success)] text-[var(--ink)]">
           <svg
             className="size-4"
             fill="none"
@@ -144,11 +142,11 @@ export function TransactionRow({
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center rounded-full border border-[var(--accent-soft-border)] bg-[var(--accent-soft)] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[var(--accent-soft-text)]">
+            <span className="inline-flex items-center rounded-[2px] border-2 border-[var(--ink)] bg-[var(--success)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--ink)]">
               Confirmed
             </span>
             {protocolLabel && (
-              <span className="inline-flex items-center rounded-full border border-[var(--surface-2)] bg-[var(--surface-0)]/35 px-2 py-0.5 text-[10px] font-medium text-[var(--text-secondary)]">
+              <span className="inline-flex items-center rounded-[2px] border-2 border-[var(--ink)] bg-[var(--canvas)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--ink)]">
                 {protocolLabel}
               </span>
             )}
