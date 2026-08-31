@@ -1,10 +1,11 @@
 "use client";
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { ConnectWalletButton } from "@/components/connect-wallet-button";
 
-const headerChipClassName =
-  "flex h-9 items-center justify-center rounded-[2px] border-2 border-[var(--ink)] bg-[var(--surface)] text-[var(--ink)] font-semibold shadow-[var(--shadow-brutal-sm)] transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none";
+const headerChipChrome =
+  "flex h-9 shrink-0 items-center justify-center rounded-[2px] border-2 border-[var(--ink)] font-semibold leading-none shadow-[var(--shadow-brutal-sm)] transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none";
+
+const headerChipClassName = `${headerChipChrome} bg-[var(--surface)] text-[var(--ink)]`;
 
 function WalletIcon() {
   return (
@@ -55,7 +56,15 @@ export function HeaderConnectButton() {
         }
 
         if (!account) {
-          return <ConnectWalletButton onClick={openConnectModal} />;
+          return (
+            <button
+              type="button"
+              onClick={openConnectModal}
+              className={`${headerChipChrome} whitespace-nowrap bg-[var(--accent)] px-3 text-xs text-[var(--accent-foreground)]`}
+            >
+              Connect wallet
+            </button>
+          );
         }
 
         if (chain?.unsupported) {
@@ -63,7 +72,7 @@ export function HeaderConnectButton() {
             <button
               type="button"
               onClick={openChainModal}
-              className={`${headerChipClassName} bg-[var(--accent)] px-3 text-xs text-[var(--accent-foreground)]`}
+              className={`${headerChipChrome} whitespace-nowrap bg-[var(--accent)] px-3 text-xs text-[var(--accent-foreground)]`}
             >
               Wrong network
             </button>
