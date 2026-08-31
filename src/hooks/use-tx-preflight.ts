@@ -1,6 +1,6 @@
 "use client";
 
-import type { SendPreflightResult } from "@/lib/send-preflight";
+import type { SendPreflightResult } from "@/lib/tx/send-preflight";
 import { useWalletCapabilities } from "@/hooks/use-wallet-capabilities";
 import { useEffect, useState } from "react";
 

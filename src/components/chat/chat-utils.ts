@@ -1,5 +1,5 @@
 import { isTextUIPart, isToolUIPart, type ChatStatus } from "ai";
-import type { CelesteUIMessage } from "@/lib/chat-message-metadata";
+import type { CelesteUIMessage } from "@/lib/chat/chat-message-metadata";
 
 export type ChatTurn = {
   id: string;

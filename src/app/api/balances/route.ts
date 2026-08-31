@@ -1,9 +1,9 @@
 import { formatUnits } from "viem";
 import { isAddress } from "viem";
-import { buildWalletBalancesResponse, goodDollarBalanceRow } from "@/lib/balances";
-import { scheduleAmplitudeFlush } from "@/lib/amplitude-flush";
+import { buildWalletBalancesResponse, goodDollarBalanceRow } from "@/lib/wallet/balances";
+import { scheduleAmplitudeFlush } from "@/lib/analytics/amplitude-flush";
 import { runWithAnalyticsWallet } from "@andrewkimjoseph/celina-sdk";
-import { getCelinaClient } from "@/lib/celina";
+import { getCelinaClient } from "@/lib/wallet/celina";
 
 export async function GET(req: Request) {
   scheduleAmplitudeFlush();

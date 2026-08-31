@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import type { CelesteUIMessage } from "@/lib/chat-message-metadata";
+import type { CelesteUIMessage } from "@/lib/chat/chat-message-metadata";
 import {
   deriveChatLastActivityAt,
   toChatListItem,
   type StoredChat,
-} from "@/lib/chats";
+} from "@/lib/chat/chats";
 
 function userMessage(createdAt: number, text = "Hello"): CelesteUIMessage {
   return {

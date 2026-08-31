@@ -1,5 +1,5 @@
 import type { FlowCategory } from "@/lib/analytics/events";
-import { parseSendSummary } from "@/lib/send-preflight";
+import { parseSendSummary } from "@/lib/tx/send-preflight";
 
 type InferFlowCategoryOptions = {
   toolName?: string;

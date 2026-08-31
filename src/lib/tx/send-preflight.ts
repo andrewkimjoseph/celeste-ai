@@ -1,17 +1,17 @@
 import type { createCelinaClient } from "@andrewkimjoseph/celina-sdk";
 import { parseUnits } from "viem";
-import { normalizeRegistryTokenInput } from "@/lib/registry-token";
-import { checkBlockedSendRecipient } from "@/lib/blocked-send-recipients";
+import { normalizeRegistryTokenInput } from "@/lib/wallet/registry-token";
+import { checkBlockedSendRecipient } from "@/lib/minipay/blocked-send-recipients";
 export {
   checkBlockedSendRecipient,
   findBlockedSendRecipient,
   parseSendRecipient,
-} from "@/lib/blocked-send-recipients";
+} from "@/lib/minipay/blocked-send-recipients";
 import {
   minipayFeeSymbolFromBalances,
   minipayGasBufferWei,
   minipaySpendBufferMessage,
-} from "@/lib/minipay-spend-buffer";
+} from "@/lib/minipay/minipay-spend-buffer";
 
 type CelinaClient = ReturnType<typeof createCelinaClient>;
 

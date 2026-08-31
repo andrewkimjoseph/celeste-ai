@@ -10,7 +10,7 @@ export type MessageMetadata = z.infer<typeof messageMetadataSchema>;
 export type CelesteUIMessage = UIMessage<MessageMetadata>;
 
 export const MESSAGE_TIMESTAMP_CLASS =
-  "text-[11px] font-normal tabular-nums text-zinc-500";
+  "text-[11px] font-normal tabular-nums text-[var(--text-muted)]";
 
 export function getMessageCreatedAt(
   message: Pick<CelesteUIMessage, "metadata">,

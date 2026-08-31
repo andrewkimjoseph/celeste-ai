@@ -1,5 +1,5 @@
-import type { WalletBalancesResponse } from "@/lib/balances";
-import { formatAddressShort, formatBalanceShort } from "@/lib/format-balance";
+import type { WalletBalancesResponse } from "@/lib/wallet/balances";
+import { formatAddressShort, formatBalanceShort } from "@/lib/wallet/format-balance";
 
 export type SystemPromptOptions = {
   address: `0x${string}`;

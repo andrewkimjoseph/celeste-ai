@@ -1,6 +1,6 @@
 import type { PromptGroup } from "@/lib/analytics/events";
-import type { WalletBalancesResponse } from "@/lib/balances";
-import { formatBalanceShort } from "@/lib/format-balance";
+import type { WalletBalancesResponse } from "@/lib/wallet/balances";
+import { formatBalanceShort } from "@/lib/wallet/format-balance";
 
 export type LandingPrompt = { text: string; group: PromptGroup };
 

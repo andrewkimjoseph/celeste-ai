@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import type { WalletBalancesResponse } from "@/lib/balances";
+import type { WalletBalancesResponse } from "@/lib/wallet/balances";
 import {
   buildLandingPrompts,
   formatLandingBalanceLine,
-} from "@/lib/landing-prompts";
-import { formatBalanceShort } from "@/lib/format-balance";
+} from "@/lib/chat/landing-prompts";
+import { formatBalanceShort } from "@/lib/wallet/format-balance";
 
 function mockBalances(
   partial: Partial<WalletBalancesResponse> & Pick<WalletBalancesResponse, "tokens">,

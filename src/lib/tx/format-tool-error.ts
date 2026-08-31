@@ -3,7 +3,7 @@
 import {
   isTruncatedTransactionHash,
   TRUNCATED_TX_HASH_MESSAGE,
-} from "@/lib/transaction-hash";
+} from "@/lib/tx/transaction-hash";
 
 export function formatToolErrorMessage(
   toolName: string,

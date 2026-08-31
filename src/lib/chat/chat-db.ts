@@ -4,13 +4,13 @@ import {
   MAX_CHATS_PER_WALLET,
   type ChatUiState,
   type StoredChat,
-} from "@/lib/chats";
-import { celesteDb } from "@/lib/transaction-db";
-import type { CelesteUIMessage } from "@/lib/chat-message-metadata";
+} from "@/lib/chat/chats";
+import { celesteDb } from "@/lib/tx/transaction-db";
+import type { CelesteUIMessage } from "@/lib/chat/chat-message-metadata";
 import {
   isCelestialPersonalityId,
   type CelestialPersonalityId,
-} from "@/lib/celestial-personalities";
+} from "@/lib/chat/celestial-personalities";
 
 function normalizeAddress(address: string): string {
   return address.toLowerCase();

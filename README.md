@@ -29,13 +29,13 @@ Installs `@andrewkimjoseph/celina-sdk` from npm at the exact version in [`packag
 - wagmi + RainbowKit (Celo mainnet)
 - `@andrewkimjoseph/celina-sdk` for chain reads and `prepare*` flows
 
-Prepared transactions include **dual on-chain attribution** via SDK config in [`src/lib/celina.ts`](src/lib/celina.ts): legacy `CELINA|…` UTF-8 suffix plus ERC-8021 `toDataSuffix` codes (Celo leaderboards / `verifyTx`). Prefer the `check_attribution_tag` chat tool to list or confirm custom tags on a tx hash after signing (`verify_attribution_tag` for raw layer decode).
+Prepared transactions include **dual on-chain attribution** via SDK config in [`src/lib/wallet/celina.ts`](src/lib/wallet/celina.ts): legacy `CELINA|…` UTF-8 suffix plus ERC-8021 `toDataSuffix` codes (Celo leaderboards / `verifyTx`). Prefer the `check_attribution_tag` chat tool to list or confirm custom tags on a tx hash after signing (`verify_attribution_tag` for raw layer decode).
 
 No `CELO_PRIVATE_KEY` — writes require wallet confirmation via `TxConfirmCard`.
 
 ## Swap routing
 
-Swaps use **composite routing** in [`src/lib/swap-routing.ts`](src/lib/swap-routing.ts): the agent quotes Mento FX, GoodDollar reserve (G$ ↔ USDm), and Uniswap v4 in parallel and picks the better `expectedOut`.
+Swaps use **composite routing** in [`src/lib/tx/swap-routing.ts`](src/lib/tx/swap-routing.ts): the agent quotes Mento FX, GoodDollar reserve (G$ ↔ USDm), and Uniswap v4 in parallel and picks the better `expectedOut`.
 
 | Tool | Purpose |
 |------|---------|
@@ -105,14 +105,14 @@ Chat tools mirror **celina-sdk** reads and `prepare_*` wallet flows (naming is s
 |------|---------|
 | `src/app/api/chat/route.ts` | Streaming chat route — wallet gate, tool wiring |
 | `src/lib/chat-tools/` | Vercel AI SDK tool definitions (reads + prepare_*) |
-| `src/lib/swap-routing.ts` | Composite Mento FX + GoodDollar reserve + Uniswap v4 quote/prepare logic |
-| `src/lib/chat-model.ts` | OpenRouter / OpenAI model selection |
-| `src/lib/celina.ts` | Server-side SDK singleton |
-| `src/lib/prepared-flow.ts` | Extract `SerializedPreparedFlow` from chat messages |
-| `src/lib/minipay-fee-currency.ts` | MiniPay CIP-64 `feeCurrency` resolution (Celeste-only) |
-| `src/lib/prepared-step-simulation.ts` | Wraps SDK `simulatePreparedStep` + send preflight for sends |
-| `src/lib/chats.ts` | Chat thread types, title helper, tx-card UI state on load |
-| `src/lib/chat-db.ts` | IndexedDB CRUD for persisted chat threads |
+| `src/lib/tx/swap-routing.ts` | Composite Mento FX + GoodDollar reserve + Uniswap v4 quote/prepare logic |
+| `src/lib/chat/chat-model.ts` | OpenRouter / OpenAI model selection |
+| `src/lib/wallet/celina.ts` | Server-side SDK singleton |
+| `src/lib/tx/prepared-flow.ts` | Extract `SerializedPreparedFlow` from chat messages |
+| `src/lib/minipay/minipay-fee-currency.ts` | MiniPay CIP-64 `feeCurrency` resolution (Celeste-only) |
+| `src/lib/tx/prepared-step-simulation.ts` | Wraps SDK `simulatePreparedStep` + send preflight for sends |
+| `src/lib/chat/chats.ts` | Chat thread types, title helper, tx-card UI state on load |
+| `src/lib/chat/chat-db.ts` | IndexedDB CRUD for persisted chat threads |
 | `src/components/chat/chat-context.tsx` | Wallet-scoped chat state + persistence |
 | `src/components/chat/chat-sidebar.tsx` | Desktop thread list + wallet balances |
 | `src/components/chat-panel.tsx` | Chat UI, address transport, tx card trigger |
@@ -136,7 +136,7 @@ See [`.env.example`](.env.example):
 | `NEXT_PUBLIC_AMPLITUDE_DISABLED` | Set to `1` to disable browser analytics |
 | `NEXT_PUBLIC_AMPLITUDE_SERVER_ZONE` | Optional `EU` if your Amplitude project is EU-resident (default US) |
 
-Browser analytics (`NEXT_PUBLIC_AMPLITUDE_*`) tracks product UX events (wallet connect, chat, tx funnel). Celina SDK server telemetry (`celeste_ai` `device_id`, connected wallet as Amplitude `user_id` via `runWithAnalyticsWallet`) is a separate stream for read-tool usage. Opt out in [`src/lib/celina.ts`](src/lib/celina.ts) with `analyticsEnabled: false` on `createCelinaClient()`.
+Browser analytics (`NEXT_PUBLIC_AMPLITUDE_*`) tracks product UX events (wallet connect, chat, tx funnel). Celina SDK server telemetry (`celeste_ai` `device_id`, connected wallet as Amplitude `user_id` via `runWithAnalyticsWallet`) is a separate stream for read-tool usage. Opt out in [`src/lib/wallet/celina.ts`](src/lib/wallet/celina.ts) with `analyticsEnabled: false` on `createCelinaClient()`.
 
 ### Next.js config notes
 
@@ -162,13 +162,13 @@ Before each wagmi send, Celeste dry-runs the prepared step so reverts surface in
 | Layer | Module | Role |
 |-------|--------|------|
 | SDK | `@andrewkimjoseph/celina-sdk/simulation` | Generic `simulatePreparedStep` — `publicClient.call` (or `estimateGas` when `feeCurrency` is set) |
-| Celeste | `src/lib/prepared-step-simulation.ts` | Host wrapper around the SDK helper |
-| Celeste | `src/lib/minipay-fee-currency.ts` | Resolves MiniPay stablecoin gas (`feeCurrency`) for simulation + send |
-| Celeste | `src/lib/minipay-spend-buffer.ts` | MiniPay gas buffer when fee token equals spend token |
-| Celeste | `src/lib/flow-preflight.ts` | Aave supply balance + gas buffer checks |
-| Celeste | `src/lib/blocked-send-recipients.ts` | Blocks prepare_send to Aave pool and other protocol contracts |
-| Celeste | `src/lib/simulation-error.ts` | Friendly simulation failure copy (retry hints, allowance lag) |
-| Celeste | `src/lib/revert-error.ts` | Friendly on-chain revert copy (hash in technical details) |
+| Celeste | `src/lib/tx/prepared-step-simulation.ts` | Host wrapper around the SDK helper |
+| Celeste | `src/lib/minipay/minipay-fee-currency.ts` | Resolves MiniPay stablecoin gas (`feeCurrency`) for simulation + send |
+| Celeste | `src/lib/minipay/minipay-spend-buffer.ts` | MiniPay gas buffer when fee token equals spend token |
+| Celeste | `src/lib/tx/flow-preflight.ts` | Aave supply balance + gas buffer checks |
+| Celeste | `src/lib/minipay/blocked-send-recipients.ts` | Blocks prepare_send to Aave pool and other protocol contracts |
+| Celeste | `src/lib/tx/simulation-error.ts` | Friendly simulation failure copy (retry hints, allowance lag) |
+| Celeste | `src/lib/tx/revert-error.ts` | Friendly on-chain revert copy (hash in technical details) |
 | Celeste | `tx-confirm-card.tsx` | Send preflight (balance checks) for send flows only; simulate → send → `receipt.status`; resumes multi-step flows on retry |
 
 Simulation failures show user-friendly messages (e.g. “Almost there” after a mined approve when the network preview lags) with a **Try again** action. Completed steps are remembered so retry continues from the next step instead of re-signing approve. On MiniPay, when network fees are paid from the same stablecoin being supplied or sent, Celeste reserves a small gas buffer so “supply all” flows fail at preflight/simulation instead of on-chain. Reverted transactions are not counted as completed steps.

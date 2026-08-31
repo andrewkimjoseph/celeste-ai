@@ -7,7 +7,7 @@ import {
   trackAppOpened,
   trackEvent,
 } from "@/lib/analytics/amplitude-browser";
-import { isMiniPayWallet } from "@/lib/wallet-capabilities";
+import { isMiniPayWallet } from "@/lib/wallet/wallet-capabilities";
 import { useEffect, useRef } from "react";
 import { useAccount } from "wagmi";
 

@@ -4,12 +4,12 @@
  */
 import { convertToModelMessages, smoothStream, stepCountIs, streamText } from "ai";
 import { isAddress } from "viem";
-import { assertChatApiKeyConfigured, getChatModel } from "@/lib/chat-model";
+import { assertChatApiKeyConfigured, getChatModel } from "@/lib/chat/chat-model";
 import { buildSystemPrompt, createChatTools } from "@/lib/chat-tools";
-import { scheduleAmplitudeFlush } from "@/lib/amplitude-flush";
+import { scheduleAmplitudeFlush } from "@/lib/analytics/amplitude-flush";
 import { runWithAnalyticsWallet } from "@andrewkimjoseph/celina-sdk";
-import { getCelinaClient } from "@/lib/celina";
-import type { CelesteUIMessage } from "@/lib/chat-message-metadata";
+import { getCelinaClient } from "@/lib/wallet/celina";
+import type { CelesteUIMessage } from "@/lib/chat/chat-message-metadata";
 
 export const maxDuration = 60;
 

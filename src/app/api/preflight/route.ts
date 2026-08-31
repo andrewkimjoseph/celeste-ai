@@ -1,8 +1,8 @@
 import { isAddress } from "viem";
-import { checkSendPreflight, parseSendRecipient, parseSendSummary } from "@/lib/send-preflight";
-import { scheduleAmplitudeFlush } from "@/lib/amplitude-flush";
+import { checkSendPreflight, parseSendRecipient, parseSendSummary } from "@/lib/tx/send-preflight";
+import { scheduleAmplitudeFlush } from "@/lib/analytics/amplitude-flush";
 import { runWithAnalyticsWallet } from "@andrewkimjoseph/celina-sdk";
-import { getCelinaClient } from "@/lib/celina";
+import { getCelinaClient } from "@/lib/wallet/celina";
 
 export async function POST(req: Request) {
   scheduleAmplitudeFlush();

@@ -4,8 +4,8 @@ import {
   addTransactionToDb,
   findTransactionByHash,
   listTransactions,
-} from "@/lib/transaction-db";
-import type { NewSessionTransaction, SessionTransaction } from "@/lib/transactions";
+} from "@/lib/tx/transaction-db";
+import type { NewSessionTransaction, SessionTransaction } from "@/lib/tx/transactions";
 import {
   createContext,
   useCallback,

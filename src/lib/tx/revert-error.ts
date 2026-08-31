@@ -1,5 +1,5 @@
-import type { PreparedTx } from "@/lib/prepared-flow";
-import type { WalletErrorDisplay } from "@/lib/wallet-error";
+import type { PreparedTx } from "@/lib/tx/prepared-flow";
+import type { WalletErrorDisplay } from "@/lib/tx/wallet-error";
 
 /** Friendly copy when a broadcast transaction reverts on-chain. */
 export function formatRevertedStepError(

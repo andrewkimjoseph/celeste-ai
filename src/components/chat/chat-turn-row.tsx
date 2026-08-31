@@ -3,7 +3,7 @@
 import { AssistantLoading } from "@/components/chat/assistant-loading";
 import { ChatMessage } from "@/components/chat/chat-message";
 import type { ChatTurn } from "@/components/chat/chat-utils";
-import { isHiddenChatUserMessage } from "@/lib/prepared-flow";
+import { isHiddenChatUserMessage } from "@/lib/tx/prepared-flow";
 
 interface ChatTurnRowProps {
   turn: ChatTurn;

@@ -1,6 +1,6 @@
 "use client";
 
-import { isMiniPayWallet, type WalletCapabilities } from "@/lib/wallet-capabilities";
+import { isMiniPayWallet, type WalletCapabilities } from "@/lib/wallet/wallet-capabilities";
 import { useSyncExternalStore } from "react";
 
 export function useWalletCapabilities(): WalletCapabilities {

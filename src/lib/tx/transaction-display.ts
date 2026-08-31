@@ -1,4 +1,4 @@
-import { formatHumanFlowText } from "@/lib/format-human-flow-text";
+import { formatHumanFlowText } from "@/lib/tx/format-human-flow-text";
 
 /** Known Celo mainnet token addresses → registry symbols for step label cleanup. */
 const TOKEN_ADDRESS_SYMBOLS: Record<string, string> = {

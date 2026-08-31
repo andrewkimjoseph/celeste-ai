@@ -1,7 +1,7 @@
 "use client";
 
-import type { FlowPreflightResult } from "@/lib/flow-preflight";
-import { parseSupplySummary } from "@/lib/flow-preflight";
+import type { FlowPreflightResult } from "@/lib/tx/flow-preflight";
+import { parseSupplySummary } from "@/lib/tx/flow-preflight";
 import { useWalletCapabilities } from "@/hooks/use-wallet-capabilities";
 import { useEffect, useState } from "react";
 

@@ -1,5 +1,5 @@
 import type { createCelinaClient } from "@andrewkimjoseph/celina-sdk";
-import { normalizeRegistryTokenInput } from "@/lib/registry-token";
+import { normalizeRegistryTokenInput } from "@/lib/wallet/registry-token";
 
 type CelinaClient = ReturnType<typeof createCelinaClient>;
 

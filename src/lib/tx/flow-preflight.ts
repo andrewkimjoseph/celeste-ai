@@ -2,8 +2,8 @@ import { erc20Abi, formatUnits, parseUnits, type PublicClient } from "viem";
 import {
   checkMiniPaySpendBuffer,
   minipayEntryForSymbol,
-} from "@/lib/minipay-spend-buffer";
-import { resolveMiniPayFeeCurrency } from "@/lib/minipay-fee-currency";
+} from "@/lib/minipay/minipay-spend-buffer";
+import { resolveMiniPayFeeCurrency } from "@/lib/minipay/minipay-fee-currency";
 
 export type FlowPreflightOptions = {
   supportsFeeAbstraction?: boolean;

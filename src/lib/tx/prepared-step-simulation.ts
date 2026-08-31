@@ -1,13 +1,13 @@
 import { simulatePreparedStep } from "@andrewkimjoseph/celina-sdk/simulation";
 import { erc20Abi, parseUnits, type PublicClient } from "viem";
-import type { PreparedTx } from "@/lib/prepared-flow";
-import { parseSupplyStepDescription } from "@/lib/flow-preflight";
-import { resolveMiniPayFeeCurrency } from "@/lib/minipay-fee-currency";
+import type { PreparedTx } from "@/lib/tx/prepared-flow";
+import { parseSupplyStepDescription } from "@/lib/tx/flow-preflight";
+import { resolveMiniPayFeeCurrency } from "@/lib/minipay/minipay-fee-currency";
 import {
   checkMiniPaySpendBuffer,
   minipayEntryForSymbol,
-} from "@/lib/minipay-spend-buffer";
-import { formatWalletError } from "@/lib/wallet-error";
+} from "@/lib/minipay/minipay-spend-buffer";
+import { formatWalletError } from "@/lib/tx/wallet-error";
 
 export type PreparedStepSimulationOptions = {
   supportsFeeAbstraction?: boolean;

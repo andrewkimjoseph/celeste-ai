@@ -1,4 +1,4 @@
-import type { WalletErrorDisplay } from "@/lib/wallet-error";
+import type { WalletErrorDisplay } from "@/lib/tx/wallet-error";
 
 export type SimulationErrorContext = {
   stepIndex: number;

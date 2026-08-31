@@ -1,6 +1,6 @@
 "use client";
 
-import { isMiniPayWallet } from "@/lib/wallet-capabilities";
+import { isMiniPayWallet } from "@/lib/wallet/wallet-capabilities";
 import { useEffect, useRef } from "react";
 import { injected, useAccount, useConnect, useConnectors } from "wagmi";
 

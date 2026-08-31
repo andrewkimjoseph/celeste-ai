@@ -1,5 +1,5 @@
 import { parseUnits } from "viem";
-import { MINIPAY_FEE_CURRENCIES } from "@/lib/minipay-fee-currency";
+import { MINIPAY_FEE_CURRENCIES } from "@/lib/minipay/minipay-fee-currency";
 
 /** Conservative MiniPay gas reserve when fee token equals spend token (6-decimal stables). */
 export const MINIPAY_STABLE_GAS_BUFFER_6 = parseUnits("0.05", 6);

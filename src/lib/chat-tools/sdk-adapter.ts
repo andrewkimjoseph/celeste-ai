@@ -5,12 +5,12 @@ import {
   filterToolDefinitions,
   type ToolRuntime,
 } from "@andrewkimjoseph/celina-sdk/tools";
-import { checkSendPreflight } from "@/lib/send-preflight";
-import { checkBlockedSendRecipient } from "@/lib/blocked-send-recipients";
+import { checkSendPreflight } from "@/lib/tx/send-preflight";
+import { checkBlockedSendRecipient } from "@/lib/minipay/blocked-send-recipients";
 import {
   parseTransactionHash,
   TRUNCATED_TX_HASH_MESSAGE,
-} from "@/lib/transaction-hash";
+} from "@/lib/tx/transaction-hash";
 import { z } from "zod";
 
 type CelinaClient = ReturnType<typeof createCelinaClient>;

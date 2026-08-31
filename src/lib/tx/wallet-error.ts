@@ -1,4 +1,4 @@
-import { formatHumanFlowText } from "@/lib/format-human-flow-text";
+import { formatHumanFlowText } from "@/lib/tx/format-human-flow-text";
 
 export type WalletErrorDisplay = {
   title: string;

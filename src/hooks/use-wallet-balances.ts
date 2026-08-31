@@ -1,6 +1,6 @@
 "use client";
 
-import type { WalletBalancesResponse } from "@/lib/balances";
+import type { WalletBalancesResponse } from "@/lib/wallet/balances";
 import {
   type QueryClient,
   useQuery,

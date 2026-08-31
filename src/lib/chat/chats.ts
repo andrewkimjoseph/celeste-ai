@@ -2,8 +2,8 @@ import { isTextUIPart } from "ai";
 import {
   getMessageCreatedAt,
   type CelesteUIMessage,
-} from "@/lib/chat-message-metadata";
-import { getActivePreparedFlowWithMeta, isPreparedFlowConfirmed } from "@/lib/prepared-flow";
+} from "@/lib/chat/chat-message-metadata";
+import { getActivePreparedFlowWithMeta, isPreparedFlowConfirmed } from "@/lib/tx/prepared-flow";
 
 export const MAX_CHATS_PER_WALLET = 50;
 

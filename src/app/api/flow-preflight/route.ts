@@ -1,5 +1,5 @@
 import { isAddress } from "viem";
-import { checkFlowPreflight, parseSupplySummary } from "@/lib/flow-preflight";
+import { checkFlowPreflight, parseSupplySummary } from "@/lib/tx/flow-preflight";
 import { createPublicClient, http } from "viem";
 import { celo } from "viem/chains";
 

@@ -1,11 +1,11 @@
 import Dexie, { type Table } from "dexie";
-import type { StoredChat } from "@/lib/chats";
-import type { CelestialPersonalityId } from "@/lib/celestial-personalities";
+import type { StoredChat } from "@/lib/chat/chats";
+import type { CelestialPersonalityId } from "@/lib/chat/celestial-personalities";
 import {
   MAX_TRANSACTIONS_PER_WALLET,
   type NewSessionTransaction,
   type SessionTransaction,
-} from "@/lib/transactions";
+} from "@/lib/tx/transactions";
 
 export interface UserPreference {
   address: string;
