@@ -109,7 +109,7 @@ export function ChatComposer({
       <p
         className={`text-[10px] text-[var(--text-subtle)] ${
           isEmbedded
-            ? "mt-2 text-center sm:text-left"
+            ? "mt-3 text-center sm:text-left"
             : "mt-1.5 hidden sm:block"
         }`}
       >
