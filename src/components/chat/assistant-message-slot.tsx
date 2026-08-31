@@ -17,14 +17,14 @@ export function AssistantMessageSlot({
       {showAvatar ? (
         <CelesteLogoAvatar
           size="sm"
-          className="mt-1 shadow-sm ring-2 ring-[var(--accent)]/15"
+          className="mt-1"
         />
       ) : (
         <div className="mt-1 size-8 shrink-0" aria-hidden />
       )}
       <div className="min-w-0 flex-1">
         {showLabel && showAvatar ? (
-          <p className="mb-1.5 text-[11px] font-medium tracking-wide text-zinc-500">
+          <p className="mb-1.5 text-[11px] font-bold tracking-wide text-[var(--text-muted)]">
             Celeste AI
           </p>
         ) : null}
