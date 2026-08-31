@@ -2,8 +2,8 @@
 
 import { BalanceRow, GroupedBalanceList } from "@/components/balance-card";
 import { useWalletBalances } from "@/hooks/use-wallet-balances";
-import { groupTokensByUseCase } from "@/lib/balances";
-import { formatBalanceShort } from "@/lib/format-balance";
+import { groupTokensByUseCase } from "@/lib/wallet/balances";
+import { formatBalanceShort } from "@/lib/wallet/format-balance";
 import { useState } from "react";
 
 interface WalletBalancePanelProps {
@@ -27,7 +27,7 @@ function formatRelativeTime(iso: string): string {
 function ChevronIcon({ expanded }: { expanded: boolean }) {
   return (
     <svg
-      className={`size-4 text-zinc-500 transition-transform duration-300 ease-in-out motion-reduce:duration-0 ${
+      className={`size-4 text-[var(--ink)] transition-transform duration-300 ease-in-out motion-reduce:duration-0 ${
         expanded ? "rotate-180" : ""
       }`}
       fill="none"
@@ -52,10 +52,12 @@ function PanelHeader({
 }) {
   return (
     <div className="flex items-center justify-between gap-2">
-      <div>
-        <h2 className="text-sm font-semibold text-white">Wallet balances</h2>
+      <div className="min-w-0">
+        <h2 className="text-sm font-bold text-[var(--ink)]">
+          Wallet balances
+        </h2>
         {lastUpdated && (
-          <p className="text-[10px] text-zinc-500">
+          <p className="truncate text-[10px] text-[var(--text-muted)]">
             Updated {formatRelativeTime(lastUpdated)}
           </p>
         )}
@@ -64,35 +66,38 @@ function PanelHeader({
         type="button"
         onClick={onRefresh}
         disabled={isFetching}
-        className="rounded-md border border-[var(--surface-2)] px-2 py-1 text-[10px] text-zinc-400 transition-colors hover:border-zinc-600 hover:text-white disabled:opacity-50"
+        className="btn-brutal btn-secondary inline-flex min-w-[5.75rem] shrink-0 items-center !justify-start gap-1 px-2 py-1 text-left text-[10px] disabled:opacity-50"
         aria-label="Refresh balances"
+        aria-busy={isFetching}
       >
-        {isFetching ? "Refreshing…" : "Refresh"}
+        {isFetching ? (
+          <>
+            <span
+              className="size-2.5 shrink-0 animate-spin rounded-full border-2 border-[var(--ink)] border-t-transparent"
+              aria-hidden
+            />
+            Refreshing…
+          </>
+        ) : (
+          "Refresh"
+        )}
       </button>
     </div>
   );
 }
 
-function PanelBody({
-  address,
-  includeZero,
-  onIncludeZeroChange,
-}: {
-  address: `0x${string}`;
-  includeZero: boolean;
-  onIncludeZeroChange: (value: boolean) => void;
-}) {
+function PanelBody({ address }: { address: `0x${string}` }) {
   const { data, isLoading, isError, refetch, isFetching, lastUpdated } =
-    useWalletBalances(address, includeZero);
+    useWalletBalances(address);
 
   if (isLoading) {
     return (
       <div className="flex flex-col items-center gap-2 py-6">
         <span
-          className="inline-block size-5 animate-spin rounded-full border-2 border-zinc-600 border-t-[var(--accent)]"
+          className="inline-block size-5 animate-spin rounded-full border-2 border-[var(--ink)] border-t-[var(--accent)]"
           aria-hidden
         />
-        <p className="text-xs text-zinc-500">Loading balances…</p>
+        <p className="text-xs text-[var(--text-muted)]">Loading balances…</p>
       </div>
     );
   }
@@ -100,11 +105,11 @@ function PanelBody({
   if (isError || !data) {
     return (
       <div className="py-4 text-center">
-        <p className="text-xs text-red-400">Could not load balances.</p>
+        <p className="text-xs font-bold text-[var(--warn)]">Could not load balances.</p>
         <button
           type="button"
           onClick={() => void refetch()}
-          className="mt-2 text-xs text-[var(--accent)] hover:underline"
+          className="mt-2 text-xs font-bold text-[var(--ink)] underline"
         >
           Try again
         </button>
@@ -122,7 +127,7 @@ function PanelBody({
         onRefresh={() => void refetch()}
       />
 
-      <div className="mt-3 rounded-lg border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-2">
+      <div className="card-brutal mt-3 min-w-0 overflow-hidden px-3 py-2">
         <BalanceRow
           row={{
             symbol: "CELO",
@@ -136,22 +141,12 @@ function PanelBody({
       </div>
 
       <div className="mt-3">
-        <GroupedBalanceList groups={groups} showZeroBalances={includeZero} />
+        <GroupedBalanceList groups={groups} />
       </div>
 
-      <label className="mt-4 flex cursor-pointer items-center gap-2 px-1">
-        <input
-          type="checkbox"
-          checked={includeZero}
-          onChange={(event) => onIncludeZeroChange(event.target.checked)}
-          className="size-3.5 rounded border-zinc-600 bg-zinc-900 accent-[var(--accent)]"
-        />
-        <span className="text-xs text-zinc-400">Show zero balances</span>
-      </label>
-
-      <p className="mt-3 px-1 text-[10px] text-zinc-600">
+      <p className="mt-3 px-1 text-[10px] text-[var(--text-muted)]">
         {data.totalChecked} tokens scanned on Celo mainnet
-        {!includeZero && data.totalNonZero > 0 && (
+        {data.totalNonZero > 0 && (
           <> · {data.totalNonZero} with balance</>
         )}
       </p>
@@ -168,11 +163,9 @@ function MobileBalanceAccordion({
   isConnected: boolean;
   hiddenOnLanding?: boolean;
 }) {
-  const [includeZero, setIncludeZero] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const { data, isLoading, isFetching } = useWalletBalances(
     isConnected ? address : undefined,
-    includeZero,
   );
 
   if (!isConnected || !address || hiddenOnLanding) {
@@ -183,24 +176,24 @@ function MobileBalanceAccordion({
   const tokenCount = data?.totalNonZero ?? 0;
 
   return (
-    <div className="border-t border-[var(--surface-2)] lg:hidden">
+    <div className="shrink-0 lg:hidden">
       <button
         type="button"
         onClick={() => setExpanded((open) => !open)}
-        className="flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left transition-colors hover:bg-white/[0.02] sm:px-4"
+        className="flex w-full items-center justify-between gap-3 bg-[var(--surface)] px-3 py-2.5 text-left sm:px-4"
         aria-expanded={expanded}
       >
         <div className="flex min-w-0 items-center gap-2">
-          <span className="text-xs font-medium text-zinc-300">Balances</span>
+          <span className="text-xs font-bold text-[var(--ink)]">Balances</span>
           {isLoading || isFetching ? (
-            <span className="inline-block size-3 animate-spin rounded-full border-2 border-zinc-600 border-t-[var(--accent-hover)]" />
+            <span className="inline-block size-3 animate-spin rounded-full border-2 border-[var(--ink)] border-t-[var(--accent)]" />
           ) : celoShort !== null ? (
             <>
-              <span className="rounded-full bg-[var(--accent-soft)] px-2 py-0.5 text-[11px] font-medium text-[var(--accent-soft-text)]">
+              <span className="rounded-[2px] border-2 border-[var(--ink)] bg-[var(--accent)] px-2 py-0.5 text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--accent-foreground)]">
                 {celoShort} CELO
               </span>
               {tokenCount > 0 && (
-                <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] text-zinc-400">
+                <span className="rounded-[2px] border-2 border-[var(--ink)] bg-[var(--surface)] px-2 py-0.5 text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--ink)]">
                   {tokenCount} token{tokenCount === 1 ? "" : "s"}
                 </span>
               )}
@@ -217,12 +210,8 @@ function MobileBalanceAccordion({
         aria-hidden={!expanded}
       >
         <div className="min-h-0 overflow-hidden">
-          <div className="max-h-[45vh] overflow-y-auto border-t border-[var(--surface-2)] bg-[var(--surface-1)]/40 px-3 pb-4 pt-3 sm:px-4">
-            <PanelBody
-              address={address}
-              includeZero={includeZero}
-              onIncludeZeroChange={setIncludeZero}
-            />
+          <div className="max-h-[45vh] overflow-y-auto border-t-2 border-[var(--ink)] bg-[var(--canvas)] px-3 pb-4 pt-3 sm:px-4">
+            <PanelBody address={address} />
           </div>
         </div>
       </div>
@@ -237,23 +226,17 @@ export function WalletBalanceSection({
   address: `0x${string}` | undefined;
   isConnected: boolean;
 }) {
-  const [includeZero, setIncludeZero] = useState(false);
-
   if (!isConnected || !address) {
     return (
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-[var(--text-muted)]">
         Balances appear after you connect.
       </p>
     );
   }
 
   return (
-    <div className="max-h-[40vh] overflow-y-auto">
-      <PanelBody
-        address={address}
-        includeZero={includeZero}
-        onIncludeZeroChange={setIncludeZero}
-      />
+    <div className="max-h-[40vh] overflow-x-hidden overflow-y-auto pr-1">
+      <PanelBody address={address} />
     </div>
   );
 }
@@ -265,8 +248,6 @@ export function WalletBalancePanel({
   variant = "sidebar",
   hiddenOnLanding,
 }: WalletBalancePanelProps) {
-  const [includeZero, setIncludeZero] = useState(false);
-
   if (!mounted) {
     return null;
   }
@@ -283,8 +264,8 @@ export function WalletBalancePanel({
 
   if (!isConnected || !address) {
     return (
-      <aside className="hidden h-full min-h-0 w-72 shrink-0 flex-col overflow-y-auto border-r border-[var(--surface-2)] bg-[var(--surface-1)]/50 p-4 lg:flex">
-        <p className="text-xs text-zinc-500">
+      <aside className="hidden h-full min-h-0 w-80 shrink-0 flex-col overflow-y-auto border-r-2 border-[var(--ink)] bg-[var(--surface)] p-4 lg:flex">
+        <p className="text-xs text-[var(--text-muted)]">
           Balances appear after you connect.
         </p>
       </aside>
@@ -292,12 +273,8 @@ export function WalletBalancePanel({
   }
 
   return (
-    <aside className="hidden h-full min-h-0 w-72 shrink-0 flex-col overflow-y-auto border-r border-[var(--surface-2)] bg-[var(--surface-1)]/50 p-4 lg:flex">
-      <PanelBody
-        address={address}
-        includeZero={includeZero}
-        onIncludeZeroChange={setIncludeZero}
-      />
+    <aside className="hidden h-full min-h-0 w-80 shrink-0 flex-col overflow-y-auto border-r-2 border-[var(--ink)] bg-[var(--surface)] p-4 lg:flex">
+      <PanelBody address={address} />
     </aside>
   );
 }
