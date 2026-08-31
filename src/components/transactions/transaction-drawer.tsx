@@ -50,7 +50,7 @@ export function TransactionDrawer() {
       <button
         type="button"
         aria-label="Close transactions panel"
-        className="absolute inset-0 bg-[var(--overlay-backdrop)] backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-[var(--overlay-backdrop)]"
         onClick={() => {
           closeDrawer();
           clearSelection();
@@ -62,17 +62,13 @@ export function TransactionDrawer() {
         role="dialog"
         aria-modal="true"
         aria-labelledby="transaction-drawer-title"
-        className="absolute right-0 top-0 flex h-dvh w-full max-w-md translate-x-0 flex-col border-l border-[var(--surface-2)] bg-[var(--surface-0)] shadow-2xl shadow-black/40 transition-transform duration-300 ease-out"
-        style={{
-          backgroundImage:
-            "radial-gradient(ellipse 80% 40% at 50% 0%, rgb(90 121 175 / 0.16), transparent)",
-        }}
+        className="absolute right-0 top-0 flex h-dvh w-full max-w-md flex-col border-l-2 border-[var(--ink)] bg-[var(--surface)]"
       >
-        <div className="flex items-center justify-between gap-3 border-b border-[var(--surface-2)] px-4 py-4">
+        <div className="flex items-center justify-between gap-3 border-b-2 border-[var(--ink)] px-4 py-4">
           <div>
             <h2
               id="transaction-drawer-title"
-              className="text-base font-semibold text-[var(--text-primary)]"
+              className="text-base font-bold tracking-tight text-[var(--ink)]"
             >
               Transactions
             </h2>
@@ -90,7 +86,7 @@ export function TransactionDrawer() {
               clearSelection();
             }}
             aria-label="Close"
-            className="flex size-9 items-center justify-center rounded-full border border-[var(--surface-2)] text-[var(--text-muted)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-primary)]"
+            className="flex size-9 items-center justify-center rounded-[2px] border-2 border-[var(--ink)] bg-[var(--surface)] text-[var(--ink)] shadow-[var(--shadow-brutal-sm)] transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
           >
             <svg
               className="size-4"
@@ -113,14 +109,14 @@ export function TransactionDrawer() {
           {isLoading ? (
             <div className="flex items-center justify-center py-16">
               <span
-                className="inline-block size-5 animate-spin rounded-full border-2 border-[var(--surface-3)] border-t-[var(--accent-hover)]"
+                className="inline-block size-5 animate-spin rounded-full border-2 border-[var(--ink)] border-t-[var(--accent)]"
                 aria-hidden
               />
               <span className="sr-only">Loading transactions</span>
             </div>
           ) : transactions.length === 0 ? (
             <div className="flex flex-col items-center justify-center px-4 py-16 text-center">
-              <div className="flex size-14 items-center justify-center rounded-2xl border border-[var(--surface-2)] bg-[var(--surface-1)] text-[var(--text-muted)]">
+              <div className="flex size-14 items-center justify-center rounded-[2px] border-2 border-[var(--ink)] bg-[var(--canvas)] text-[var(--ink)] shadow-[var(--shadow-brutal-sm)]">
                 <svg
                   className="size-6"
                   fill="none"
@@ -136,7 +132,7 @@ export function TransactionDrawer() {
                   />
                 </svg>
               </div>
-              <p className="mt-4 text-sm font-medium text-[var(--text-secondary)]">
+              <p className="mt-4 text-sm font-bold text-[var(--ink)]">
                 No transactions yet
               </p>
               <p className="mt-1 max-w-xs text-sm leading-relaxed text-[var(--text-muted)]">
