@@ -17,8 +17,8 @@ interface PersonalityPickerProps {
 export function PersonalityPicker({
   selectedId,
   onSelect,
-  title = "Choose your celestial personality",
-  description = "Pick the constellation that represents you in chat.",
+  title = "Choose your personality",
+  description = "This avatar appears next to your messages.",
   compact = false,
   showHeading = true,
 }: PersonalityPickerProps) {

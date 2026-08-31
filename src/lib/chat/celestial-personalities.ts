@@ -22,52 +22,52 @@ export interface CelestialPersonalityOption {
 export const CELESTIAL_PERSONALITIES: readonly CelestialPersonalityOption[] = [
   {
     id: "aries_constellation",
-    label: "Aries Constellation",
+    label: "Direct",
     imageSrc: "/celestial_personalities/aries_constellation.svg",
   },
   {
     id: "beautiful_swirl",
-    label: "Beautiful Swirl",
+    label: "Warm",
     imageSrc: "/celestial_personalities/beautiful_swirl.svg",
   },
   {
     id: "comet_trail",
-    label: "Comet Trail",
+    label: "Playful",
     imageSrc: "/celestial_personalities/comet_trail.svg",
   },
   {
     id: "cosmic_cloud",
-    label: "Cosmic Cloud",
+    label: "Calm",
     imageSrc: "/celestial_personalities/cosmic_cloud.svg",
   },
   {
     id: "cosmic_flower",
-    label: "Cosmic Flower",
+    label: "Curious",
     imageSrc: "/celestial_personalities/cosmic_flower.svg",
   },
   {
     id: "enchanting_galaxy",
-    label: "Enchanting Galaxy",
+    label: "Witty",
     imageSrc: "/celestial_personalities/enchanting_galaxy.svg",
   },
   {
     id: "gold_galaxy",
-    label: "Gold Galaxy",
+    label: "Precise",
     imageSrc: "/celestial_personalities/gold_galaxy.svg",
   },
   {
     id: "lenticular_galaxy",
-    label: "Lenticular Galaxy",
+    label: "Steady",
     imageSrc: "/celestial_personalities/lenticular_galaxy.svg",
   },
   {
     id: "pink_planet",
-    label: "Pink Planet",
+    label: "Friendly",
     imageSrc: "/celestial_personalities/pink_planet.svg",
   },
   {
     id: "scorpio_constellation",
-    label: "Scorpio Constellation",
+    label: "Focused",
     imageSrc: "/celestial_personalities/scorpio_constellation.svg",
   },
 ];
