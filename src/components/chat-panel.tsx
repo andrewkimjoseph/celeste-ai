@@ -23,8 +23,8 @@ import {
   buildPreparedFlowClientContext,
   getActivePreparedFlowWithMeta,
   isPreparedFlowSigned,
-} from "@/lib/prepared-flow";
-import { formatFlowSummary } from "@/lib/wallet-error";
+} from "@/lib/tx/prepared-flow";
+import { formatFlowSummary } from "@/lib/tx/wallet-error";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMounted } from "@/hooks/use-mounted";
 import { useTransactions } from "@/hooks/use-transactions";
@@ -38,7 +38,7 @@ import {
   type CelesteUIMessage,
   createMessageMetadata,
   messageMetadataSchema,
-} from "@/lib/chat-message-metadata";
+} from "@/lib/chat/chat-message-metadata";
 
 interface ChatPanelProps {
   address?: `0x${string}`;
@@ -274,7 +274,7 @@ export function ChatPanel({
     return (
       <div className="flex min-h-0 flex-1 items-center justify-center">
         <span
-          className="inline-block size-5 animate-spin rounded-full border-2 border-zinc-600 border-t-[var(--accent-hover)]"
+          className="inline-block size-5 animate-spin rounded-full border-2 border-[var(--ink)] border-t-[var(--accent)]"
           aria-hidden
         />
         <span className="sr-only">Loading chat</span>
