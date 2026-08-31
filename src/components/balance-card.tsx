@@ -1,7 +1,7 @@
 "use client";
 
-import type { TokenBalanceRow } from "@/lib/balances";
-import { formatBalanceShort } from "@/lib/format-balance";
+import type { TokenBalanceRow } from "@/lib/wallet/balances";
+import { formatBalanceShort } from "@/lib/wallet/format-balance";
 
 interface BalanceRowProps {
   row: TokenBalanceRow;
@@ -25,25 +25,25 @@ export function BalanceRow({
 
   return (
     <div
-      className={`flex gap-2 sm:items-center sm:justify-between ${
+      className={`flex min-w-0 gap-2 sm:items-center sm:justify-between ${
         compact ? "flex-col py-1.5 sm:flex-row" : "flex-col py-2 sm:flex-row"
       } ${isZero(row.raw) ? "opacity-50" : ""}`}
     >
       <div className="min-w-0 flex-1">
-        <p className={`truncate font-medium text-zinc-100 ${compact ? "text-xs" : "text-sm"}`}>
+        <p className={`truncate font-bold text-[var(--ink)] ${compact ? "text-xs" : "text-sm"}`}>
           {row.symbol}
           {row.readError && (
-            <span className="ml-1.5 text-[10px] font-normal text-amber-400">
+            <span className="ml-1.5 text-[10px] font-normal text-[var(--accent)]">
               unreadable
             </span>
           )}
         </p>
         {subtitle && (
-          <p className="truncate text-[10px] text-zinc-500">{subtitle}</p>
+          <p className="truncate text-[10px] text-[var(--text-muted)]">{subtitle}</p>
         )}
       </div>
       <p
-        className={`max-w-full font-mono tabular-nums text-zinc-200 sm:shrink-0 sm:text-right ${
+        className={`max-w-full font-mono font-bold tabular-nums text-[var(--ink)] sm:shrink-0 sm:text-right ${
           compact ? "text-xs" : "text-sm"
         }`}
       >
@@ -79,16 +79,16 @@ export function BalanceCard({
 
   if (!hasCelo && !hasTokens) {
     return (
-      <div className="mt-2 rounded-lg border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-2 sm:px-3.5">
-        <p className="text-xs text-zinc-500">{emptyMessage}</p>
+      <div className="card-brutal mt-2 px-3 py-2 sm:px-3.5">
+        <p className="text-xs text-[var(--text-muted)]">{emptyMessage}</p>
       </div>
     );
   }
 
   return (
-    <div className="mt-2 rounded-lg border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-2 sm:px-3.5">
+    <div className="card-brutal mt-2 px-3 py-2 sm:px-3.5">
       {title && (
-        <p className="mb-1 text-[10px] font-medium uppercase tracking-wide text-zinc-500">
+        <p className="mb-1 text-[10px] font-bold uppercase tracking-wide text-[var(--text-muted)]">
           {title}
         </p>
       )}
@@ -105,7 +105,7 @@ export function BalanceCard({
         />
       )}
       {filteredRows.length > 0 && (
-        <div className={celo ? "mt-1 border-t border-[var(--surface-2)] pt-1" : ""}>
+        <div className={celo ? "mt-1 border-t-2 border-[var(--ink)] pt-1" : ""}>
           {filteredRows.map((row) => (
             <BalanceRow key={`${row.symbol}-${row.address}`} row={row} compact={compact} />
           ))}
@@ -135,7 +135,7 @@ export function GroupedBalanceList({
 
   if (visibleGroups.length === 0) {
     return (
-      <p className="px-1 py-4 text-center text-xs text-zinc-500">
+      <p className="px-1 py-4 text-center text-xs text-[var(--text-muted)]">
         No token balances found.
       </p>
     );
@@ -145,10 +145,10 @@ export function GroupedBalanceList({
     <div className="space-y-3">
       {visibleGroups.map((group) => (
         <div key={group.label}>
-          <p className="mb-1 px-1 text-[10px] font-medium uppercase tracking-wide text-zinc-500">
+          <p className="mb-1 px-1 text-[10px] font-bold uppercase tracking-wide text-[var(--text-muted)]">
             {group.label}
           </p>
-          <div className="rounded-lg border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-1">
+          <div className="card-brutal min-w-0 overflow-hidden px-3 py-1">
             {group.tokens.map((row) => (
               <BalanceRow key={`${row.symbol}-${row.address}`} row={row} compact />
             ))}
