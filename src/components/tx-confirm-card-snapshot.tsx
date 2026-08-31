@@ -1,12 +1,12 @@
-import type { PreparedTx } from "@/lib/prepared-flow";
+import type { PreparedTx } from "@/lib/tx/prepared-flow";
 import {
   formatMessageTimestamp,
   MESSAGE_TIMESTAMP_CLASS,
-} from "@/lib/chat-message-metadata";
-import { formatFlowSummary } from "@/lib/wallet-error";
-import { formatTransactionStep } from "@/lib/transaction-display";
-import { formatTxHash } from "@/lib/format-balance";
-import { celoscanTxUrl } from "@/lib/links";
+} from "@/lib/chat/chat-message-metadata";
+import { formatFlowSummary } from "@/lib/tx/wallet-error";
+import { formatTransactionStep } from "@/lib/tx/transaction-display";
+import { formatTxHash } from "@/lib/wallet/format-balance";
+import { celoscanTxUrl } from "@/lib/wallet/links";
 
 interface TxConfirmCardSnapshotProps {
   summary: string;
@@ -16,7 +16,7 @@ interface TxConfirmCardSnapshotProps {
   confirmedAt?: number;
 }
 
-/** Read-only green success card pinned in chat history after signing. */
+/** Read-only success card pinned in chat history after signing. */
 export function TxConfirmCardSnapshot({
   summary,
   steps,
@@ -29,10 +29,10 @@ export function TxConfirmCardSnapshot({
     confirmedAt != null ? formatMessageTimestamp(confirmedAt) : null;
 
   return (
-    <div className="w-full min-w-0 max-w-full rounded-xl border border-emerald-500/30 bg-gradient-to-b from-emerald-500/10 to-[var(--surface-1)] p-4 shadow-sm">
+    <div className="card-brutal w-full min-w-0 max-w-full p-4">
       <div className="flex items-start gap-3">
         <div
-          className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300"
+          className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-[2px] border-2 border-[var(--ink)] bg-[var(--success)] text-[var(--ink)]"
           aria-hidden
         >
           <svg
@@ -51,7 +51,7 @@ export function TxConfirmCardSnapshot({
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-2">
-            <p className="text-sm font-semibold text-emerald-50">
+            <p className="text-sm font-bold text-[var(--ink)]">
               Transaction confirmed
             </p>
             {timestampLabel ? (
@@ -63,22 +63,22 @@ export function TxConfirmCardSnapshot({
               </time>
             ) : null}
           </div>
-          <p className="mt-1 break-words text-sm leading-relaxed text-zinc-300">
+          <p className="mt-1 break-words text-sm leading-relaxed text-[var(--text-secondary)]">
             {displaySummary}
           </p>
-          <p className="mt-1.5 text-xs text-zinc-500">
+          <p className="mt-1.5 text-xs text-[var(--text-muted)]">
             Saved to your history. Tap a hash to view details.
           </p>
         </div>
       </div>
 
-      <ol className="mt-3 space-y-1.5 border-t border-emerald-500/15 pt-3">
+      <ol className="mt-3 space-y-1.5 border-t-2 border-[var(--ink)] pt-3">
         {steps.map((step, index) => (
           <li
             key={`${step.description}-${index}`}
-            className="flex gap-2 text-sm text-zinc-400"
+            className="flex gap-2 text-sm text-[var(--text-secondary)]"
           >
-            <span className="font-medium text-zinc-500">{index + 1}.</span>
+            <span className="font-bold text-[var(--ink)]">{index + 1}.</span>
             <span className="min-w-0 break-words">
               {formatTransactionStep(step.description, { summary })}
             </span>
@@ -87,14 +87,14 @@ export function TxConfirmCardSnapshot({
       </ol>
 
       {hashes.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-2 border-t border-emerald-500/15 pt-3">
+        <div className="mt-3 flex flex-wrap gap-2 border-t-2 border-[var(--ink)] pt-3">
           {hashes.map((hash) => (
             <a
               key={hash}
               href={celoscanTxUrl(hash)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center rounded-md bg-emerald-500/10 px-2.5 py-1 font-mono text-xs text-emerald-100 ring-1 ring-emerald-500/25 transition-colors hover:bg-emerald-500/20"
+              className="inline-flex items-center rounded-[2px] border-2 border-[var(--ink)] bg-[var(--success)] px-2.5 py-1 font-mono text-xs font-bold text-[var(--ink)]"
               title={hash}
             >
               {formatTxHash(hash)}
