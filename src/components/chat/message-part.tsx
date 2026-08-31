@@ -78,7 +78,9 @@ export function MessagePart({
     return (
       <div
         className={`space-y-3 text-[0.9375rem] leading-[1.65] ${
-          variant === "user" ? "text-white" : "text-zinc-100"
+          variant === "user"
+            ? "text-[var(--accent-foreground)]"
+            : "text-[var(--ink)]"
         }`}
       >
         {isStreaming ? (
