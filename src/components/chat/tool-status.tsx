@@ -7,9 +7,9 @@ import {
   getToolErrorTone,
   TOOL_ERROR_TONE_CLASS,
 } from "@/components/chat/tool-error-tone";
-import { formatToolErrorMessage } from "@/lib/format-tool-error";
-import { parseToolBalanceRows } from "@/lib/balances";
-import { formatHumanFlowText } from "@/lib/format-human-flow-text";
+import { formatToolErrorMessage } from "@/lib/tx/format-tool-error";
+import { parseToolBalanceRows } from "@/lib/wallet/balances";
+import { formatHumanFlowText } from "@/lib/tx/format-human-flow-text";
 
 type ToolPart = UIMessage["parts"][number];
 
@@ -121,9 +121,9 @@ export function ToolStatus({
 
   if (part.state === "input-streaming" || part.state === "input-available") {
     return (
-      <div className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-black/20 px-3 py-2 text-xs text-zinc-400">
+      <div className="flex items-center gap-2 rounded-[2px] border-2 border-[var(--ink)] bg-[var(--canvas)] px-3 py-2 text-xs text-[var(--text-secondary)]">
         <span
-          className="inline-block size-3 shrink-0 animate-spin rounded-full border-2 border-zinc-600 border-t-[var(--accent-hover)]"
+          className="inline-block size-3 shrink-0 animate-spin rounded-full border-2 border-[var(--ink)] border-t-[var(--accent)]"
           aria-hidden
         />
         <span>{labels.inProgress}</span>
@@ -188,15 +188,15 @@ export function ToolStatus({
 
     return (
       <div className="space-y-2">
-        <div className="min-w-0 space-y-1">
-          <div className="inline-flex w-fit max-w-full shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-[var(--accent-soft-border)] bg-[var(--accent-soft)] px-2.5 py-1 text-[11px] font-medium text-[var(--accent-soft-text)]">
-            <span className="text-[var(--accent-hover)]" aria-hidden>
+        <div className="min-w-0 space-y-2">
+          <div className="inline-flex w-fit max-w-full shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[2px] border-2 border-[var(--ink)] bg-[var(--success)] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--ink)]">
+            <span aria-hidden>
               ✓
             </span>
             {labels.done}
           </div>
           {detailSummary ? (
-            <p className="text-[11px] leading-snug text-[var(--accent-soft-text)]/80 break-words">
+            <p className="text-[11px] leading-snug text-[var(--text-secondary)] break-words">
               {detailSummary}
             </p>
           ) : null}
