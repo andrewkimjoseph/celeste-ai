@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { isAddress } from "viem";
-import { trimTrailingUrlPunctuation } from "@/lib/trim-url-punctuation";
+import { trimTrailingUrlPunctuation } from "@/lib/chat/trim-url-punctuation";
 
 export type MessageTextVariant = "assistant" | "user";
 
@@ -49,25 +49,22 @@ function parseInline(text: string, options: FormatOptions = {}): ReactNode[] {
   let match: RegExpExecArray | null;
   let key = 0;
 
-  const boldClass =
-    variant === "user"
-      ? "font-semibold text-white"
-      : "font-semibold text-white";
+  const boldClass = "font-bold text-[var(--ink)]";
 
   const linkClass =
     variant === "user"
-      ? "text-white underline decoration-white/50 underline-offset-2 hover:decoration-white"
-      : "text-[var(--accent-hover)] underline decoration-[var(--accent-hover)]/30 underline-offset-2 hover:decoration-[var(--accent-hover)]";
+      ? "text-[var(--ink)] underline decoration-[var(--ink)]/50 underline-offset-2 hover:decoration-[var(--ink)]"
+      : "text-[var(--celo-forest)] underline decoration-[var(--celo-forest)]/50 underline-offset-2 hover:decoration-[var(--celo-forest)]";
 
   const codeClass =
     variant === "user"
-      ? "rounded bg-white/20 px-1.5 py-0.5 font-mono text-[0.85em] text-white"
-      : "rounded bg-black/30 px-1.5 py-0.5 font-mono text-[0.85em] text-[var(--accent-soft-text)]/90";
+      ? "rounded-[2px] bg-black/10 px-1.5 py-0.5 font-mono text-[0.85em] text-[var(--ink)]"
+      : "rounded-[2px] bg-[var(--canvas)] px-1.5 py-0.5 font-mono text-[0.85em] text-[var(--ink)]";
 
   const hashClass =
     variant === "user"
-      ? "break-all rounded bg-white/15 px-1.5 py-0.5 font-mono text-[0.8em] text-white ring-1 ring-white/20"
-      : "break-all rounded bg-black/25 px-1 py-0.5 font-mono text-[0.8em] text-zinc-200";
+      ? "break-all rounded-[2px] bg-black/10 px-1.5 py-0.5 font-mono text-[0.8em] text-[var(--ink)] ring-1 ring-[var(--ink)]/20"
+      : "break-all rounded-[2px] bg-[var(--canvas)] px-1 py-0.5 font-mono text-[0.8em] text-[var(--ink)] ring-1 ring-[var(--ink)]/20";
 
   while ((match = INLINE_PATTERN.exec(text)) !== null) {
     if (match.index > lastIndex) {
@@ -107,9 +104,9 @@ function parseInline(text: string, options: FormatOptions = {}): ReactNode[] {
             }}
             className={`${hashClass} cursor-pointer transition-colors ${
               variant === "user"
-                ? "hover:bg-white/25"
-                : "hover:text-[var(--accent-hover)]"
-            } ${copied ? "ring-[var(--accent-hover)]/50" : ""}`}
+                ? "hover:bg-black/15"
+                : "hover:text-[var(--celo-forest)]"
+            } ${copied ? "ring-[var(--ink)]/40" : ""}`}
             title={copied ? "Copied" : "Copy to clipboard"}
             aria-label={copied ? "Copied" : "Copy to clipboard"}
           >
@@ -166,7 +163,7 @@ function renderListBlock(
   return (
     <ul
       key={blockKey}
-      className="ml-1 list-none space-y-1.5 pl-0 [&>li]:relative [&>li]:pl-4 [&>li]:before:absolute [&>li]:before:left-0 [&>li]:before:top-[0.55em] [&>li]:before:size-1 [&>li]:before:rounded-full [&>li]:before:bg-[var(--accent-hover)]/70 [&>li]:before:content-['']"
+      className="ml-1 list-none space-y-1.5 pl-0 [&>li]:relative [&>li]:pl-4 [&>li]:before:absolute [&>li]:before:left-0 [&>li]:before:top-[0.6em] [&>li]:before:size-1.5 [&>li]:before:rounded-[2px] [&>li]:before:bg-[var(--ink)] [&>li]:before:content-['']"
     >
       {lines.map((line, index) => (
         <li key={`${blockKey}-${index}`} className="leading-relaxed">
