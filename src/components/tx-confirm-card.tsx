@@ -4,29 +4,29 @@ import { useFlowPreflight } from "@/hooks/use-flow-preflight";
 import { useTxPreflight } from "@/hooks/use-tx-preflight";
 import { useWalletBalances } from "@/hooks/use-wallet-balances";
 import { useWalletCapabilities } from "@/hooks/use-wallet-capabilities";
-import { parseSupplySummary } from "@/lib/flow-preflight";
-import type { PreparedTx } from "@/lib/prepared-flow";
-import { simulatePreparedStepBeforeSend } from "@/lib/prepared-step-simulation";
-import { formatRevertedStepError } from "@/lib/revert-error";
-import { parseSendSummary } from "@/lib/send-preflight";
+import { parseSupplySummary } from "@/lib/tx/flow-preflight";
+import type { PreparedTx } from "@/lib/tx/prepared-flow";
+import { simulatePreparedStepBeforeSend } from "@/lib/tx/prepared-step-simulation";
+import { formatRevertedStepError } from "@/lib/tx/revert-error";
+import { parseSendSummary } from "@/lib/tx/send-preflight";
 import {
   categorizeSimulationError,
   formatSimulationError,
   type SimulationErrorDisplay,
-} from "@/lib/simulation-error";
-import { formatFlowSummary, formatWalletError } from "@/lib/wallet-error";
-import { formatTransactionStep } from "@/lib/transaction-display";
+} from "@/lib/tx/simulation-error";
+import { formatFlowSummary, formatWalletError } from "@/lib/tx/wallet-error";
+import { formatTransactionStep } from "@/lib/tx/transaction-display";
 import { useState } from "react";
 import { useAccount, usePublicClient, useSendTransaction } from "wagmi";
 import { trackEvent } from "@/lib/analytics/amplitude-browser";
 import { categorizeWalletError } from "@/lib/analytics/events";
 import { inferFlowCategory } from "@/lib/analytics/flow-category";
-import { formatTxHash } from "@/lib/format-balance";
-import { celoscanTxUrl } from "@/lib/links";
+import { formatTxHash } from "@/lib/wallet/format-balance";
+import { celoscanTxUrl } from "@/lib/wallet/links";
 import {
   formatMessageTimestamp,
   MESSAGE_TIMESTAMP_CLASS,
-} from "@/lib/chat-message-metadata";
+} from "@/lib/chat/chat-message-metadata";
 
 type CardStatus = "idle" | "signing" | "done" | "error";
 
@@ -233,24 +233,10 @@ export function TxConfirmCard({
 
   const iconStyles =
     status === "done"
-      ? "bg-emerald-500/20 text-emerald-300"
+      ? "rounded-[2px] border-2 border-[var(--ink)] bg-[var(--success)] text-[var(--ink)]"
       : status === "error"
-        ? "bg-red-500/15 text-red-300"
-        : status === "signing"
-          ? "bg-amber-500/25 text-amber-200"
-          : "bg-amber-500/20 text-amber-300";
-
-  const borderStyles =
-    status === "done"
-      ? "border-emerald-500/30"
-      : status === "error"
-        ? "border-red-500/25"
-        : "border-amber-500/30";
-
-  const surfaceStyles =
-    status === "done"
-      ? "from-emerald-500/10"
-      : "from-[var(--warn)]/10";
+        ? "rounded-[2px] border-2 border-[var(--ink)] bg-[var(--warn)] text-white"
+        : "rounded-[2px] border-2 border-[var(--ink)] bg-[var(--accent)] text-[var(--accent-foreground)]";
 
   function handleDismiss() {
     setCompletedHashes([]);
@@ -372,12 +358,10 @@ export function TxConfirmCard({
       : null;
 
   return (
-    <div
-      className={`w-full min-w-0 max-w-full rounded-xl border bg-gradient-to-b ${surfaceStyles} to-[var(--surface-1)] p-4 shadow-sm ${borderStyles}`}
-    >
+    <div className="card-brutal w-full min-w-0 max-w-full p-4">
       <div className="flex items-start gap-3">
         <div
-          className={`mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full ${iconStyles}`}
+          className={`mt-0.5 flex size-9 shrink-0 items-center justify-center ${iconStyles}`}
           aria-hidden
         >
           <CardIcon variant={copy.icon} />
@@ -385,9 +369,7 @@ export function TxConfirmCard({
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-2">
             <p
-              className={`text-sm font-semibold ${
-                status === "done" ? "text-emerald-50" : "text-amber-50"
-              }`}
+              className="text-sm font-bold text-[var(--ink)]"
             >
               {cardTitle}
             </p>
@@ -400,20 +382,20 @@ export function TxConfirmCard({
               </time>
             ) : null}
           </div>
-          <p className="mt-1 break-words text-sm leading-relaxed text-zinc-300">
+          <p className="mt-1 break-words text-sm leading-relaxed text-[var(--text-secondary)]">
             {displaySummary}
           </p>
-          <p className="mt-1.5 text-xs text-zinc-500">{cardHint}</p>
+          <p className="mt-1.5 text-xs text-[var(--text-muted)]">{cardHint}</p>
         </div>
       </div>
 
       {warnings && warnings.length > 0 && (
         <div
-          className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2.5"
+          className="mt-3 rounded-[2px] border-2 border-[var(--ink)] bg-[var(--warn)] px-3 py-2.5"
           role="status"
         >
-          <p className="text-xs font-medium text-amber-100">Warnings</p>
-          <ul className="mt-1.5 list-inside list-disc space-y-1 text-xs text-amber-100/90">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-white">Warnings</p>
+          <ul className="mt-1.5 list-inside list-disc space-y-1 text-xs text-white">
             {warnings.map((warning) => (
               <li key={warning}>{warning}</li>
             ))}
@@ -427,7 +409,7 @@ export function TxConfirmCard({
             href={deepLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm font-medium text-amber-300 underline-offset-2 hover:text-amber-200 hover:underline"
+            className="text-sm font-bold text-[var(--ink)] underline underline-offset-2"
           >
             View details
           </a>
@@ -436,23 +418,23 @@ export function TxConfirmCard({
 
       {(isSendFlow || isSupplyFlow) &&
         (preflightLoading || preflightBlocked || flowPreflightBlocked) && (
-          <div className="mt-3 border-t border-[var(--warn)]/15 pt-3">
+          <div className="mt-3 border-t-2 border-[var(--ink)] pt-3">
             {preflightLoading && (
-              <p className="flex items-center gap-2 text-xs text-zinc-400">
+              <p className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
                 <span
-                  className="inline-block size-3 shrink-0 animate-spin rounded-full border-2 border-zinc-500 border-t-[var(--accent-hover)]"
+                  className="inline-block size-3 shrink-0 animate-spin rounded-full border-2 border-[var(--ink)] border-t-[var(--accent)]"
                   aria-hidden
                 />
                 Checking your balance…
               </p>
             )}
             {preflightBlocked && preflight.status === "ready" && (
-              <p className="break-words text-xs text-amber-200/90" role="alert">
+              <p className="break-words text-xs font-bold text-[var(--warn)]" role="alert">
                 {preflight.data.message}
               </p>
             )}
             {flowPreflightBlocked && flowPreflight.status === "ready" && (
-              <p className="break-words text-xs text-amber-200/90" role="alert">
+              <p className="break-words text-xs font-bold text-[var(--warn)]" role="alert">
                 {flowPreflight.data.message}
               </p>
             )}
@@ -460,21 +442,21 @@ export function TxConfirmCard({
         )}
 
       {!isSendFlow && insufficientGas && (
-        <div className="mt-3 border-t border-[var(--warn)]/15 pt-3">
-          <p className="text-xs text-amber-200/90" role="alert">
+        <div className="mt-3 border-t-2 border-[var(--ink)] pt-3">
+          <p className="text-xs font-bold text-[var(--warn)]" role="alert">
             You need a small CELO balance to pay network fees. Add CELO to your
             wallet, then try again.
           </p>
         </div>
       )}
 
-      <ol className="mt-3 space-y-1.5 border-t border-[var(--warn)]/15 pt-3">
+      <ol className="mt-3 space-y-1.5 border-t-2 border-[var(--ink)] pt-3">
         {steps.map((step, index) => (
           <li
             key={`${step.description}-${index}`}
-            className="flex gap-2 text-sm text-zinc-400"
+            className="flex gap-2 text-sm text-[var(--text-secondary)]"
           >
-            <span className="font-medium text-zinc-500">{index + 1}.</span>
+            <span className="font-bold text-[var(--ink)]">{index + 1}.</span>
             <span className="min-w-0 break-words">
               {formatTransactionStep(step.description, { summary })}
             </span>
@@ -483,14 +465,14 @@ export function TxConfirmCard({
       </ol>
 
       {status === "done" && completedHashes.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-2 border-t border-emerald-500/15 pt-3">
+        <div className="mt-3 flex flex-wrap gap-2 border-t-2 border-[var(--ink)] pt-3">
           {completedHashes.map((hash) => (
             <a
               key={hash}
               href={celoscanTxUrl(hash)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center rounded-md bg-emerald-500/10 px-2.5 py-1 font-mono text-xs text-emerald-100 ring-1 ring-emerald-500/25 transition-colors hover:bg-emerald-500/20"
+              className="inline-flex items-center rounded-[2px] border-2 border-[var(--ink)] bg-[var(--success)] px-2.5 py-1 font-mono text-xs font-bold text-[var(--ink)]"
               title={hash}
             >
               {formatTxHash(hash)}
@@ -501,13 +483,13 @@ export function TxConfirmCard({
 
       {errorDisplay && (
         <div
-          className="mt-3 rounded-lg border border-red-500/25 bg-red-500/10 px-3 py-2.5"
+          className="mt-3 rounded-[2px] border-2 border-[var(--ink)] bg-[var(--warn)] px-3 py-2.5"
           role="alert"
         >
-          <p className="break-words text-sm font-medium text-red-200">
+          <p className="break-words text-sm font-semibold text-white">
             {errorDisplay.title}
           </p>
-          <p className="mt-0.5 break-words text-sm text-red-100/90">
+          <p className="mt-0.5 break-words text-sm text-white">
             {errorDisplay.message}
           </p>
           {errorDisplay.technicalDetails && (
@@ -515,12 +497,12 @@ export function TxConfirmCard({
               <button
                 type="button"
                 onClick={() => setShowTechnicalDetails((open) => !open)}
-                className="text-xs text-red-200/80 underline-offset-2 hover:text-red-100 hover:underline"
+                className="text-xs font-semibold text-white underline underline-offset-2"
               >
                 {showTechnicalDetails ? "Hide details" : "Show technical details"}
               </button>
               {showTechnicalDetails && (
-                <pre className="mt-1.5 max-h-32 overflow-auto whitespace-pre-wrap break-all rounded bg-black/20 p-2 text-[10px] leading-snug text-red-200/70">
+                <pre className="mt-1.5 max-h-32 overflow-auto whitespace-pre-wrap break-all border-2 border-[var(--ink)] bg-[var(--canvas)] p-2 text-[10px] leading-snug text-[var(--text-secondary)]">
                   {errorDisplay.technicalDetails}
                 </pre>
               )}
@@ -535,7 +517,7 @@ export function TxConfirmCard({
             type="button"
             disabled={confirmDisabled}
             onClick={() => void handleConfirm()}
-            className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-amber-400 disabled:opacity-50"
+            className="btn-brutal btn-primary px-4 py-2 text-sm disabled:opacity-50"
           >
             {confirmLabel}
           </button>
@@ -543,7 +525,7 @@ export function TxConfirmCard({
             type="button"
             disabled={status === "signing"}
             onClick={handleDismiss}
-            className="rounded-lg border border-zinc-600 px-4 py-2 text-sm text-zinc-300 transition-colors hover:border-zinc-500 hover:text-white disabled:opacity-50"
+            className="btn-brutal btn-secondary px-4 py-2 text-sm disabled:opacity-50"
           >
             Dismiss
           </button>
