@@ -67,10 +67,10 @@ export function ChatComposer({
       className={
         isEmbedded
           ? "w-full"
-          : "composer-safe-bottom shrink-0 border-t border-[var(--surface-2)] bg-[var(--surface-0)]/95 px-3 pt-3 backdrop-blur-md sm:px-4 sm:pt-4"
+          : "composer-safe-bottom shrink-0 border-t-2 border-[var(--ink)] bg-[var(--surface)] px-3 pt-3 sm:px-4 sm:pt-4"
       }
     >
-      <div className="flex items-end gap-2">
+      <div className="flex items-stretch gap-2">
         <textarea
           ref={textareaRef}
           value={input}
@@ -90,8 +90,8 @@ export function ChatComposer({
           suppressHydrationWarning
           className={
             isEmbedded
-              ? "min-h-[72px] w-full flex-1 resize-none overflow-hidden rounded-xl border border-[var(--surface-2)] bg-[var(--surface-0)] px-4 py-3 text-sm leading-relaxed text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/30 disabled:opacity-50"
-              : "min-h-[44px] flex-1 resize-none overflow-hidden rounded-xl border border-[var(--surface-2)] bg-[var(--surface-1)] px-3 py-2.5 text-sm leading-relaxed text-[var(--text-primary)] placeholder:text-[var(--text-subtle)] focus:border-[var(--accent)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/30 disabled:opacity-50"
+              ? "min-h-[72px] w-full flex-1 resize-none overflow-hidden rounded-[2px] border-2 border-[var(--ink)] bg-[var(--surface)] px-4 py-3 text-sm leading-relaxed text-[var(--ink)] shadow-[var(--shadow-brutal)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--celo-forest)] disabled:opacity-50"
+              : "min-h-[44px] flex-1 resize-none overflow-hidden rounded-[2px] border-2 border-[var(--ink)] bg-[var(--surface)] px-3 py-2.5 text-sm leading-relaxed text-[var(--ink)] shadow-[var(--shadow-brutal)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--celo-forest)] disabled:opacity-50"
           }
         />
         <button
@@ -99,8 +99,8 @@ export function ChatComposer({
           disabled={!canChat || !input.trim() || isBusy}
           className={
             isEmbedded
-              ? "h-11 shrink-0 rounded-xl bg-[var(--accent-strong)] px-5 text-sm font-semibold text-[var(--accent-foreground)] transition-colors hover:bg-[var(--accent)] disabled:cursor-not-allowed disabled:bg-[var(--surface-2)] disabled:text-[var(--text-subtle)]"
-              : "h-[44px] shrink-0 rounded-xl bg-[var(--accent-strong)] px-4 text-sm font-semibold text-[var(--accent-foreground)] transition-colors hover:bg-[var(--accent)] disabled:cursor-not-allowed disabled:bg-[var(--surface-2)] disabled:text-[var(--text-subtle)]"
+              ? "btn-brutal btn-primary min-h-[72px] w-[4.75rem] shrink-0 self-stretch px-4 text-sm disabled:cursor-not-allowed disabled:bg-[var(--surface-3)] disabled:text-[var(--text-muted)]"
+              : "btn-brutal btn-primary min-h-[44px] w-[4.75rem] shrink-0 self-stretch px-3 text-sm disabled:cursor-not-allowed disabled:bg-[var(--surface-3)] disabled:text-[var(--text-muted)]"
           }
         >
           Send
