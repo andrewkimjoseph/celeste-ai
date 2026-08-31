@@ -1,15 +1,15 @@
 "use client";
 
-import type { CelesteUIMessage } from "@/lib/chat-message-metadata";
+import type { CelesteUIMessage } from "@/lib/chat/chat-message-metadata";
 import {
   formatMessageTimestamp,
   getMessageCreatedAt,
   MESSAGE_TIMESTAMP_CLASS,
-} from "@/lib/chat-message-metadata";
+} from "@/lib/chat/chat-message-metadata";
 import { CelesteLogoAvatar } from "@/components/celeste-logo";
 import { MessagePart } from "@/components/chat/message-part";
 import { useChats } from "@/hooks/use-chats";
-import { getCelestialPersonality } from "@/lib/celestial-personalities";
+import { getCelestialPersonality } from "@/lib/chat/celestial-personalities";
 
 interface ChatMessageProps {
   message: CelesteUIMessage;
@@ -46,11 +46,11 @@ export function ChatMessage({
             alt={selectedPersonality.label}
             width={32}
             height={32}
-            className="mt-1 size-7 shrink-0 rounded-full object-contain ring-1 ring-[var(--accent)]/30 sm:size-8"
+            className="mt-1 size-7 shrink-0 object-contain sm:size-8"
           />
         ) : (
           <span
-            className="mt-1 flex size-7 shrink-0 items-center justify-center rounded-full border border-[var(--surface-2)] text-xs text-[var(--text-subtle)] sm:size-8"
+            className="mt-1 flex size-7 shrink-0 items-center justify-center rounded-[2px] border-2 border-[var(--ink)] bg-[var(--surface)] text-xs text-[var(--ink)] sm:size-8"
             aria-label="Choose personality"
             role="img"
           >
@@ -60,7 +60,7 @@ export function ChatMessage({
       ) : (
         <CelesteLogoAvatar
           size="sm"
-          className="mt-1 shadow-sm ring-2 ring-[var(--accent)]/15"
+          className="mt-1"
         />
       )}
       <div
@@ -79,7 +79,7 @@ export function ChatMessage({
             </p>
           ) : (
             <div className="mb-1.5 flex items-baseline justify-between gap-2">
-              <p className="text-[11px] font-medium tracking-wide text-zinc-500">
+              <p className="text-[11px] font-bold tracking-wide text-[var(--text-muted)]">
                 Celeste AI
               </p>
               <time
@@ -93,17 +93,17 @@ export function ChatMessage({
         ) : (
           <p
             className={`mb-1.5 text-[11px] font-medium tracking-wide ${
-              isUser ? "sr-only" : "text-zinc-500"
+              isUser ? "sr-only" : "text-[var(--text-muted)]"
             }`}
           >
             {isUser ? "You" : "Celeste AI"}
           </p>
         )}
         <div
-          className={`space-y-2 break-words rounded-2xl px-3.5 py-2.5 shadow-sm [overflow-wrap:anywhere] sm:px-4 sm:py-3 ${
+          className={`space-y-2 break-words rounded-[2px] border-2 border-[var(--ink)] px-3.5 py-2.5 shadow-[var(--shadow-brutal-sm)] [overflow-wrap:anywhere] sm:px-4 sm:py-3 ${
             isUser
-              ? "bg-gradient-to-br from-[var(--accent)] to-[var(--accent-strong)] text-white shadow-black/20"
-              : "border border-white/[0.06] bg-gradient-to-b from-[var(--surface-1)] to-zinc-900/80 text-zinc-100 shadow-black/20"
+              ? "bg-[var(--accent)] text-[var(--accent-foreground)]"
+              : "bg-[var(--surface)] text-[var(--ink)]"
           }`}
         >
           {message.parts?.map((part, index) => {
