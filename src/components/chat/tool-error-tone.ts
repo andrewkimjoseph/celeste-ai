@@ -1,4 +1,4 @@
-import { isExpectedToolError } from "@/lib/format-tool-error";
+import { isExpectedToolError } from "@/lib/tx/format-tool-error";
 
 export type ToolErrorTone = "notice" | "error";
 
@@ -45,7 +45,7 @@ export function getToolErrorTone(
 
 export const TOOL_ERROR_TONE_CLASS: Record<ToolErrorTone, string> = {
   notice:
-    "rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-xs text-zinc-300",
+    "border-2 border-[var(--ink)] bg-[var(--canvas)] px-3 py-2 text-xs text-[var(--text-secondary)] rounded-[2px]",
   error:
-    "rounded-xl border border-red-500/25 bg-red-500/10 px-3 py-2 text-xs text-red-300",
+    "rounded-[2px] border-2 border-[var(--ink)] bg-[var(--warn)] px-3 py-2 text-xs font-semibold text-white",
 };
