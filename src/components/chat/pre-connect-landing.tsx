@@ -21,6 +21,7 @@ const CAPABILITIES = [
   {
     label: "GoodDollar",
     description: "Claim and manage G$ flows",
+    badge: "G$",
   },
 ] as const;
 
@@ -34,24 +35,31 @@ export function PreConnectLanding() {
   const { openConnectModal } = useConnectModal();
 
   return (
-    <div className="mx-auto w-full max-w-xl text-center">
+    <div className="relative mx-auto w-full max-w-xl text-center">
       <CelesteGlobeMark className="mb-4 sm:mb-5" />
-      <h2 className="text-2xl font-medium tracking-tight text-[var(--text-primary)] sm:text-3xl">
-        Your cosmic copilot for Celo
+      <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+        <span className="box-decoration-clone bg-[var(--accent)] px-1.5 text-[var(--accent-foreground)]">
+          Your cosmic copilot for Celo
+        </span>
       </h2>
       <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)] sm:text-base">
         Connect, ask in plain language, and Celeste helps you send, swap, earn,
         and claim across the Celo ecosystem.
       </p>
 
-      <ul className="mt-6 grid gap-2 text-left sm:grid-cols-2">
+      <ul className="mt-6 grid gap-3 text-left sm:grid-cols-2">
         {CAPABILITIES.map((capability) => (
           <li
             key={capability.label}
-            className="rounded-lg border border-[var(--surface-2)] bg-[var(--surface-1)]/50 px-3 py-2.5"
+            className="card-brutal relative px-3 py-2.5"
           >
-            <p className="text-xs font-semibold text-[var(--text-primary)]">
+            <p className="flex items-center gap-1.5 text-xs font-semibold text-[var(--ink)]">
               {capability.label}
+              {"badge" in capability ? (
+                <span className="rounded-[2px] border-2 border-[var(--ink)] bg-[var(--accent)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] text-[var(--accent-foreground)]">
+                  {capability.badge}
+                </span>
+              ) : null}
             </p>
             <p className="mt-0.5 text-[11px] leading-4 text-[var(--text-muted)]">
               {capability.description}
@@ -66,7 +74,7 @@ export function PreConnectLanding() {
             key={step}
             className="flex items-start gap-2 text-xs text-[var(--text-secondary)] sm:max-w-[9.5rem] sm:flex-col sm:items-center sm:text-center"
           >
-            <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border border-[var(--surface-2)] bg-[var(--surface-0)]/60 text-[10px] font-semibold text-[var(--text-muted)] sm:mt-0">
+            <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-[2px] border-2 border-[var(--ink)] bg-[var(--surface)] text-[10px] font-bold text-[var(--ink)] shadow-[var(--shadow-brutal-sm)] sm:mt-0">
               {index + 1}
             </span>
             <span>{step}</span>
@@ -76,18 +84,19 @@ export function PreConnectLanding() {
 
       <div className="mt-6 flex flex-col items-center gap-3">
         <ConnectWalletButton
+          className="w-full max-w-sm"
           onClick={() => openConnectModal?.()}
           disabled={!openConnectModal}
         />
         <Link
           href="/about"
-          className="text-xs text-[var(--accent-soft-text)] transition-colors hover:text-[var(--text-primary)]"
+          className="text-xs font-semibold text-[var(--ink)] underline underline-offset-2"
         >
           Learn more about Celeste
         </Link>
       </div>
 
-      <p className="mt-4 text-[11px] leading-4 text-[var(--text-subtle)]">
+      <p className="mt-4 text-[11px] leading-4 text-[var(--text-muted)]">
         Celeste never auto-sends — you review and sign every transaction.
       </p>
     </div>
