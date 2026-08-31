@@ -23,8 +23,8 @@ const STATIC_MORE_GROUPS: Array<{ label: string; group: PromptGroup; prompts: st
     label: "Send",
     group: "Send",
     prompts: [
-      "Launch a transfer: send 5 USDm to andrewkimjoseph.celo.eth",
-      "Beam 1 USDC to andrewkimjoseph.celo.eth",
+      "Send 5 USDm to andrewkimjoseph.celo.eth",
+      "Send 1 USDC to andrewkimjoseph.celo.eth",
     ],
   },
   {
@@ -32,9 +32,9 @@ const STATIC_MORE_GROUPS: Array<{ label: string; group: PromptGroup; prompts: st
     group: "Swap",
     prompts: [
       "Route 10 USDm into CELO",
-      "Plot a quote for CELO to USDC",
-      "Convert 50 USDm into EURm",
-      "Convert 20 EURm into USDC",
+      "Quote CELO to USDC",
+      "Convert 50 USDm to EURm",
+      "Convert 20 EURm to USDC",
     ],
   },
   {
@@ -50,8 +50,8 @@ const STATIC_MORE_GROUPS: Array<{ label: string; group: PromptGroup; prompts: st
     label: "GoodDollar",
     group: "GoodDollar",
     prompts: [
-      "Claim my GoodDollar UBI mission",
-      "Check my GoodDollar orbit status",
+      "Claim my GoodDollar UBI",
+      "Check my GoodDollar status",
       "How much G$ is needed to receive 0.6 USDm?",
     ],
   },
@@ -59,11 +59,11 @@ const STATIC_MORE_GROUPS: Array<{ label: string; group: PromptGroup; prompts: st
 
 const PRIMARY_BACKFILL: LandingPrompt[] = [
   {
-    text: "Launch a transfer: send 5 USDm to andrewkimjoseph.celo.eth",
+    text: "Send 5 USDm to andrewkimjoseph.celo.eth",
     group: "Send",
   },
-  { text: "Plot a quote for CELO to USDC", group: "Swap" },
-  { text: "Claim my GoodDollar UBI mission", group: "GoodDollar" },
+  { text: "Quote CELO to USDC", group: "Swap" },
+  { text: "Claim my GoodDollar UBI", group: "GoodDollar" },
   { text: "Scan my Aave balances", group: "Earn" },
 ];
 
@@ -125,7 +125,7 @@ function buildPrimaryFromBalances(
 
   if (stable) {
     primary.push({
-      text: `Launch transfer: send 1 ${stable} to andrewkimjoseph.celo.eth`,
+      text: `Send 1 ${stable} to andrewkimjoseph.celo.eth`,
       group: "Send",
     });
   }
@@ -137,7 +137,7 @@ function buildPrimaryFromBalances(
     });
   } else {
     primary.push({
-      text: "Plot a quote for CELO to USDC",
+      text: "Quote CELO to USDC",
       group: "Swap",
     });
   }
@@ -149,7 +149,7 @@ function buildPrimaryFromBalances(
     });
   } else {
     primary.push({
-      text: "Claim my GoodDollar UBI mission",
+      text: "Claim my GoodDollar UBI",
       group: "GoodDollar",
     });
   }
@@ -259,5 +259,5 @@ export function formatLandingBalanceLine(
     return null;
   }
 
-  return `Stellar holdings detected: ${holdings}. Launch a mission below.`;
+  return `You have ${holdings}. Try a prompt below.`;
 }

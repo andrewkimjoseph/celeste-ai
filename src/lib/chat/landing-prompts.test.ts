@@ -89,8 +89,9 @@ describe("formatLandingBalanceLine", () => {
         ],
       }),
     );
-    expect(line).toContain(`${formatBalanceShort("921.8844")} CELO`);
-    expect(line).toContain("2 tokens");
+    expect(line).toBe(
+      `You have ${formatBalanceShort("921.8844")} CELO and 2 tokens. Try a prompt below.`,
+    );
   });
 
   it("returns null when no balance data", () => {
