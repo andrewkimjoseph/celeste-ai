@@ -4,7 +4,6 @@ import { ChatProvider } from "@/components/chat/chat-context";
 import { ChatHistoryDrawer } from "@/components/chat/chat-history-drawer";
 import { ChatSidebar } from "@/components/chat/chat-sidebar";
 import { ChatPanel } from "@/components/chat-panel";
-import { CelestialFxLayer } from "@/components/celestial-fx-layer";
 import { Header } from "@/components/header";
 import { TransactionDrawer } from "@/components/transactions/transaction-drawer";
 import { TransactionProvider } from "@/components/transactions/transaction-context";
@@ -17,7 +16,7 @@ import { useCallback, useState } from "react";
 function AppShellContent() {
   const mounted = useMounted();
   const { address, isConnected } = useAccount();
-  const { activeChatId, fxEnabled, fxIntensity } = useChats();
+  const { activeChatId } = useChats();
   const [navShowNewChat, setNavShowNewChat] = useState(false);
   const [navOnNewChat, setNavOnNewChat] = useState<(() => void) | undefined>();
   const [isLanding, setIsLanding] = useState(false);
@@ -35,8 +34,12 @@ function AppShellContent() {
   }, []);
 
   return (
-    <div className="celestial-atmosphere relative flex h-full min-h-0 flex-1 flex-col">
-      <CelestialFxLayer enabled={fxEnabled} intensity={fxIntensity} />
+    <div className="relative flex h-full min-h-0 flex-1 flex-col bg-[var(--canvas)]">
+      <Header
+        showNewChat={navShowNewChat}
+        onNewChat={navOnNewChat}
+        isConnected={isConnected}
+      />
       <div className="flex min-h-0 flex-1 overflow-hidden">
         <ChatSidebar
           address={address}
@@ -44,20 +47,13 @@ function AppShellContent() {
           mounted={mounted}
         />
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-          <div className="sticky top-0 z-30 shrink-0 border-b border-[var(--surface-2)] bg-[var(--surface-0)]/90 backdrop-blur-md lg:border-b-0">
-            <Header
-              showNewChat={navShowNewChat}
-              onNewChat={navOnNewChat}
-              isConnected={isConnected}
-            />
-            <WalletBalancePanel
-              address={address}
-              isConnected={isConnected}
-              mounted={mounted}
-              variant="mobile-collapsible"
-              hiddenOnLanding={isLanding}
-            />
-          </div>
+          <WalletBalancePanel
+            address={address}
+            isConnected={isConnected}
+            mounted={mounted}
+            variant="mobile-collapsible"
+            hiddenOnLanding={isLanding}
+          />
           <ChatPanel
             key={activeChatId ?? "loading"}
             address={address}
