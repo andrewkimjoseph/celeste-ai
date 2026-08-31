@@ -7,17 +7,17 @@ export function AssistantLoading() {
     <div className="flex w-full gap-3">
       <CelesteLogoAvatar
         size="sm"
-        className="mt-1 shadow-sm ring-2 ring-[var(--accent)]/15"
+        className="mt-1"
       />
       <div className="min-w-0 flex-1">
-        <p className="mb-1.5 text-[11px] font-medium tracking-wide text-zinc-500">
+        <p className="mb-1.5 text-[11px] font-bold tracking-wide text-[var(--text-muted)]">
           Celeste AI
         </p>
-        <div className="flex items-center gap-2.5 rounded-2xl border border-white/[0.06] bg-gradient-to-b from-[var(--surface-1)] to-zinc-900/80 px-4 py-3 text-sm text-zinc-300 shadow-sm shadow-black/20">
+        <div className="flex items-center gap-2.5 rounded-[2px] border-2 border-[var(--ink)] bg-[var(--surface)] px-4 py-3 text-sm text-[var(--ink)] shadow-[var(--shadow-brutal-sm)]">
           <span className="flex gap-1" aria-hidden>
-            <span className="size-1.5 animate-bounce rounded-full bg-[var(--accent-hover)] [animation-delay:0ms]" />
-            <span className="size-1.5 animate-bounce rounded-full bg-[var(--accent-hover)] [animation-delay:150ms]" />
-            <span className="size-1.5 animate-bounce rounded-full bg-[var(--accent-hover)] [animation-delay:300ms]" />
+            <span className="size-1.5 animate-bounce rounded-[2px] bg-[var(--ink)] [animation-delay:0ms]" />
+            <span className="size-1.5 animate-bounce rounded-[2px] bg-[var(--ink)] [animation-delay:150ms]" />
+            <span className="size-1.5 animate-bounce rounded-[2px] bg-[var(--ink)] [animation-delay:300ms]" />
           </span>
           <span className="text-[0.9375rem]">Thinking…</span>
         </div>
