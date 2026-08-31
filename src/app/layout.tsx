@@ -1,9 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Inter, Manrope, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
+  subsets: ["latin"],
+});
+
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
 });
 
@@ -30,7 +35,11 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   interactiveWidget: "resizes-content",
+  colorScheme: "light",
+  themeColor: "#ffffff",
 };
+
+const THEME_SCRIPT = `(function(){try{var stored=localStorage.getItem('celeste-color-scheme');document.documentElement.classList.toggle('dark',stored==='dark');}catch(e){document.documentElement.classList.remove('dark');}})();`;
 
 export default function RootLayout({
   children,
@@ -40,8 +49,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${inter.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className={`${spaceGrotesk.variable} ${manrope.variable} ${inter.variable} h-full antialiased`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body className="text-[var(--text-primary)]">{children}</body>
     </html>
   );
