@@ -187,7 +187,11 @@ export function ToolStatus({
     }
 
     return (
-      <div className="space-y-2">
+      <div
+        className={`space-y-2${
+          toolName.startsWith(PREPARE_TOOL_PREFIX) ? " pt-2" : ""
+        }`}
+      >
         <div className="min-w-0 space-y-2">
           <div className="inline-flex w-fit max-w-full shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[2px] border-2 border-[var(--ink)] bg-[var(--success)] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--ink)]">
             <span aria-hidden>
