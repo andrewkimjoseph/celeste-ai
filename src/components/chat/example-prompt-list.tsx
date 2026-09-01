@@ -7,7 +7,7 @@ export function ExamplePromptList({ className = "" }: { className?: string }) {
   return (
     <div className={className}>
       <p className="px-3 text-[10px] font-bold uppercase tracking-wide text-[var(--text-muted)]">
-        Example prompts
+        Example conversations
       </p>
       <ul className="mt-2 space-y-1">
         {EXAMPLE_PROMPTS.map((prompt) => (
