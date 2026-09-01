@@ -186,13 +186,19 @@ export function ChatMessageList({
     <div
       ref={scrollContainerRef}
       className={`min-h-0 flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] ${
-        isLandingView ? "flex min-h-full flex-col items-center justify-center" : ""
+        isLandingView
+          ? showConnectPrompt
+            ? "flex min-h-full flex-col items-center justify-start"
+            : "flex min-h-full flex-col items-center justify-center"
+          : ""
       }`}
     >
       <div
         className={`w-full ${
           isLandingView
-            ? "mx-auto max-w-2xl px-3 py-4 sm:px-6 sm:py-5"
+            ? showConnectPrompt
+              ? "mx-auto max-w-3xl px-3 py-6 sm:px-6 sm:py-8 lg:py-10"
+              : "mx-auto max-w-2xl px-3 py-4 sm:px-6 sm:py-5"
             : "space-y-8 px-4 py-4 sm:space-y-10 sm:px-5 sm:py-5"
         }`}
       >

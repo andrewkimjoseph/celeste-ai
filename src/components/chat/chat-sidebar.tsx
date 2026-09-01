@@ -1,6 +1,7 @@
 "use client";
 
 import { ChatThreadRow } from "@/components/chat/chat-thread-row";
+import { ExamplePromptList } from "@/components/chat/example-prompt-list";
 import { WalletBalanceSection } from "@/components/wallet-balance-panel";
 import { useChats } from "@/hooks/use-chats";
 
@@ -57,38 +58,9 @@ export function ChatSidebar({
 
       <div className="min-h-0 flex-1 overflow-y-auto p-2">
         {!isConnected ? (
-          <div className="space-y-3 px-2 py-3">
-            <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-muted)]">
-              Example prompts
-            </p>
-            <ul className="space-y-1.5">
-              {(
-                [
-                  { label: "Send", example: "Send 5 USDm to a Celo ENS" },
-                  { label: "Swap", example: "Quote CELO to USDC" },
-                  { label: "Earn", example: "Scan Aave balances" },
-                  { label: "GoodDollar", example: "Claim daily UBI" },
-                ] as const
-              ).map((mission, index) => (
-                <li
-                  key={mission.label}
-                  className="relative rounded-[2px] border-2 border-[var(--ink)] bg-[var(--canvas)] px-2.5 py-2 shadow-[var(--shadow-brutal-sm)]"
-                >
-                  {index === 3 ? (
-                    <span className="absolute -right-1 -top-1.5 rounded-[2px] border-2 border-[var(--ink)] bg-[var(--accent)] px-1 py-0.5 text-[8px] font-bold uppercase tracking-[0.14em] text-[var(--accent-foreground)]">
-                      G$
-                    </span>
-                  ) : null}
-                  <p className="text-[11px] font-semibold text-[var(--ink)]">
-                    {mission.label}
-                  </p>
-                  <p className="mt-0.5 text-[10px] leading-4 text-[var(--text-muted)]">
-                    {mission.example}
-                  </p>
-                </li>
-              ))}
-            </ul>
-            <p className="text-[10px] leading-4 text-[var(--text-muted)]">
+          <div className="space-y-3 py-1">
+            <ExamplePromptList />
+            <p className="px-3 text-[10px] leading-4 text-[var(--text-muted)]">
               Connect your wallet to save chat history.
             </p>
           </div>

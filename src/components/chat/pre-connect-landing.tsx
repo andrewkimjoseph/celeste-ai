@@ -4,6 +4,7 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import { CelesteGlobeMark } from "@/components/celeste-logo";
 import { ConnectWalletButton } from "@/components/connect-wallet-button";
+import { ExamplePromptList } from "@/components/chat/example-prompt-list";
 
 const CAPABILITIES = [
   {
@@ -35,19 +36,19 @@ export function PreConnectLanding() {
   const { openConnectModal } = useConnectModal();
 
   return (
-    <div className="relative mx-auto w-full max-w-xl text-center">
+    <div className="relative mx-auto w-full text-center">
       <CelesteGlobeMark className="mb-4 sm:mb-5" />
       <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
         <span className="box-decoration-clone bg-[var(--accent)] px-1.5 text-[var(--accent-foreground)]">
           Your wallet copilot for Celo
         </span>
       </h2>
-      <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)] sm:text-base">
+      <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-[var(--text-secondary)] sm:text-base">
         Connect, ask in plain language, and Celeste helps you send, swap, earn,
         and claim across the Celo ecosystem.
       </p>
 
-      <ul className="mt-6 grid gap-3 text-left sm:grid-cols-2">
+      <ul className="mt-6 grid grid-cols-1 gap-3 text-left sm:grid-cols-2">
         {CAPABILITIES.map((capability) => (
           <li
             key={capability.label}
@@ -68,11 +69,13 @@ export function PreConnectLanding() {
         ))}
       </ul>
 
-      <ol className="mt-5 flex flex-col gap-1.5 text-left sm:flex-row sm:items-start sm:justify-center sm:gap-4">
+      <ExamplePromptList className="mt-6 text-left lg:hidden" />
+
+      <ol className="mt-6 grid grid-cols-1 gap-3 text-left sm:grid-cols-3 sm:gap-4">
         {STEPS.map((step, index) => (
           <li
             key={step}
-            className="flex items-start gap-2 text-xs text-[var(--text-secondary)] sm:max-w-[9.5rem] sm:flex-col sm:items-center sm:text-center"
+            className="flex items-start gap-2 text-xs text-[var(--text-secondary)] sm:flex-col sm:items-center sm:text-center"
           >
             <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-[2px] border-2 border-[var(--ink)] bg-[var(--surface)] text-[10px] font-bold text-[var(--ink)] shadow-[var(--shadow-brutal-sm)] sm:mt-0">
               {index + 1}
@@ -82,7 +85,7 @@ export function PreConnectLanding() {
         ))}
       </ol>
 
-      <div className="mt-6 flex flex-col items-center gap-3">
+      <div className="mt-8 flex flex-col items-center gap-3">
         <ConnectWalletButton
           className="w-full max-w-sm"
           onClick={() => openConnectModal?.()}
