@@ -19,6 +19,7 @@ export type FlowPreflightResult = {
 const TOKEN_DECIMALS: Record<string, number> = {
   USDT: 6,
   USDC: 6,
+  USAT: 6,
   USDm: 18,
 };
 

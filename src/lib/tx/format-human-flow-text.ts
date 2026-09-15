@@ -10,6 +10,7 @@ const TOKEN_DECIMALS: Record<string, number> = {
   BRLm: 18,
   USDC: 6,
   USDT: 6,
+  USAT: 6,
   GoodDollar: 18,
   G$: 18,
   WETH: 18,
