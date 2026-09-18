@@ -43,7 +43,7 @@ Swaps use **composite routing** in [`src/lib/tx/swap-routing.ts`](src/lib/tx/swa
 | `get_mento_swap_pairs` / `get_uniswap_swap_pairs` | List real venue pairs before quoting — do not invent them |
 | `prepare_swap` | Unsigned steps after user confirms (auto-selects or uses quoted protocol) |
 | `get_mento_fx_quote` / `prepare_mento_fx` | Mento FX only |
-| `get_gooddollar_reserve_quote` / `prepare_gooddollar_reserve_swap` | GoodDollar reserve (G$ ↔ USDm) only |
+| `get_gooddollar_reserve_quote` / `prepare_gooddollar_reserve_swap` | GoodDollar reserve (G$ ↔ USDm) only — other G$ pairs use `get_swap_quote` |
 | `get_uniswap_quote` / `prepare_uniswap_swap` | Uniswap v4 only |
 | `estimate_mento_fx` / `estimate_uniswap_swap` | Gas estimates (when user asks) |
 
@@ -64,7 +64,7 @@ Wallet-signed UBI claims and **G$ ↔ USDm reserve swaps** via celina-sdk:
 
 Example (UBI): *"Claim my GoodDollar UBI"* → `get_gooddollar_ubi_entitlement` → user confirms → `prepare_claim_daily_gooddollar_ubi` → sign in wallet. One claim per verified identity per day.
 
-Example (reserve): *"Swap 100 G$ to USDm"* → `get_swap_quote` (or `get_gooddollar_reserve_quote`) → user confirms → `prepare_swap` → sign in wallet.
+Example (reserve): *"Swap 100 G$ to USDm"* → `get_swap_quote` (or `get_gooddollar_reserve_quote`) → user confirms → `prepare_swap` → sign in wallet. *"Swap G$ to USDC"* → `get_swap_quote` (Uniswap) — not the reserve.
 
 Requires `@andrewkimjoseph/celina-sdk` at the version pinned in `package.json`. Reserve **execute** (`execute_gooddollar_reserve_swap`) is MCP stdio only — Celeste uses `prepare_swap` + wallet signing. See [GoodDollar guide](https://andrewkimjoseph.gitbook.io/celina-sdk/guides/gooddollar).
 

@@ -1,5 +1,6 @@
 import { dynamicTool, type FlexibleSchema, type ToolSet } from "ai";
 import type { createCelinaClient } from "@andrewkimjoseph/celina-sdk";
+import { isGoodDollarUsdReservePair } from "@andrewkimjoseph/celina-sdk";
 import {
   ALL_TOOL_DEFINITIONS,
   filterToolDefinitions,
@@ -14,6 +15,19 @@ import {
 import { z } from "zod";
 
 type CelinaClient = ReturnType<typeof createCelinaClient>;
+
+/** True when a reserve quote/prepare should run as composite swap instead. */
+export function shouldDelegateReserveToComposite(
+  tokenIn: string | undefined,
+  tokenOut: string | undefined,
+): boolean {
+  const a = tokenIn?.trim() ?? "";
+  const b = tokenOut?.trim() ?? "";
+  if (!a || !b) {
+    return false;
+  }
+  return !isGoodDollarUsdReservePair(a, b);
+}
 
 /** Celo governance and validator staking — not part of Celeste DeFAI. */
 const OMITTED_CHAT_TOOLS = new Set([
@@ -109,6 +123,9 @@ export function createChatToolsFromSdk(
   const definitions = filterToolDefinitions(ALL_TOOL_DEFINITIONS, {
     surface: "browser",
   }).filter((def) => !OMITTED_CHAT_TOOLS.has(def.name));
+  const definitionByName = new Map(definitions.map((def) => [def.name, def]));
+  const swapQuote = definitionByName.get("get_swap_quote");
+  const prepareSwap = definitionByName.get("prepare_swap");
 
   const tools: ToolSet = {};
   for (const def of definitions) {
@@ -153,6 +170,46 @@ export function createChatToolsFromSdk(
             throw new Error(TRUNCATED_TX_HASH_MESSAGE);
           }
           return def.handler(runtime, { hash });
+        },
+      });
+      continue;
+    }
+
+    if (def.name === "get_gooddollar_reserve_quote") {
+      tools[def.name] = dynamicTool({
+        description: def.description,
+        inputSchema: def.inputSchema as unknown as FlexibleSchema<
+          Record<string, unknown>
+        >,
+        execute: async (input) => {
+          const params = input as { token_in?: string; token_out?: string };
+          if (
+            swapQuote &&
+            shouldDelegateReserveToComposite(params.token_in, params.token_out)
+          ) {
+            return swapQuote.handler(runtime, input as Record<string, unknown>);
+          }
+          return def.handler(runtime, input as Record<string, unknown>);
+        },
+      });
+      continue;
+    }
+
+    if (def.name === "prepare_gooddollar_reserve_swap") {
+      tools[def.name] = dynamicTool({
+        description: def.description,
+        inputSchema: def.inputSchema as unknown as FlexibleSchema<
+          Record<string, unknown>
+        >,
+        execute: async (input) => {
+          const params = input as { token_in?: string; token_out?: string };
+          if (
+            prepareSwap &&
+            shouldDelegateReserveToComposite(params.token_in, params.token_out)
+          ) {
+            return prepareSwap.handler(runtime, input as Record<string, unknown>);
+          }
+          return def.handler(runtime, input as Record<string, unknown>);
         },
       });
       continue;
