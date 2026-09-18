@@ -22,13 +22,10 @@
   },
   "workers_dev": true,
   "preview_urls": true,
-  // Worker custom_domain cannot attach while a Vercel CNAME exists (API 100117).
-  // This zone route is the cutover path: orange-cloud or delete that CNAME, then
-  // replace with { "pattern": "celeste.usecelina.xyz", "custom_domain": true }.
   "routes": [
     {
-      "pattern": "celeste.usecelina.xyz/*",
-      "zone_name": "usecelina.xyz"
+      "pattern": "celeste.usecelina.xyz",
+      "custom_domain": true
     }
   ]
 }
