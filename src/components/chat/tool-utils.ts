@@ -5,7 +5,9 @@ type MessagePart = UIMessage["parts"][number];
 const RETRYABLE_READ_TOOLS = new Set([
   "get_swap_quote",
   "get_mento_fx_quote",
+  "get_mento_swap_pairs",
   "get_uniswap_quote",
+  "get_uniswap_swap_pairs",
   "estimate_mento_fx",
   "estimate_uniswap_swap",
   "get_token_balance",

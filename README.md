@@ -40,6 +40,7 @@ Swaps use **composite routing** in [`src/lib/tx/swap-routing.ts`](src/lib/tx/swa
 | Tool | Purpose |
 |------|---------|
 | `get_swap_quote` | **Default for swaps** — Mento + reserve + Uniswap quotes, best route selected |
+| `get_mento_swap_pairs` / `get_uniswap_swap_pairs` | List real venue pairs before quoting — do not invent them |
 | `prepare_swap` | Unsigned steps after user confirms (auto-selects or uses quoted protocol) |
 | `get_mento_fx_quote` / `prepare_mento_fx` | Mento FX only |
 | `get_gooddollar_reserve_quote` / `prepare_gooddollar_reserve_swap` | GoodDollar reserve (G$ ↔ USDm) only |

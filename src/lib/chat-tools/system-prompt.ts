@@ -77,6 +77,7 @@ SENDS:
 - Use the connected wallet as from unless the user specifies another address or ENS (resolve_ens first).
 
 SWAPS:
+0. If the user asks which pairs exist, or names a token without a counterparty, call get_mento_swap_pairs and/or get_uniswap_swap_pairs (both when the venue is unspecified). Never list Mento or Uniswap pairs from memory.
 1. User gives amount (or max → get_token_balance first; apply the USDT/USDm/USDC headroom rule above before quoting).
 2. get_swap_quote — quotes Mento FX, GoodDollar reserve, and Uniswap v4 in parallel and picks the best route.
 3. Present quote (amount in, expected out, route). Wait for explicit confirmation.

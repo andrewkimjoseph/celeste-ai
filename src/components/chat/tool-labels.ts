@@ -23,6 +23,10 @@ const TOOL_LABELS: Record<string, { inProgress: string; done: string }> = {
     inProgress: "Getting FX quote…",
     done: "Quote ready",
   },
+  get_mento_swap_pairs: {
+    inProgress: "Loading Mento pairs…",
+    done: "Mento pairs loaded",
+  },
   get_swap_quote: {
     inProgress: "Finding best swap route…",
     done: "Quote ready",
@@ -30,6 +34,10 @@ const TOOL_LABELS: Record<string, { inProgress: string; done: string }> = {
   get_uniswap_quote: {
     inProgress: "Getting Uniswap quote…",
     done: "Quote ready",
+  },
+  get_uniswap_swap_pairs: {
+    inProgress: "Loading Uniswap pairs…",
+    done: "Uniswap pairs loaded",
   },
   estimate_send: {
     inProgress: "Estimating send gas…",

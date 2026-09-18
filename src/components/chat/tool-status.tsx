@@ -62,6 +62,45 @@ function formatSwapQuote(output: unknown): string | null {
   );
 }
 
+function formatSwapPairs(output: unknown): string | null {
+  if (typeof output !== "object" || output === null) {
+    return null;
+  }
+
+  const listing = output as {
+    protocol?: string;
+    token?: string;
+    counterparts?: string[];
+    pairs?: Array<{ token_a?: string; token_b?: string; hops?: number }>;
+  };
+
+  const venue =
+    listing.protocol === "uniswap_v4"
+      ? "Uniswap"
+      : listing.protocol === "mento_fx"
+        ? "Mento"
+        : "Swap";
+
+  if (listing.token && Array.isArray(listing.counterparts)) {
+    if (listing.counterparts.length === 0) {
+      return `${venue}: no pairs for ${listing.token}`;
+    }
+    return `${venue}: ${listing.token} ↔ ${listing.counterparts.join(", ")}`;
+  }
+
+  if (!Array.isArray(listing.pairs) || listing.pairs.length === 0) {
+    return null;
+  }
+
+  const preview = listing.pairs
+    .slice(0, 8)
+    .map((pair) => `${pair.token_a} ↔ ${pair.token_b}`)
+    .join(", ");
+  const extra =
+    listing.pairs.length > 8 ? ` (+${listing.pairs.length - 8} more)` : "";
+  return `${venue}: ${preview}${extra}`;
+}
+
 function formatEstimateSendNotice(output: unknown): string | null {
   if (typeof output !== "object" || output === null) {
     return null;
@@ -168,6 +207,11 @@ export function ToolStatus({
         ? formatSwapQuote(part.output)
         : null;
 
+    const swapPairsSummary =
+      toolName === "get_mento_swap_pairs" || toolName === "get_uniswap_swap_pairs"
+        ? formatSwapPairs(part.output)
+        : null;
+
     const governanceSummary =
       toolName === "get_governance_proposals"
         ? formatGovernanceSummary(part.output)
@@ -178,7 +222,7 @@ export function ToolStatus({
         ? formatEstimateSendNotice(part.output)
         : null;
 
-    const detailSummary = swapQuoteSummary ?? governanceSummary;
+    const detailSummary = swapQuoteSummary ?? swapPairsSummary ?? governanceSummary;
 
     if (estimateSendNotice) {
       return (
