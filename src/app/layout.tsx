@@ -21,10 +21,6 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Celeste AI",
   description: "A DeFAI copilot for Celo wallets.",
-  icons: {
-    icon: [{ url: "/logo.svg", type: "image/svg+xml" }],
-    apple: "/logo.svg",
-  },
   other: {
     "talentapp:project_verification":
       "7398652af3489ea6a588f59047a82cb350fd6bd30d2b2a7406d2f705c6b4c8940be39182412de3ddf1783283398149bb6ecd77d63a2a65b4d8897d425b268f16",
