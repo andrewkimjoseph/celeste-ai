@@ -8,6 +8,37 @@ import { imagesOptimizer } from "@vinext/cloudflare/images/images-optimizer";
 
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
+/** CJS wallet/UI deps that crash workerd's RSC module runner unless prebundled. */
+const cjsOptimizeDeps = [
+  "@metamask/sdk",
+  "@metamask/utils",
+  "@metamask/utils > semver",
+  "@rainbow-me/rainbowkit",
+  "@tanstack/react-query",
+  "dexie",
+  "eventemitter3",
+  "semver",
+  "use-sync-external-store",
+  "valtio",
+  "wagmi",
+];
+
+function includeCjsOptimizeDeps() {
+  return {
+    name: "include-cjs-optimize-deps",
+    config(config: { environments?: Record<string, { optimizeDeps?: { include?: string[] } }> }) {
+      for (const envName of ["ssr", "rsc"] as const) {
+        const env = config.environments?.[envName];
+        if (!env) continue;
+        env.optimizeDeps ??= {};
+        env.optimizeDeps.include = [
+          ...new Set([...(env.optimizeDeps.include ?? []), ...cjsOptimizeDeps]),
+        ];
+      }
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
     vinext({
@@ -20,6 +51,7 @@ export default defineConfig({
         childEnvironments: ["ssr"],
       },
     }),
+    includeCjsOptimizeDeps(),
   ],
   resolve: {
     alias: {
@@ -28,5 +60,8 @@ export default defineConfig({
         "src/lib/empty-module.ts",
       ),
     },
+  },
+  legacy: {
+    inconsistentCjsInterop: true,
   },
 });
