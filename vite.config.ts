@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 import vinext from "vinext";
 import { cloudflare } from "@cloudflare/vite-plugin";
-import { responseStoreAdapter } from "@vinext/cloudflare/cache/response-store-adapter";
+import { cdnAdapter } from "@vinext/cloudflare/cache/cdn-adapter";
 import { imagesOptimizer } from "@vinext/cloudflare/images/images-optimizer";
 
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
@@ -42,7 +42,8 @@ function includeCjsOptimizeDeps() {
 export default defineConfig({
   plugins: [
     vinext({
-      cache: responseStoreAdapter(),
+      // Workers Cache until the CELINA account enables R2 (Response Store needs a bucket).
+      cache: { cdn: cdnAdapter() },
       images: { optimizer: imagesOptimizer() },
     }),
     cloudflare({
