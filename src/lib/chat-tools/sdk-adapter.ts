@@ -12,6 +12,7 @@ import {
   parseTransactionHash,
   TRUNCATED_TX_HASH_MESSAGE,
 } from "@/lib/tx/transaction-hash";
+import { isPreparedFlow } from "@/lib/tx/prepared-flow";
 import { z } from "zod";
 
 type CelinaClient = ReturnType<typeof createCelinaClient>;
@@ -142,14 +143,32 @@ export function createChatToolsFromSdk(
             amount?: string;
             from?: string;
           };
-          const { address: recipient } = await celina.ens.resolveAddressOrEns(
-            String(params.to ?? ""),
-          );
+          const originalTo = String(params.to ?? "");
+          const { address: recipient } = await celina.ens.resolveAddressOrEns(originalTo);
           const blocked = checkBlockedSendRecipient(recipient);
           if (!blocked.ok) {
             throw new Error(blocked.message);
           }
-          return def.handler(runtime, input as Record<string, unknown>);
+          const result = await def.handler(runtime, input as Record<string, unknown>);
+
+          // If the user specified an ENS name, replace the resolved hex address
+          // in the flow summary and step descriptions so the LLM echoes the ENS
+          // name rather than the raw hex — keeping the AI message and confirm
+          // card consistent.
+          const isEns = /\.eth$/i.test(originalTo.trim());
+          if (isEns && isPreparedFlow(result)) {
+            const hexPattern = new RegExp(
+              recipient.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+              "gi",
+            );
+            result.summary = result.summary.replace(hexPattern, originalTo);
+            result.steps = result.steps.map((step) => ({
+              ...step,
+              description: step.description.replace(hexPattern, originalTo),
+            }));
+          }
+
+          return result;
         },
       });
       continue;
