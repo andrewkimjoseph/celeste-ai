@@ -4,7 +4,6 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import { CelesteGlobeMark } from "@/components/celeste-logo";
 import { ConnectWalletButton } from "@/components/connect-wallet-button";
-import { ExamplePromptList } from "@/components/chat/example-prompt-list";
 
 const CAPABILITIES = [
   {
@@ -26,12 +25,6 @@ const CAPABILITIES = [
   },
 ] as const;
 
-const STEPS = [
-  "Describe the action in chat",
-  "Celeste prepares the transaction steps",
-  "You review and sign in your wallet",
-] as const;
-
 export function PreConnectLanding() {
   const { openConnectModal } = useConnectModal();
 
@@ -48,7 +41,7 @@ export function PreConnectLanding() {
         and claim across the Celo ecosystem.
       </p>
 
-      <ul className="mt-6 grid grid-cols-1 gap-3 text-left sm:grid-cols-2">
+      <ul className="mt-6 grid grid-cols-2 gap-2 text-left sm:gap-3">
         {CAPABILITIES.map((capability) => (
           <li
             key={capability.label}
@@ -69,28 +62,15 @@ export function PreConnectLanding() {
         ))}
       </ul>
 
-      <ExamplePromptList className="mt-6 text-left lg:hidden" />
-
-      <ol className="mt-6 grid grid-cols-1 gap-3 text-left sm:grid-cols-3 sm:gap-4">
-        {STEPS.map((step, index) => (
-          <li
-            key={step}
-            className="flex items-start gap-2 text-xs text-[var(--text-secondary)] sm:flex-col sm:items-center sm:text-center"
-          >
-            <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-[2px] border-2 border-[var(--ink)] bg-[var(--surface)] text-[10px] font-bold text-[var(--ink)] shadow-[var(--shadow-brutal-sm)] sm:mt-0">
-              {index + 1}
-            </span>
-            <span>{step}</span>
-          </li>
-        ))}
-      </ol>
-
       <div className="mt-8 flex flex-col items-center gap-3">
         <ConnectWalletButton
           className="w-full max-w-sm"
           onClick={() => openConnectModal?.()}
           disabled={!openConnectModal}
         />
+        <p className="text-[11px] leading-4 text-[var(--text-muted)]">
+          Describe the action · Celeste prepares the steps · You review and sign
+        </p>
         <Link
           href="/about"
           className="text-xs font-semibold text-[var(--ink)] underline underline-offset-2"
