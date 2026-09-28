@@ -53,7 +53,8 @@
     "wrangler": "^4.134.0"
   },
   "overrides": {
-    "qr": "0.5.5"
+    "qr": "0.5.5",
+    "@walletconnect/ethereum-provider": "2.25.0"
   },
   "type": "module"
 }
