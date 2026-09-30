@@ -5,6 +5,9 @@ import {
   TRUNCATED_TX_HASH_MESSAGE,
 } from "@/lib/tx/transaction-hash";
 
+const TOO_MANY_SUBREQUESTS_MESSAGE =
+  "This action required too many network calls at once. Please try again — it usually works on the second attempt.";
+
 export function formatToolErrorMessage(
   toolName: string,
   errorText: string,
@@ -12,6 +15,10 @@ export function formatToolErrorMessage(
   const text = errorText.trim();
   if (!text) {
     return "Something went wrong. Please try again.";
+  }
+
+  if (text.includes("Too many subrequests by single Worker invocation")) {
+    return TOO_MANY_SUBREQUESTS_MESSAGE;
   }
 
   if (
