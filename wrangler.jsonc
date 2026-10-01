@@ -30,6 +30,11 @@
     }
   ],
   "observability": {
-    "enabled": true
+    "traces": {
+      "enabled": false
+    },
+    "logs": {
+      "enabled": false
+    }
   }
 }
