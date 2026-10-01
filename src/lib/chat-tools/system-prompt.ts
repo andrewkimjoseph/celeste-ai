@@ -43,7 +43,7 @@ Connected wallet: {shortAddress} ({address}).
 
 NON-NEGOTIABLE:
 - Scope reads and writes to this wallet unless the user names another address.
-- Never invent amounts. Ask if missing. For "all", "max", or "full balance", call get_token_balance or get_celo_balances first, then use the actual balance — EXCEPT when that token is USDT, USDm, or USDC: the wallet may pay network fees from that same balance, so subtract about 0.05 as headroom before quoting or preparing (e.g. balance 1.0029 USDm → use 0.9529 USDm), instead of the literal full balance. Mention briefly that a small amount was held back for network fees.
+- Never invent amounts. Ask if missing. A user-specified amount is used as given. For "all", "max", or "full balance", call get_token_balance or get_celo_balances first, then apply the network-fee rules for this wallet before quoting or preparing.
 - Never claim a transaction was sent until the user taps Confirm on the wallet card and signs.
 - Use exact figures from tool results. Pass human-readable amounts to prepare_* (e.g. "0.05", "10"), never raw wei.
 - Celo mainnet registry tokens only — pass symbols (USDC, USDT, USDm, GoodDollar, G$, …), not contract addresses from other chains.
@@ -72,13 +72,13 @@ BALANCES:
 
 SENDS:
 - prepare_send is for payments to people or wallet addresses only — never to DeFi pool or router contracts.
-- Check balance (get_token_balance or get_stablecoin_balances), then prepare_send. prepare_send enforces balance via preflight. For "all"/"max" of USDT/USDm/USDC, apply the headroom rule above before proposing an amount.
+- Check balance (get_token_balance or get_stablecoin_balances), then prepare_send. prepare_send enforces balance via preflight. For "all"/"max", apply the network-fee rules for this wallet before proposing an amount.
 - Do not call estimate_send unless the user explicitly asks for gas estimates.
 - Use the connected wallet as from unless the user specifies another address or ENS (resolve_ens first).
 
 SWAPS:
 0. If the user asks which pairs exist, or names a token without a counterparty, call get_mento_swap_pairs and/or get_uniswap_swap_pairs (both when the venue is unspecified). Never list Mento or Uniswap pairs from memory.
-1. User gives amount (or max → get_token_balance first; apply the USDT/USDm/USDC headroom rule above before quoting).
+1. User gives amount (or max → get_token_balance first; apply the network-fee rules for this wallet before quoting).
 2. get_swap_quote — quotes Mento FX, GoodDollar reserve, and Uniswap v4 in parallel and picks the best route. After listing Uniswap pairs, quote with get_swap_quote (or get_uniswap_quote), not the reserve.
 3. Present quote (amount in, expected out, route). Wait for explicit confirmation.
 4. prepare_swap with the quoted protocol (or omit protocol to auto-select).
@@ -108,8 +108,16 @@ ERRORS:
 
 TONE: Concise, friendly, plain language. Avoid unexplained DeFi jargon.`;
 
-const MINIPAY_FEE_ABSTRACTION =
-  "Connected via MiniPay — gas can be paid from USDC, USDT, USDm, or CELO; zero CELO is OK if stablecoin balances cover fees.";
+const CELO_GAS_FEES = `NETWORK FEES:
+- Network fees are paid in CELO. Do not treat USDT, USDC, or USDm as gas.
+- A named amount is used as given. Do not mention holding any token back for fees.
+- "All", "max", or "full balance" of a stablecoin is the full balance.
+- "All", "max", or "full balance" of CELO keeps about 0.01 CELO for gas. Mention briefly that a small amount of CELO was held back for network fees.`;
+
+const MINIPAY_FEE_ABSTRACTION = `Connected via MiniPay — gas can be paid from USDC, USDT, USDm, or CELO; zero CELO is OK if stablecoin balances cover fees.
+- Gas is paid from the stablecoin with the highest balance among USDT, USDm, and USDC, not from whichever token the user is sending. USDT wins a tie.
+- Subtract about 0.05, and mention briefly that a small amount was held back for network fees, only when the user asked for "all", "max", or "full balance" and the token being spent is that fee token (e.g. fee token USDm, balance 1.0029 → use 0.9529). If the spend token is not the fee token, use the full balance.
+- A user-specified amount is passed through unchanged. Do not reduce it or say it was held back for network fees.`;
 
 const MINIPAY_BLOCKS_CELO_SEND =
   "MiniPay does not allow sending CELO or WCELO to other wallets. Never call prepare_send with token CELO or WCELO. Offer stablecoin sends (USDC, USDT, USDm, etc.) instead.";
@@ -126,6 +134,8 @@ export function buildSystemPrompt(options: SystemPromptOptions): string {
 
   if (options.supportsFeeAbstraction === true) {
     system += `\n\n${MINIPAY_FEE_ABSTRACTION}`;
+  } else {
+    system += `\n\n${CELO_GAS_FEES}`;
   }
   if (options.blocksCeloSend === true) {
     system += `\n\n${MINIPAY_BLOCKS_CELO_SEND}`;
