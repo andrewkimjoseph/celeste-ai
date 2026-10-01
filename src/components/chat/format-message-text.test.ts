@@ -1,4 +1,4 @@
-import { Children, isValidElement, type ReactNode } from "react";
+import { Children, isValidElement, type ReactElement, type ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import {
   classifyHexToken,
@@ -64,6 +64,59 @@ function collectHexElements(node: ReactNode, out: HexElement[] = []): HexElement
   return out;
 }
 
+function findButton(node: ReactNode, text: string): ReactElement | undefined {
+  if (node == null || typeof node === "boolean") {
+    return undefined;
+  }
+
+  if (Array.isArray(node)) {
+    for (const child of node) {
+      const found = findButton(child, text);
+      if (found) {
+        return found;
+      }
+    }
+    return undefined;
+  }
+
+  if (!isValidElement(node)) {
+    return undefined;
+  }
+
+  if (node.type === "button") {
+    const children = node.props.children as ReactNode;
+    const label = Array.isArray(children)
+      ? children.find((child) => typeof child === "string")
+      : children;
+    if (label === text) {
+      return node;
+    }
+  }
+
+  let found: ReactElement | undefined;
+  Children.forEach(node.props.children as ReactNode, (child) => {
+    found ??= findButton(child, text);
+  });
+  return found;
+}
+
+function findStatus(node: ReactElement | undefined): ReactElement | undefined {
+  if (!node) {
+    return undefined;
+  }
+
+  let found: ReactElement | undefined;
+  Children.forEach(node.props.children as ReactNode, (child) => {
+    if (found || !isValidElement(child)) {
+      return;
+    }
+    if (child.props.role === "status") {
+      found = child;
+    }
+  });
+  return found;
+}
+
 describe("classifyHexToken", () => {
   it("classifies 40-char wallet addresses", () => {
     expect(classifyHexToken(ADDRESS)).toBe("address");
@@ -127,6 +180,21 @@ describe("formatMessageText hex rendering", () => {
 
     hexElements[0]?.onClick?.({ stopPropagation: vi.fn() });
     expect(onHashClick).toHaveBeenCalledWith(TRUNCATED_HASH);
+  });
+
+  it("shows a Copied popup on the chip that was just copied", () => {
+    const nodes = formatMessageText(`Send 1 USDT to ${ADDRESS}`, {
+      onHashClick: vi.fn(),
+      copiedToken: ADDRESS,
+    });
+    const hexElements = collectHexElements(nodes);
+
+    expect(hexElements).toHaveLength(1);
+    expect(hexElements[0]?.text).toBe(ADDRESS);
+
+    const button = findButton(nodes, ADDRESS);
+    const popup = findStatus(button);
+    expect(popup?.props.children).toBe("Copied");
   });
 
   it("renders mixed address and hash lines as clickable buttons", () => {

@@ -102,7 +102,7 @@ function parseInline(text: string, options: FormatOptions = {}): ReactNode[] {
               event.stopPropagation();
               onHashClick(token);
             }}
-            className={`${hashClass} cursor-pointer transition-colors ${
+            className={`relative ${hashClass} cursor-pointer transition-colors ${
               variant === "user"
                 ? "hover:bg-black/15"
                 : "hover:text-[var(--celo-forest)]"
@@ -111,6 +111,15 @@ function parseInline(text: string, options: FormatOptions = {}): ReactNode[] {
             aria-label={copied ? "Copied" : "Copy to clipboard"}
           >
             {token}
+            {copied ? (
+              <span
+                role="status"
+                aria-hidden="true"
+                className="pointer-events-none absolute bottom-[calc(100%+6px)] left-1/2 z-30 -translate-x-1/2 whitespace-nowrap rounded-[2px] border-2 border-[var(--ink)] bg-[var(--celo-yellow)] px-2 py-1 font-sans text-[11px] font-bold leading-none text-[var(--ink)] shadow-[var(--shadow-brutal-sm)]"
+              >
+                Copied
+              </span>
+            ) : null}
           </button>,
         );
       } else {
