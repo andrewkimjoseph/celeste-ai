@@ -230,25 +230,17 @@ export function ToolStatus({
       );
     }
 
+    if (!detailSummary && balanceRows.length === 0) {
+      return null;
+    }
+
     return (
-      <div
-        className={`space-y-2${
-          toolName.startsWith(PREPARE_TOOL_PREFIX) ? " pt-2" : ""
-        }`}
-      >
-        <div className="min-w-0 space-y-2">
-          <div className="inline-flex w-fit max-w-full shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[2px] border-2 border-[var(--ink)] bg-[var(--success)] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--ink)]">
-            <span aria-hidden>
-              ✓
-            </span>
-            {labels.done}
-          </div>
-          {detailSummary ? (
-            <p className="text-[11px] leading-snug text-[var(--text-secondary)] break-words">
-              {detailSummary}
-            </p>
-          ) : null}
-        </div>
+      <div className="space-y-2">
+        {detailSummary ? (
+          <p className="text-[11px] leading-snug text-[var(--text-secondary)] break-words">
+            {detailSummary}
+          </p>
+        ) : null}
 
         {balanceRows.length > 0 && (
           <BalanceCard
