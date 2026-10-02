@@ -98,7 +98,7 @@ Chats are saved **locally in your browser** (IndexedDB via Dexie), scoped to the
 6. `ChatPanel` detects the flow in message parts and renders `TxConfirmCard`.
 7. User confirms — `TxConfirmCard` simulates each step via SDK + Celeste MiniPay wrapper, then signs sequentially via wagmi; checks `receipt.status` after each mine.
 
-Chat tools mirror **celina-sdk** reads and `prepare_*` wallet flows (naming is similar to celina-mcp for familiarity, but Celeste does not call MCP). Server-key writes (`send_token`, `execute_mento_fx`, `execute_uniswap_swap`) and **Self Agent ID** registration flows are only in [celina-mcp](../celina-mcp) or [`@selfxyz/agent-sdk`](https://www.npmjs.com/package/@selfxyz/agent-sdk).
+Chat tools mirror **celina-sdk** reads and `prepare_*` wallet flows (naming is similar to celina-mcp for familiarity, but Celeste does not call MCP). Server-key writes (`send_token`, `execute_mento_fx`, `execute_uniswap_swap`) and **Self Agent ID** registration, proof refresh, session polling, and request signing stay in [celina-mcp](../celina-mcp) or [`@selfxyz/agent-sdk`](https://www.npmjs.com/package/@selfxyz/agent-sdk). Self verification reads (`verify_self_agent`, `get_self_identity`, `lookup_self_agent`, `verify_self_request`) are available in chat.
 
 ### Directory map
 

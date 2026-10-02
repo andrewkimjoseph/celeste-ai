@@ -175,6 +175,22 @@ const TOOL_LABELS: Record<string, { inProgress: string; done: string }> = {
     inProgress: "Preparing GoodDollar reserve swap…",
     done: "Reserve swap prepared",
   },
+  verify_self_agent: {
+    inProgress: "Checking Self verification…",
+    done: "Self verification checked",
+  },
+  get_self_identity: {
+    inProgress: "Loading Self identity…",
+    done: "Self identity loaded",
+  },
+  lookup_self_agent: {
+    inProgress: "Looking up Self agent…",
+    done: "Self agent loaded",
+  },
+  verify_self_request: {
+    inProgress: "Verifying Self request…",
+    done: "Self request checked",
+  },
 };
 
 export function getToolLabels(toolName: string): {
