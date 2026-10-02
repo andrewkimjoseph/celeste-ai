@@ -121,7 +121,7 @@ function ChatThreadRowChrome({
   }`;
   const deleteClass = `mr-1.5 flex size-8 shrink-0 items-center justify-center self-center ${
     interactive
-      ? "opacity-100 transition-colors hover:bg-[var(--canvas)] hover:text-[var(--accent)] lg:opacity-0 lg:group-hover:opacity-100 lg:focus:opacity-100"
+      ? "opacity-100 transition-colors hover:bg-[var(--ink)] hover:text-[var(--canvas)] lg:opacity-0 lg:group-hover:opacity-100 lg:focus:opacity-100"
       : isActive
         ? "pointer-events-none opacity-100"
         : "pointer-events-none opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
