@@ -16,7 +16,7 @@ DeFAI chat UI for Celo — applied Celina, a third-party, open-source stack that
 
 ```bash
 cp .env.example .env.local
-# Set OPENROUTER_API_KEY (or OPENAI_API_KEY) and optionally NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
+# Set OPENROUTER_API_KEY and optionally NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
 npm install
 npm run dev
 ```
@@ -25,7 +25,7 @@ Installs `@andrewkimjoseph/celina-sdk` from npm at the exact version in [`packag
 
 ## Stack
 
-- Next.js + Vercel AI SDK + OpenAI-compatible LLM (`/api/chat`) — OpenRouter or direct OpenAI
+- Next.js + Vercel AI SDK + OpenRouter (`/api/chat`)
 - wagmi + RainbowKit (Celo mainnet)
 - `@andrewkimjoseph/celina-sdk` for chain reads and `prepare*` flows
 
@@ -126,10 +126,9 @@ See [`.env.example`](.env.example):
 
 | Variable | Purpose |
 |----------|---------|
-| `OPENROUTER_API_KEY` | OpenRouter LLM (recommended) |
-| `OPENAI_API_KEY` | Direct OpenAI (alternative) |
-| `OPENAI_MODEL` | Model id (e.g. `openai/gpt-4o-mini` on OpenRouter) |
-| `OPENAI_BASE_URL` | Override provider URL (optional) |
+| `OPENROUTER_API_KEY` | OpenRouter LLM |
+| `OPENAI_MODEL` | Model id (default `openai/gpt-4o-mini`) |
+| `OPENROUTER_APP_NAME` | OpenRouter app title (default `Celeste AI`) |
 | `CELO_RPC_URL_MAINNET` | Celo RPC for SDK reads/prepare |
 | `ETH_RPC_URL_MAINNET` | Ethereum RPC for ENS resolution |
 | `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | WalletConnect / RainbowKit |
