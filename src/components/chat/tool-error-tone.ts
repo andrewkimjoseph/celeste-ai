@@ -40,7 +40,7 @@ export function getToolErrorTone(
     return "notice";
   }
 
-  return "error";
+  return "notice";
 }
 
 export const TOOL_ERROR_TONE_CLASS: Record<ToolErrorTone, string> = {
