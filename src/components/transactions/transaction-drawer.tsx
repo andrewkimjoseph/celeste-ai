@@ -46,7 +46,7 @@ export function TransactionDrawer() {
   }
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div className="fixed inset-x-0 top-[var(--app-offset-top)] z-50 h-[var(--app-height)]">
       <button
         type="button"
         aria-label="Close transactions panel"
@@ -62,9 +62,9 @@ export function TransactionDrawer() {
         role="dialog"
         aria-modal="true"
         aria-labelledby="transaction-drawer-title"
-        className="absolute right-0 top-0 flex h-dvh w-full max-w-md flex-col border-l-2 border-[var(--ink)] bg-[var(--surface)]"
+        className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l-2 border-[var(--ink)] bg-[var(--surface)]"
       >
-        <div className="flex items-center justify-between gap-3 border-b-2 border-[var(--ink)] px-4 py-4">
+        <div className="flex h-[var(--app-header-height)] shrink-0 items-center justify-between gap-3 border-b-2 border-[var(--ink)] px-4">
           <div>
             <h2
               id="transaction-drawer-title"

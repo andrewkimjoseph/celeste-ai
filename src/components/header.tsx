@@ -12,7 +12,7 @@ import {
   getCelestialPersonality,
   type CelestialPersonalityId,
 } from "@/lib/chat/celestial-personalities";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 const headerChipClassName =
@@ -374,9 +374,32 @@ export function Header({
   isConnected = false,
 }: HeaderProps) {
   const isAbout = variant === "about";
+  const headerRef = useRef<HTMLElement>(null);
+
+  useLayoutEffect(() => {
+    const header = headerRef.current;
+    if (!header) {
+      return;
+    }
+
+    const apply = () => {
+      document.documentElement.style.setProperty(
+        "--app-header-height",
+        `${header.getBoundingClientRect().height}px`,
+      );
+    };
+
+    apply();
+    const observer = new ResizeObserver(apply);
+    observer.observe(header);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <header className="z-30 shrink-0 border-b-2 border-[var(--ink)] bg-[var(--surface)] px-3 py-2.5 sm:px-4 sm:py-3">
+    <header
+      ref={headerRef}
+      className="z-30 shrink-0 border-b-2 border-[var(--ink)] bg-[var(--surface)] px-3 py-2.5 sm:px-4 sm:py-3"
+    >
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
           {isAbout ? (
