@@ -1,6 +1,6 @@
 # Celeste AI
 
-DeFAI chat UI for Celo — applied Celina, a third-party, open-source stack that gives an LLM read, prepare, and execute access to Celo mainnet through an SDK, an MCP server, and a REST API. Connect a wallet, ask about balances, and prepare sends, swaps (Mento FX + GoodDollar reserve + Uniswap v4), and Aave actions — you sign in your wallet.
+DeFAI chat UI for Celo — applied Celina, a third-party, open-source stack that gives an LLM read, prepare, and execute access to Celo mainnet through an SDK, an MCP server, and a REST API. Connect a wallet, ask about balances, and prepare sends, swaps (Mento FX + GoodDollar reserve + Uniswap v3 and v4), and Aave actions — you sign in your wallet.
 
 **Live:** [celeste.usecelina.xyz](https://celeste.usecelina.xyz)
 
@@ -35,7 +35,7 @@ No `CELO_PRIVATE_KEY` — writes require wallet confirmation via `TxConfirmCard`
 
 ## Swap routing
 
-Swaps use **composite routing** in [`src/lib/tx/swap-routing.ts`](src/lib/tx/swap-routing.ts): the agent quotes Mento FX, GoodDollar reserve (G$ ↔ USDm), and Uniswap v4 in parallel and picks the better `expectedOut`.
+Swaps use **composite routing** in [`src/lib/tx/swap-routing.ts`](src/lib/tx/swap-routing.ts): the agent quotes Mento FX, GoodDollar reserve (G$ ↔ USDm), and Uniswap v3 and v4 in parallel and picks the better `expectedOut`.
 
 | Tool | Purpose |
 |------|---------|
@@ -44,7 +44,7 @@ Swaps use **composite routing** in [`src/lib/tx/swap-routing.ts`](src/lib/tx/swa
 | `prepare_swap` | Unsigned steps after user confirms (auto-selects or uses quoted protocol) |
 | `get_mento_fx_quote` / `prepare_mento_fx` | Mento FX only |
 | `get_gooddollar_reserve_quote` / `prepare_gooddollar_reserve_swap` | GoodDollar reserve (G$ ↔ USDm) only — other G$ pairs use `get_swap_quote` |
-| `get_uniswap_quote` / `prepare_uniswap_swap` | Uniswap v4 only |
+| `get_uniswap_quote` / `prepare_uniswap_swap` | Uniswap v3 and v4; the quote keeps the higher output |
 | `estimate_mento_fx` / `estimate_uniswap_swap` | Gas estimates (when user asks) |
 
 Example: *"Swap 100 G$ to USDm"* → `get_swap_quote` selects **`gooddollar_reserve`** via MentoBroker — not Uniswap → user confirms → `prepare_swap` (or `prepare_gooddollar_reserve_swap`) → `TxConfirmCard` (optional approve + broker swap).
@@ -68,7 +68,7 @@ Example (reserve): *"Swap 100 G$ to USDm"* → `get_swap_quote` (or `get_gooddol
 
 Requires `@andrewkimjoseph/celina-sdk` at the version pinned in `package.json`. Reserve **execute** (`execute_gooddollar_reserve_swap`) is MCP stdio only — Celeste uses `prepare_swap` + wallet signing. See [GoodDollar guide](https://andrewkimjoseph.gitbook.io/celina-sdk/guides/gooddollar).
 
-Uniswap v4 CELO swaps route through WCELO — the connected wallet needs WCELO balance. Dismissing the confirm card does not re-prepare until the user sends a new message.
+Uniswap v3 and v4 CELO swaps route through WCELO — the connected wallet needs WCELO balance. Dismissing the confirm card does not re-prepare until the user sends a new message.
 
 ## Aave V3
 
@@ -106,7 +106,7 @@ Chat tools mirror **celina-sdk** reads and `prepare_*` wallet flows (naming is s
 |------|---------|
 | `src/app/api/chat/route.ts` | Streaming chat route — wallet gate, tool wiring |
 | `src/lib/chat-tools/` | Vercel AI SDK tool definitions (reads + prepare_*) |
-| `src/lib/tx/swap-routing.ts` | Composite Mento FX + GoodDollar reserve + Uniswap v4 quote/prepare logic |
+| `src/lib/tx/swap-routing.ts` | Composite Mento FX + GoodDollar reserve + Uniswap v3 and v4 quote/prepare logic |
 | `src/lib/chat/chat-model.ts` | OpenRouter / OpenAI model selection |
 | `src/lib/wallet/celina.ts` | Server-side SDK singleton |
 | `src/lib/tx/prepared-flow.ts` | Extract `SerializedPreparedFlow` from chat messages |

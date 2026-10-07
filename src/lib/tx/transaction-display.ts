@@ -53,6 +53,9 @@ export function formatProtocolLabel(summary: string): string {
 }
 
 export function getTransactionProtocolLabel(summary: string): string | null {
+  if (/uniswap v3/i.test(summary)) {
+    return "Uniswap v3";
+  }
   if (/uniswap v4/i.test(summary)) {
     return "Uniswap v4";
   }

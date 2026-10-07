@@ -21,10 +21,15 @@ describe("parseSpendStepDescription", () => {
     ).toEqual({ amount: "1.0029", token: "USDm" });
   });
 
-  it("parses Uniswap v4 swap step descriptions", () => {
+  it("parses Uniswap v3 and v4 swap step descriptions", () => {
     expect(
       parseSpendStepDescription(
         "Swap 5 CELO → ~0.39 USDC via Uniswap v4",
+      ),
+    ).toEqual({ amount: "5", token: "CELO" });
+    expect(
+      parseSpendStepDescription(
+        "Swap 5 CELO → ~0.39 USDC via Uniswap v3",
       ),
     ).toEqual({ amount: "5", token: "CELO" });
   });
