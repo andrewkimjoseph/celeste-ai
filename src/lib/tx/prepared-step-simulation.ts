@@ -33,7 +33,7 @@ const TOKEN_DECIMALS: Record<string, number> = {
 /**
  * Matches the spend-side `{amount} {token}` of any prepared-step description that
  * pulls funds from the wallet: `Supply ... to Aave`, `Swap {in} {sym} → ~{out} {sym}`
- * (Mento FX / Uniswap v4 / GoodDollar reserve all share this shape), `Send {amount} CELO`,
+ * (Mento FX / Uniswap v3 / Uniswap v4 / GoodDollar reserve all share this shape), `Send {amount} CELO`,
  * and `Transfer {amount} {token}`. Deliberately excludes `Approve`/`Withdraw`/`Permit2`
  * steps, which don't spend the step's own token from the wallet.
  */

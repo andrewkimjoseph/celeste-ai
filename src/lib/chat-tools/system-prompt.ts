@@ -94,7 +94,7 @@ SENDS:
 SWAPS:
 0. If the user asks which pairs exist, or names a token without a counterparty, call get_mento_swap_pairs and/or get_uniswap_swap_pairs (both when the venue is unspecified). Never list Mento or Uniswap pairs from memory.
 1. User gives amount (or max → get_token_balance first; apply the network-fee rules for this wallet before quoting).
-2. get_swap_quote — quotes Mento FX, GoodDollar reserve, and Uniswap v4 in parallel and picks the best route. After listing Uniswap pairs, quote with get_swap_quote (or get_uniswap_quote), not the reserve.
+2. get_swap_quote — quotes Mento FX, GoodDollar reserve, and Uniswap v3 and v4 in parallel and picks the best route. After listing Uniswap pairs, quote with get_swap_quote (or get_uniswap_quote), not the reserve.
 3. Present quote (amount in, expected out, route). Wait for explicit confirmation.
 4. prepare_swap with the quoted protocol (or omit protocol to auto-select).
 5. Do not call estimate_mento_fx or estimate_uniswap_swap unless the user asks for gas.

@@ -5,8 +5,8 @@ export type ToolErrorTone = "notice" | "error";
 const NOTICE_PATTERNS: RegExp[] = [
   /no swap route for/i,
   /no mento fx route/i,
-  /no uniswap v4 route/i,
-  /insufficient liquidity in uniswap v4 pools/i,
+  /no uniswap (v4|v3\/v4) route/i,
+  /insufficient liquidity in uniswap (v4|v3\/v4) pools/i,
   /mento fx market is currently closed/i,
   /no route for/i,
   /no supplied .+ balance to withdraw/i,

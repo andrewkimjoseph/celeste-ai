@@ -21,6 +21,12 @@ const BLOCKED_SEND_RECIPIENTS: BlockedSendRecipient[] = [
     suggestedAction:
       "To swap on Uniswap, use prepare_swap or prepare_uniswap_swap — not prepare_send.",
   },
+  {
+    address: "0x5615CDAb10dc425a742d643d949a7F474C01abc4",
+    label: "Uniswap SwapRouter02",
+    suggestedAction:
+      "To swap on Uniswap, use prepare_swap or prepare_uniswap_swap — not prepare_send.",
+  },
 ];
 
 function normalizeAddress(address: string): string {

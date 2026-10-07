@@ -51,11 +51,13 @@ function formatSwapQuote(output: unknown): string | null {
   const tokenOut = formatQuoteToken(quote.tokenOut);
 
   const via =
-    quote.protocol === "uniswap_v4"
-      ? " via Uniswap"
-      : quote.protocol === "mento_fx"
-        ? " via Mento"
-        : "";
+    quote.protocol === "uniswap_v3"
+      ? " via Uniswap v3"
+      : quote.protocol === "uniswap_v4"
+        ? " via Uniswap v4"
+        : quote.protocol === "mento_fx"
+          ? " via Mento"
+          : "";
 
   return formatHumanFlowText(
     `${quote.amountIn} ${tokenIn} → ${amountOut} ${tokenOut}${via}`,
